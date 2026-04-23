@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAA · Sala de Situação v5 | Ministério da Saúde</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════
+   DESIGN TOKENS v5
+═══════════════════════════════════ */
+:root {
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-xs: 4px;
+  --trans: .16s cubic-bezier(.4,0,.2,1);
+  --trans-slow: .3s cubic-bezier(.4,0,.2,1);
+  --shadow: 0 2px 12px rgba(0,40,100,.10);
+  --shadow-lg: 0 8px 32px rgba(0,40,100,.18);
+  --font: 'DM Sans', sans-serif;
+  --display: 'Syne', sans-serif;
+  --mono: 'DM Mono', monospace;
+
+  /* MS brand */
+  --ms-blue:    #005B9A;   /* azul primário Ministério da Saúde */
+  --ms-blue2:   #003F72;   /* azul escuro */
+  --ms-blue-a:  rgba(0,91,154,.10);
+
+  /* status semântico — tons discretos */
+  --good:   #1a8a5a;
+  --warn:   #b45309;
+  --crit:   #c0283d;
+  --nd:     #6b7280;
+  --good-a: rgba(26,138,90,.10);
+  --warn-a: rgba(180,83,9,.10);
+  --crit-a: rgba(192,40,61,.10);
+  --nd-a:   rgba(107,114,128,.08);
+
+  --teal:   #0e7490;
+  --purple: #5b5ea6;
+}
+
+[data-theme="dark"] {
+  --bg:       #06090f;
+  --bg2:      #090d17;
+  --surface:  #0d1221;
+  --surface2: #121930;
+  --surface3: #182240;
+  --border:   rgba(255,255,255,.05);
+  --border2:  rgba(255,255,255,.10);
+  --text:     #dce8f5;
+  --text2:    #7a96b4;
+  --text3:    #2e4260;
+  --accent:   #4a9fd4;   /* azul MS claro para dark */
+  --accent2:  #2d8bbf;
+}
+[data-theme="light"] {
+  --bg:       #f5f7fa;
+  --bg2:      #eef2f8;
+  --surface:  #ffffff;
+  --surface2: #f0f5fb;
+  --surface3: #e4edf8;
+  --border:   rgba(0,40,100,.07);
+  --border2:  rgba(0,40,100,.14);
+  --text:     #0a1628;
+  --text2:    #3d5a78;
+  --text3:    #8aa5c0;
+  --accent:   #005B9A;   /* azul MS para light */
+  --accent2:  #003F72;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--text);
+  min-height:100vh;transition:background var(--trans),color var(--trans);
+  font-size:14px;
+}
+
+/* grain overlay */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+[data-theme="light"] body::before{opacity:.04}
+
+/* sem glow colorido — visual limpo MS */
+body::after{ display:none }
+
+.app{position:relative;z-index:1;display:flex;min-height:100vh}
+
+/* ═══════════════════════════════════
+   LOCK SCREEN
+═══════════════════════════════════ */
+#lock-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .5s;
+}
+#lock-screen.hidden{opacity:0;pointer-events:none}
+
+.lock-wrap{display:flex;flex-direction:column;align-items:center;gap:32px;width:100%;max-width:420px;padding:24px}
+.lock-brand{text-align:center}
+.lock-emblem{
+  width:64px;height:64px;border-radius:16px;margin:0 auto 16px;
+  background:linear-gradient(135deg,var(--surface2),var(--surface3));
+  border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;box-shadow:var(--shadow);
+}
+.lock-title{font-family:var(--display);font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px}
+.lock-sub{font-size:12px;color:var(--text2);line-height:1.6}
+
+.lock-card{
+  width:100%;background:var(--surface);border:1px solid var(--border2);
+  border-radius:20px;padding:32px;box-shadow:var(--shadow-lg);
+}
+.lock-tabs{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  background:var(--surface2);border-radius:var(--radius-sm);padding:4px;
+  margin-bottom:24px;
+}
+.lock-tab{
+  padding:9px;border:none;background:transparent;border-radius:var(--radius-xs);
+  font-family:var(--font);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;
+  transition:all var(--trans);
+}
+.lock-tab.active{background:var(--surface3);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+.lock-field{margin-bottom:16px}
+.lock-field-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:7px}
+.lock-input{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:12px 16px;
+  font-family:var(--mono);font-size:15px;color:var(--text);
+  outline:none;transition:border-color var(--trans);text-align:center;
+  letter-spacing:.2em;
+}
+.lock-input:focus{border-color:var(--accent)}
+
+.lock-btn{
+  width:100%;background:var(--accent);color:var(--bg);
+  border:none;border-radius:var(--radius-sm);padding:13px;
+  font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.04em;
+  cursor:pointer;transition:all var(--trans);
+}
+.lock-btn:hover{opacity:.88;transform:translateY(-1px)}
+.lock-error{font-size:12px;color:var(--crit);text-align:center;margin-top:10px;min-height:18px}
+
+.lock-hint{
+  font-family:var(--mono);font-size:10px;color:var(--text3);
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:12px 14px;line-height:1.8;
+  text-align:center;
+}
+.lock-hint b{color:var(--text2)}
+.lock-hint code{color:var(--accent)}
+
+.mode-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:20px;
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  margin-left:10px;
+}
+.mb-view{background:var(--nd-a);color:var(--nd)}
+.mb-edit{background:var(--good-a);color:var(--good)}
+
+/* ═══════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════ */
+.sidebar{
+  width:220px;flex-shrink:0;background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sidebar-brand{padding:22px 18px 16px;border-bottom:1px solid var(--border)}
+.brand-eyebrow{
+  font-family:var(--mono);font-size:9px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.brand-eyebrow::before{content:'';width:16px;height:1px;background:var(--accent)}
+.brand-name{font-family:var(--display);font-size:16px;font-weight:800;line-height:1.25;color:var(--text)}
+.brand-name em{font-style:normal;color:var(--accent)}
+.brand-week{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px}
+.brand-week b{color:var(--text2)}
+
+.nav-section{padding:14px 0 4px}
+.nav-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--text3);padding:0 18px 6px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:9px;padding:8px 18px;
+  cursor:pointer;transition:all var(--trans);border:none;
+  background:transparent;color:var(--text2);
+  font-family:var(--font);font-size:12px;font-weight:500;
+  width:100%;text-align:left;border-left:2px solid transparent;
+}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{background:var(--surface);color:var(--accent);border-left-color:var(--accent)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background var(--trans)}
+.nav-item.active .nav-dot{background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.nav-badge{
+  margin-left:auto;min-width:18px;height:18px;border-radius:9px;
+  font-size:9px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:500;padding:0 5px;
+}
+.nb-r{background:var(--crit-a);color:var(--crit)}
+.nb-y{background:var(--warn-a);color:var(--warn)}
+.nb-g{background:var(--good-a);color:var(--good)}
+
+.sidebar-footer{
+  margin-top:auto;padding:14px 18px;
+  border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;
+}
+.theme-toggle{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text2);font-family:var(--mono);cursor:pointer}
+.toggle-track{
+  width:34px;height:18px;border-radius:9px;
+  background:var(--surface3);border:1px solid var(--border2);
+  position:relative;flex-shrink:0;transition:background var(--trans);
+}
+.toggle-track.on{background:rgba(61,214,140,.2)}
+.toggle-thumb{
+  position:absolute;top:3px;left:3px;width:10px;height:10px;
+  border-radius:50%;background:var(--text3);transition:all var(--trans);
+}
+.toggle-track.on .toggle-thumb{left:19px;background:var(--accent)}
+.footer-ts{font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.6}
+.footer-ts span{color:var(--text2)}
+.lock-btn-side{
+  display:flex;align-items:center;gap:7px;padding:7px 0;
+  cursor:pointer;border:none;background:transparent;
+  font-family:var(--font);font-size:11px;color:var(--text3);
+  width:100%;text-align:left;transition:color var(--trans);
+}
+.lock-btn-side:hover{color:var(--crit)}
+
+/* ═══════════════════════════════════
+   TOPBAR
+═══════════════════════════════════ */
+.main{flex:1;overflow:hidden;min-width:0}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;border-bottom:1px solid var(--border);
+  background:var(--bg2);position:sticky;top:0;z-index:100;
+  gap:12px;flex-wrap:wrap;
+}
+.topbar-breadcrumb{font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:2px;letter-spacing:.08em}
+.topbar-breadcrumb span{color:var(--text2)}
+.topbar-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center}
+.topbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:var(--radius-sm);
+  font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;
+  border:1px solid var(--border2);background:var(--surface);color:var(--text2);
+  transition:all var(--trans);
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:600}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px);color:var(--bg)}
+.btn-danger{border-color:var(--crit-a);color:var(--crit)}
+.btn-danger:hover{background:var(--crit-a)}
+.btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+
+.live-ind{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:10px;color:var(--accent);
+}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+
+/* WhatsApp button */
+.btn-wpp{background:#25d366;color:#fff;border-color:#25d366;font-weight:600}
+.btn-wpp:hover{background:#1ebe5d;color:#fff;border-color:#1ebe5d;opacity:1}
+
+/* Export dropdown */
+.btn-group{position:relative}
+.export-menu{
+  display:none;position:absolute;top:calc(100% + 6px);right:0;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);
+  min-width:220px;overflow:hidden;z-index:200;
+}
+.export-menu.open{display:block}
+.export-menu button{
+  display:block;width:100%;text-align:left;
+  padding:10px 16px;border:none;background:transparent;
+  font-family:var(--font);font-size:12px;color:var(--text2);cursor:pointer;
+  transition:background var(--trans);border-bottom:1px solid var(--border);
+}
+.export-menu button:last-child{border-bottom:none}
+.export-menu button:hover{background:var(--surface2);color:var(--accent)}
+
+/* Nav pop-out link */
+.nav-popout{
+  opacity:0;font-size:10px;color:var(--text3);margin-left:auto;
+  cursor:pointer;transition:opacity var(--trans);text-decoration:none;
+  padding:2px 4px;border-radius:3px;
+}
+.nav-item:hover .nav-popout{opacity:1}
+.nav-popout:hover{color:var(--accent);background:var(--surface3)}
+
+/* Crédito Lucas Macedo */
+.credit-bar{
+  text-align:center;padding:8px;
+  font-family:var(--mono);font-size:9px;color:var(--text3);
+  border-top:1px solid var(--border);
+  background:var(--bg2);
+}
+.credit-bar a{color:var(--text3);text-decoration:none}
+.credit-bar a:hover{color:var(--accent)}
+
+/* ═══════════════════════════════════
+   CONTENT
+═══════════════════════════════════ */
+.content{padding:28px 28px 80px}
+.section{display:none;animation:fadeIn .2s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.sec-head{margin-bottom:24px}
+.sec-title{font-family:var(--display);font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px}
+.sec-title em{font-style:normal;color:var(--accent)}
+.sec-sub{font-size:13px;color:var(--text2)}
+
+.row-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text3);
+  margin-bottom:14px;display:flex;align-items:center;gap:12px;
+}
+.row-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ═══════════════════════════════════
+   HEALTH CARDS (topo do overview)
+═══════════════════════════════════ */
+.health-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:28px}
+.hcard{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 18px;
+  position:relative;overflow:hidden;transition:border-color var(--trans);
+}
+.hcard:hover{border-color:var(--border2)}
+.hcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.hc-g::before{background:var(--good)}.hc-w::before{background:var(--warn)}
+.hc-r::before{background:var(--crit)}.hc-b::before{background:var(--accent2)}.hc-p::before{background:var(--purple)}
+.hcard-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.hcard-val{font-family:var(--display);font-size:28px;font-weight:800;line-height:1;margin-bottom:4px}
+.hv-g{color:var(--good)}.hv-w{color:var(--warn)}.hv-r{color:var(--crit)}.hv-b{color:var(--accent2)}.hv-p{color:var(--purple)}
+.hcard-sub{font-size:11px;color:var(--text3)}
+
+/* ═══════════════════════════════════
+   COORD GRID CARDS
+═══════════════════════════════════ */
+.coord-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:28px}
+.coord-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px 20px;
+  cursor:pointer;transition:all var(--trans);
+}
+.coord-card:hover{border-color:rgba(61,214,140,.3);transform:translateY(-2px);box-shadow:var(--shadow)}
+.coord-card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.coord-card-acro{font-family:var(--display);font-size:13px;font-weight:700;color:var(--text)}
+.coord-card-full{font-size:10px;color:var(--text3);margin-top:3px;line-height:1.4}
+.semaph{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.sg{background:var(--good);box-shadow:0 0 8px var(--good)}
+.sw{background:var(--warn);box-shadow:0 0 8px var(--warn)}
+.sr{background:var(--crit);box-shadow:0 0 8px var(--crit)}
+.coord-card-rows{display:flex;flex-direction:column;gap:6px}
+.coord-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.coord-row-lbl{font-size:11px;color:var(--text2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.coord-row-val{font-family:var(--mono);font-size:11px;font-weight:500;flex-shrink:0}
+.coord-bar-wrap{height:2px;background:var(--surface3);border-radius:1px;overflow:hidden;margin-top:2px}
+.coord-bar{height:100%;border-radius:1px;transition:width .6s ease}
+.coord-card-cta{
+  margin-top:12px;font-size:10px;color:var(--accent);font-family:var(--mono);
+  display:flex;align-items:center;gap:4px;opacity:0;transition:opacity var(--trans);
+}
+.coord-card:hover .coord-card-cta{opacity:1}
+
+.add-coord-btn{
+  background:transparent;border:1px dashed var(--border2);border-radius:var(--radius);
+  padding:16px;cursor:pointer;color:var(--text3);font-size:12px;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all var(--trans);min-height:120px;
+}
+.add-coord-btn:hover{border-color:var(--accent);color:var(--accent)}
+.add-coord-btn.locked{pointer-events:none;opacity:.2}
+
+/* ═══════════════════════════════════
+   INTEGRATED KPIs
+═══════════════════════════════════ */
+.int-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:28px}
+.int-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px 20px;transition:border-color var(--trans);
+}
+.int-card:hover{border-color:var(--border2)}
+.int-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.int-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;max-width:75%}
+.int-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.tag{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.int-val{font-family:var(--display);font-size:28px;font-weight:800;line-height:1;margin-bottom:4px}
+.int-meta{font-family:var(--mono);font-size:10px;color:var(--text2)}
+.int-trend{font-family:var(--mono);font-size:10px;margin-top:6px}
+.tr-g{color:var(--good)}.tr-r{color:var(--crit)}.tr-n{color:var(--text3)}
+
+/* mini sparkline inline */
+.int-spark{display:flex;align-items:flex-end;gap:2px;height:20px;margin-top:8px}
+
+/* ═══════════════════════════════════
+   COORDENAÇÃO DETAIL
+═══════════════════════════════════ */
+.detail-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.detail-acro{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.detail-name{font-family:var(--display);font-size:22px;font-weight:800;color:var(--text)}
+.detail-desc{font-size:12px;color:var(--text2);margin-top:5px;line-height:1.65;max-width:560px}
+.detail-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.status-pill{padding:5px 12px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:500}
+.sp-g{background:var(--good-a);color:var(--good);border:1px solid rgba(61,214,140,.2)}
+.sp-w{background:var(--warn-a);color:var(--warn);border:1px solid rgba(245,158,11,.2)}
+.sp-r{background:var(--crit-a);color:var(--crit);border:1px solid rgba(244,63,94,.2)}
+
+.insight{
+  background:var(--surface2);border:1px solid var(--border);
+  border-left:3px solid var(--warn);border-radius:var(--radius);
+  padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;
+}
+.insight-ico{font-size:16px;flex-shrink:0;margin-top:1px}
+.insight-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--warn);margin-bottom:4px}
+.insight-text{font-size:12px;color:var(--text2);line-height:1.6}
+.insight-text[contenteditable="true"]{outline:none;border-bottom:1px dashed rgba(245,158,11,.4);cursor:text}
+
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:24px}
+.kpi-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px 20px;transition:all var(--trans);
+}
+.kpi-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.kpi-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.kpi-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.45;max-width:75%}
+.kpi-name[contenteditable="true"]{outline:none;border-bottom:1px dashed var(--border2);cursor:text}
+
+.badge{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:.04em;font-weight:500;flex-shrink:0}
+.bg-g{background:var(--good-a);color:var(--good);border:1px solid rgba(61,214,140,.2)}
+.bg-w{background:var(--warn-a);color:var(--warn);border:1px solid rgba(245,158,11,.2)}
+.bg-r{background:var(--crit-a);color:var(--crit);border:1px solid rgba(244,63,94,.2)}
+.bg-nd{background:var(--nd-a);color:var(--nd);border:1px solid rgba(100,116,139,.1)}
+
+/* números realizado/meta lado a lado */
+.kpi-numbers{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.kpi-real{font-family:var(--display);font-size:32px;font-weight:800;line-height:1}
+.kpi-sep{font-size:16px;color:var(--text3);font-family:var(--mono)}
+.kpi-meta-val{font-family:var(--mono);font-size:14px;color:var(--text2)}
+.kpi-unit-tag{font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:2px}
+
+/* mini campos de edição */
+.kpi-edit-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.kpi-field{display:flex;flex-direction:column;gap:3px}
+.kpi-field-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+.kpi-input{
+  background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-xs);
+  padding:7px 9px;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text);
+  outline:none;transition:border-color var(--trans);width:100%;
+}
+.kpi-input:focus{border-color:var(--accent)}
+[data-theme="light"] .kpi-input{background:var(--bg2)}
+.kpi-input.disabled-field{opacity:.45;pointer-events:none;background:transparent;border-color:transparent;padding-left:0}
+.kpi-input[readonly]{cursor:default;pointer-events:none}
+
+.kpi-unit-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.kpi-unit-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;color:var(--text3)}
+.kpi-unit-input{
+  background:var(--surface2);border:1px solid var(--border);border-radius:4px;
+  padding:4px 8px;font-family:var(--mono);font-size:11px;color:var(--text2);
+  outline:none;width:80px;transition:border-color var(--trans);
+}
+.kpi-unit-input:focus{border-color:var(--accent)}
+
+.prog-wrap{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.prog-bar{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.pb-g{background:var(--good)}.pb-w{background:var(--warn)}.pb-r{background:var(--crit)}.pb-nd{background:var(--nd)}
+
+.kpi-footer{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.kpi-spark{display:flex;align-items:flex-end;gap:2px;height:20px}
+.sk{border-radius:1px;background:var(--surface3);min-height:2px;width:5px}
+
+.kpi-card-actions{display:flex;gap:4px;opacity:0;transition:opacity var(--trans)}
+.kpi-card:hover .kpi-card-actions{opacity:1}
+.icon-btn{
+  width:22px;height:22px;border-radius:4px;border:1px solid var(--border);
+  background:var(--surface2);cursor:pointer;font-size:11px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text3);transition:all var(--trans);
+}
+.icon-btn:hover{border-color:var(--crit);color:var(--crit)}
+.add-kpi-btn{
+  background:transparent;border:1px dashed var(--border2);border-radius:var(--radius);
+  padding:16px;cursor:pointer;color:var(--text3);font-size:12px;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:all var(--trans);
+}
+.add-kpi-btn:hover{border-color:var(--accent);color:var(--accent)}
+.add-kpi-btn.locked,.icon-btn.locked{display:none}
+
+/* inverso toggle no card */
+.kpi-inv-badge{
+  font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;
+  background:rgba(100,116,139,.1);color:var(--nd);border:1px solid rgba(100,116,139,.2);
+}
+
+/* ═══════════════════════════════════
+   AI PANEL
+═══════════════════════════════════ */
+.ai-panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;margin-bottom:20px;
+}
+.ai-panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;border-bottom:1px solid var(--border);
+  background:linear-gradient(90deg,var(--surface2),var(--surface));
+}
+.ai-panel-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.ai-badge{
+  font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:3px;
+  background:var(--good-a);color:var(--good);
+  border:1px solid rgba(61,214,140,.2);letter-spacing:.05em;
+}
+.ai-suggestions{display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px 0;border-top:1px solid var(--border)}
+.ai-chip{
+  font-size:11px;color:var(--text2);background:var(--surface2);
+  border:1px solid var(--border2);border-radius:20px;padding:4px 10px;
+  cursor:pointer;transition:all var(--trans);white-space:nowrap;
+}
+.ai-chip:hover{border-color:var(--accent);color:var(--accent)}
+.ai-body{padding:14px 18px}
+.ai-input-row{display:flex;gap:8px}
+.ai-input{
+  flex:1;background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:10px 14px;
+  font-family:var(--font);font-size:13px;color:var(--text);outline:none;
+  transition:border-color var(--trans);
+}
+.ai-input:focus{border-color:var(--accent)}
+[data-theme="light"] .ai-input{background:var(--bg2)}
+.ai-input::placeholder{color:var(--text3)}
+.ai-send{
+  background:var(--accent);color:var(--bg);border:none;
+  border-radius:var(--radius-sm);padding:10px 20px;
+  font-family:var(--display);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all var(--trans);flex-shrink:0;
+}
+.ai-send:hover{opacity:.88}
+.ai-send:disabled{opacity:.4;cursor:not-allowed}
+.ai-response{
+  margin-top:12px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:14px 16px;
+  font-size:13px;color:var(--text2);line-height:1.75;display:none;
+}
+.ai-response.visible{display:block}
+.ai-thinking{display:flex;gap:4px;align-items:center;color:var(--text3);font-size:12px;font-family:var(--mono)}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:bounce .8s infinite}
+.ai-dot:nth-child(2){animation-delay:.16s}
+.ai-dot:nth-child(3){animation-delay:.32s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* ═══════════════════════════════════
+   ATUALIZAÇÃO RÁPIDA (NOVO)
+═══════════════════════════════════ */
+.quick-update-panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;margin-bottom:20px;
+}
+.qup-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;border-bottom:1px solid var(--border);
+  background:linear-gradient(90deg,rgba(61,214,140,.06),transparent);
+  cursor:pointer;
+}
+.qup-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.qup-badge{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:3px;background:var(--good-a);color:var(--good);border:1px solid rgba(61,214,140,.2)}
+.qup-toggle{font-family:var(--mono);font-size:11px;color:var(--text3);transition:transform var(--trans)}
+.qup-toggle.open{transform:rotate(180deg)}
+.qup-body{padding:16px 18px;display:none}
+.qup-body.open{display:block}
+.qup-subtitle{font-size:12px;color:var(--text2);margin-bottom:14px}
+.qup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:14px}
+.qup-item{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 12px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.qup-item-head{display:flex;justify-content:space-between;align-items:center}
+.qup-coord{font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.qup-kpi-name{font-size:11px;color:var(--text2);line-height:1.35;margin-bottom:4px}
+.qup-input-row{display:flex;align-items:center;gap:6px}
+.qup-input{
+  flex:1;background:var(--surface);border:1px solid var(--border2);
+  border-radius:4px;padding:6px 8px;
+  font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);
+  outline:none;transition:border-color var(--trans);
+}
+.qup-input:focus{border-color:var(--accent)}
+.qup-input-unit{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.qup-apply-btn{
+  background:var(--accent);color:var(--bg);border:none;
+  border-radius:var(--radius-sm);padding:9px 18px;
+  font-family:var(--display);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all var(--trans);
+}
+.qup-apply-btn:hover{opacity:.88}
+.qup-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:8px;border-top:1px solid var(--border)}
+
+/* ═══════════════════════════════════
+   ALERTAS
+═══════════════════════════════════ */
+.alert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:24px}
+.alert-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px 18px;
+  display:flex;gap:12px;transition:border-color var(--trans);
+}
+.alert-item.crit{border-left:3px solid var(--crit)}
+.alert-item.warn{border-left:3px solid var(--warn)}
+.alert-item.info{border-left:3px solid var(--accent2)}
+.alert-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+.alert-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
+.alert-desc{font-size:11px;color:var(--text2);line-height:1.55}
+.alert-tag{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px}
+
+/* ═══════════════════════════════════
+   GRÁFICO DE BARRAS EXECUTIVO
+═══════════════════════════════════ */
+.chart-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:22px 24px;margin-bottom:16px;
+}
+.chart-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.chart-sub{font-size:11px;color:var(--text3);margin-bottom:20px}
+.exec-bar-chart{display:flex;flex-direction:column;gap:8px}
+.exec-bar-row{display:grid;grid-template-columns:72px 1fr 36px;align-items:center;gap:10px}
+.exec-bar-label{font-family:var(--mono);font-size:10px;color:var(--text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.exec-bar-track{height:6px;background:var(--surface3);border-radius:3px;position:relative;overflow:visible}
+.exec-bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1);position:relative}
+.exec-bar-meta{position:absolute;top:-4px;bottom:-4px;width:1px;background:var(--border2);z-index:1}
+.exec-bar-pct{font-family:var(--mono);font-size:10px;text-align:right;font-weight:500}
+
+/* ── KPI numbers: reduzir tamanho ── */
+.kpi-real{font-family:var(--display);font-size:22px;font-weight:700;line-height:1}
+.kpi-meta-val{font-family:var(--mono);font-size:12px;color:var(--text2)}
+.kpi-unit-tag{font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:2px}
+
+/* ═══════════════════════════════════
+   MATRIZ DE STATUS
+═══════════════════════════════════ */
+.matrix-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:22px 24px;margin-bottom:16px;
+  overflow-x:auto;
+}
+.matrix-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.matrix-sub{font-size:11px;color:var(--text3);margin-bottom:18px}
+.matrix-table{width:100%;border-collapse:collapse;min-width:500px;font-size:12px}
+.matrix-table th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border2);text-align:left;font-weight:500}
+.matrix-table td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text2)}
+.matrix-table td:first-child{font-family:var(--mono);color:var(--accent);font-size:10px}
+.matrix-table tr:last-child td{border-bottom:none}
+.matrix-table tr:hover td{background:var(--surface2)}
+
+/* ═══════════════════════════════════
+   INTEGRAÇÃO
+═══════════════════════════════════ */
+.arch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:24px}
+.arch-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.arch-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.arch-body{font-size:12px;color:var(--text2);line-height:1.75}
+.code-blk{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 14px;font-family:var(--mono);font-size:11px;color:var(--accent);
+  margin-top:10px;line-height:1.85;overflow-x:auto;
+}
+.cd{color:var(--text3)}
+.step-row{display:flex;gap:10px;font-size:12px;color:var(--text2);margin-bottom:8px;align-items:flex-start}
+.step-n{
+  width:20px;height:20px;border-radius:50%;background:var(--surface2);
+  border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;color:var(--accent);flex-shrink:0;margin-top:1px;
+}
+
+/* ═══════════════════════════════════
+   MODAL
+═══════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.72);
+  backdrop-filter:blur(6px);z-index:1000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity var(--trans);
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:16px;
+  padding:28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;
+  transform:translateY(12px);transition:transform var(--trans-slow);box-shadow:var(--shadow-lg);
+}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-title{font-family:var(--display);font-size:16px;font-weight:800;color:var(--text);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.modal-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.modal-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.modal-input{
+  background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+  padding:10px 13px;font-family:var(--font);font-size:13px;color:var(--text);outline:none;
+  transition:border-color var(--trans);
+}
+.modal-input:focus{border-color:var(--accent)}
+[data-theme="light"] .modal-input{background:var(--bg2)}
+.modal-textarea{resize:vertical;min-height:72px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+.modal-hint{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--surface2);border-radius:var(--radius-xs);padding:8px 10px;margin-bottom:12px;line-height:1.6}
+
+/* ═══════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════ */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
+
+@media(max-width:700px){
+  .sidebar{width:180px}
+  .content,.topbar{padding-left:14px;padding-right:14px}
+  .kpi-numbers{gap:5px}
+  .kpi-real{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════ LOCK SCREEN ════════════ -->
+<div id="lock-screen">
+  <div class="lock-wrap">
+    <div class="lock-brand">
+      <div class="lock-emblem">🏛️</div>
+      <div class="lock-title">SAA · Sala de Situação</div>
+      <div class="lock-sub">Ministério da Saúde<br>Subsecretaria de Assuntos Administrativos · v5</div>
+    </div>
+    <div class="lock-card">
+      <div class="lock-tabs">
+        <button class="lock-tab active" id="lvl-view-btn" onclick="setLockLevel('view')">👁 Visualizar</button>
+        <button class="lock-tab" id="lvl-edit-btn" onclick="setLockLevel('edit')">✏️ Editar</button>
+      </div>
+      <div class="lock-field">
+        <div class="lock-field-label">Senha de acesso</div>
+        <input class="lock-input" type="password" id="lock-input"
+          placeholder="••••••••" onkeydown="if(event.key==='Enter')doUnlock()">
+      </div>
+      <button class="lock-btn" onclick="doUnlock()">Entrar no painel</button>
+      <div class="lock-error" id="lock-error"></div>
+    </div>
+    <div class="lock-hint">
+      <b>Visualizar:</b> <code>saa2025</code> &nbsp;·&nbsp; <b>Editar:</b> <code>saa@gestao</code><br>
+      <span style="opacity:.5;font-size:9px">Altere PASS_VIEW e PASS_EDIT no código antes de publicar</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ APP ════════════ -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-eyebrow">Ministério da Saúde</div>
+      <div class="brand-name">Sala de <em>Situação</em><br>SAA · v5</div>
+      <div class="brand-week">Sem <b id="wk-n">—</b> · <b id="wk-r">—</b></div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Visão Geral</div>
+      <button class="nav-item active" onclick="goTo('overview')" data-sec="overview">
+        <span class="nav-dot"></span>Dashboard Executivo
+      </button>
+      <button class="nav-item" onclick="goTo('graficos')" data-sec="graficos">
+        <span class="nav-dot"></span>Gráficos & Análise
+      </button>
+      <button class="nav-item" onclick="goTo('alertas')" data-sec="alertas">
+        <span class="nav-dot"></span>Alertas e Riscos
+        <span class="nav-badge nb-r" id="alert-pip">—</span>
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Coordenações</div>
+      <div id="coord-nav"></div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Config.</div>
+      <button class="nav-item" onclick="goTo('integracao')" data-sec="integracao">
+        <span class="nav-dot"></span>Integração & Arquitetura
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="theme-toggle" onclick="toggleTheme()">
+        <div class="toggle-track" id="theme-track"><div class="toggle-thumb"></div></div>
+        <span id="theme-label">Modo Escuro</span>
+      </div>
+      <button class="lock-btn-side" onclick="lockApp()">🔒 Bloquear / Trocar modo</button>
+      <div class="footer-ts">v5 · <span>SAA/MS</span><br><span id="ts-date">—</span><br><span style="font-size:8px;opacity:.6">by Lucas Macedo</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-breadcrumb">MS · SAA · <span id="bc-curr">Dashboard Executivo</span></div>
+        <div class="topbar-title" id="pg-title">
+          Dashboard Executivo
+          <span class="mode-badge" id="mode-badge">—</span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="live-ind"><div class="live-dot"></div>AO VIVO</div>
+
+        <!-- Compartilhar WhatsApp -->
+        <button class="btn btn-wpp" onclick="shareWhatsApp()" title="Compartilhar pelo WhatsApp">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.852L.057 23.986l6.306-1.652A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.892a9.865 9.865 0 01-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374A9.862 9.862 0 012.108 12C2.108 6.523 6.523 2.108 12 2.108c5.477 0 9.892 4.415 9.892 9.892 0 5.477-4.415 9.892-9.892 9.892z"/></svg>
+          WhatsApp
+        </button>
+
+        <!-- Exportar relatório -->
+        <div class="btn-group" id="export-group">
+          <button class="btn" onclick="toggleExportMenu()" id="btn-export-main">📄 Exportar ▾</button>
+          <div class="export-menu" id="export-menu">
+            <button onclick="exportPDF()">📄 PDF — Relatório Executivo</button>
+            <button onclick="exportWord()">📝 Word — Documento .docx</button>
+            <button onclick="exportExcel()">📊 Excel — Planilha .xlsx</button>
+            <button onclick="exportData()">💾 JSON — Backup de dados</button>
+          </div>
+        </div>
+
+        <button class="btn" id="btn-import" onclick="showImportModal()">⬆ Importar</button>
+        <button class="btn btn-primary" id="btn-save" onclick="saveAll()">💾 Salvar</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── OVERVIEW ── -->
+      <div id="sec-overview" class="section active">
+        <div class="sec-head">
+          <div class="sec-title">Visão <em>Executiva</em> SAA</div>
+          <div class="sec-sub">Subsecretaria de Assuntos Administrativos · <span id="coord-count">9</span> coordenações monitoradas</div>
+        </div>
+
+        <!-- Atualização Rápida (NOVO) -->
+        <div class="quick-update-panel" id="qup-panel" style="display:none">
+          <div class="qup-head" onclick="toggleQUP()">
+            <div class="qup-title">⚡ Atualização Rápida de Dados <span class="qup-badge">NOVO</span></div>
+            <span class="qup-toggle" id="qup-arrow">▾</span>
+          </div>
+          <div class="qup-body" id="qup-body">
+            <p class="qup-subtitle">Atualize os valores realizados de todos os indicadores em uma única tela, sem precisar navegar coordenação por coordenação.</p>
+            <div class="qup-grid" id="qup-grid"></div>
+            <div class="qup-actions">
+              <button class="btn" onclick="resetQUP()">↺ Restaurar valores</button>
+              <button class="qup-apply-btn" onclick="applyQUP()">✓ Aplicar todas as atualizações</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- IA -->
+        <div class="ai-panel">
+          <div class="ai-panel-head">
+            <div class="ai-panel-title">🤖 Assistente de Análise <span class="ai-badge">IA · Claude</span></div>
+          </div>
+          <div class="ai-suggestions" id="ai-chips-overview"></div>
+          <div class="ai-body">
+            <div class="ai-input-row">
+              <input class="ai-input" id="ai-input-overview" placeholder="Pergunte sobre o painel... ex: Quais coordenações estão com maior risco esta semana?" />
+              <button class="ai-send" id="ai-btn-overview" onclick="askAI('overview')">Analisar</button>
+            </div>
+            <div class="ai-response" id="ai-resp-overview"></div>
+          </div>
+        </div>
+
+        <div class="row-label">Saúde Geral</div>
+        <div class="health-row" id="health-row"></div>
+        <div class="row-label">Coordenações e Núcleos</div>
+        <div class="coord-grid" id="coord-grid"></div>
+        <div class="row-label">KPIs Integrados Estratégicos</div>
+        <div class="int-grid" id="int-grid"></div>
+      </div>
+
+      <!-- ── GRÁFICOS (NOVO) ── -->
+      <div id="sec-graficos" class="section">
+        <div class="sec-head">
+          <div class="sec-title">Gráficos & <em>Análise</em></div>
+          <div class="sec-sub">Visão comparativa de desempenho entre todas as coordenações</div>
+        </div>
+        <div id="chart-execucao" class="chart-wrap">
+          <div class="chart-title">Execução vs Meta por Coordenação</div>
+          <div class="chart-sub">Atingimento médio dos KPIs por área · linha pontilhada = meta 85%</div>
+          <div class="exec-bar-chart" id="bar-execucao"></div>
+        </div>
+
+        <!-- Gráficos importados do Power BI -->
+        <div id="pbi-charts" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:16px"></div>
+
+        <div id="matrix-status" class="matrix-wrap">
+          <div class="matrix-title">Matriz de Status dos Indicadores</div>
+          <div class="matrix-sub">Todos os KPIs com status atual e tendência semanal</div>
+          <table class="matrix-table" id="matrix-kpis">
+            <thead>
+              <tr>
+                <th>Área</th><th>Indicador</th><th>Realizado</th><th>Meta</th><th>% Ating.</th><th>Status</th><th>Tend.</th>
+              </tr>
+            </thead>
+            <tbody id="matrix-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── ALERTAS ── -->
+      <div id="sec-alertas" class="section">
+        <div class="sec-head">
+          <div class="sec-title">Alertas e <em>Riscos</em></div>
+          <div class="sec-sub">Monitoramento preventivo automatizado · ciclo semanal</div>
+        </div>
+        <div class="row-label">Críticos</div>
+        <div class="alert-grid" id="alerts-crit"></div>
+        <div class="row-label">Atenção</div>
+        <div class="alert-grid" id="alerts-warn"></div>
+        <div class="row-label">Informativos</div>
+        <div class="alert-grid" id="alerts-info"></div>
+      </div>
+
+      <!-- ── COORD SECTIONS ── -->
+      <div id="coord-sections"></div>
+
+      <!-- ── INTEGRAÇÃO ── -->
+      <div id="sec-integracao" class="section">
+        <div class="sec-head">
+          <div class="sec-title">Arquitetura & <em>Integração</em></div>
+          <div class="sec-sub">Como escalar, conectar e publicar o painel SAA</div>
+        </div>
+        <div class="arch-grid">
+          <div class="arch-card">
+            <div class="arch-title">📊 Estrutura Excel/CSV</div>
+            <div class="arch-body">Cada coordenação preenche uma aba padrão:</div>
+            <div class="code-blk"><span class="cd">// Colunas obrigatórias</span><br>coordenacao | kpi_id | kpi_nome<br>realizado   | meta   | unidade<br>inverso     | semana | fonte</div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-title">⚡ Integração JSON / API</div>
+            <div class="arch-body">Conecte qualquer fonte de dados:</div>
+            <div class="code-blk"><span class="cd">// Carregar dados externos</span><br>fetch('data.json')<br>&nbsp;.then(r => r.json())<br>&nbsp;.then(d => {<br>&nbsp;&nbsp;Object.assign(DB, d);<br>&nbsp;&nbsp;renderAll();<br>&nbsp;});</div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-title">🌐 Publicar no GitHub Pages</div>
+            <div class="arch-body">Deploy gratuito em minutos:</div>
+            <div class="step-row"><div class="step-n">1</div>Crie repositório <code style="color:var(--accent)">saa-dashboard</code></div>
+            <div class="step-row"><div class="step-n">2</div>Suba o HTML como <code style="color:var(--accent)">index.html</code></div>
+            <div class="step-row"><div class="step-n">3</div>Settings → Pages → Source: main</div>
+            <div class="step-row"><div class="step-n">4</div>URL: <code style="color:var(--accent)">usuario.github.io/saa-dashboard</code></div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-title">🔑 Sistema de Senhas</div>
+            <div class="arch-body">
+              <b style="color:var(--text)">Modo Visualizar</b> — acesso somente leitura. Senha: <code style="color:var(--accent)">saa2025</code><br><br>
+              <b style="color:var(--text)">Modo Editar</b> — acesso completo. Senha: <code style="color:var(--accent)">saa@gestao</code><br><br>
+              Altere <code style="color:var(--accent)">PASS_VIEW</code> e <code style="color:var(--accent)">PASS_EDIT</code> no JS.
+            </div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-title">🔄 Rotina Semanal v5</div>
+            <div class="arch-body">
+              <div class="step-row"><div class="step-n">1</div>Coords. preenchem dados até sex 17h</div>
+              <div class="step-row"><div class="step-n">2</div>NPM entra em Modo Editar</div>
+              <div class="step-row"><div class="step-n">3</div>Usa <b>⚡ Atualização Rápida</b> no overview para atualizar todos os KPIs de uma vez</div>
+              <div class="step-row"><div class="step-n">4</div>Confirma na Matriz de Status (aba Gráficos)</div>
+              <div class="step-row"><div class="step-n">5</div>Salva + Exporta JSON como backup</div>
+            </div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-title">🏗️ Roadmap de Evolução</div>
+            <div class="arch-body">
+              <b style="color:var(--text)">v5 (atual)</b> — HTML único, localStorage, IA integrada, atualização rápida.<br><br>
+              <b style="color:var(--text)">Próximo</b> — Supabase (PostgreSQL) + este frontend. Multi-usuário, histórico real.<br><br>
+              <b style="color:var(--text)">Escala</b> — React + Supabase + Vercel + Auth. CI/CD por área.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- Crédito -->
+<div class="credit-bar">
+  Desenvolvido por <b>Lucas Macedo</b> · SAA/MS · Sala de Situação v5
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Modal</div>
+    <div id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="modal-confirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="import-overlay">
+  <div class="modal">
+    <div class="modal-title">⬆ Importar Dados</div>
+    <div class="modal-hint">
+      Aceita <b>dois formatos</b>:<br>
+      <b style="color:var(--accent)">Formato SAA</b> — <code>{"coords":{...},"integrated":[...]}</code><br>
+      <b style="color:var(--accent2)">Formato Power BI</b> — <code>{"kpis":[{"label":"...","valor":0}],"graficos":[...]}</code><br>
+      <span style="opacity:.6">Cole o JSON exportado do Power BI ou do painel SAA diretamente abaixo.</span>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Cole o JSON aqui</div>
+      <textarea class="modal-input modal-textarea" id="import-textarea" style="min-height:200px;font-family:var(--mono);font-size:11px" placeholder='{"kpis":[{"label":"Total de Processos","valor":5151}],"graficos":[...]}'></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeImport()">Cancelar</button>
+      <button class="btn btn-primary" onclick="doImport()">Importar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// SENHAS — altere antes de publicar
+// ══════════════════════════════════════════════
+const PASS_VIEW = 'saa2025';
+const PASS_EDIT = 'saa@gestao';
+
+let SESSION = { mode: null };
+let _lockLevel = 'view';
+
+function setLockLevel(l){
+  _lockLevel = l;
+  document.getElementById('lvl-view-btn').classList.toggle('active', l==='view');
+  document.getElementById('lvl-edit-btn').classList.toggle('active', l==='edit');
+  document.getElementById('lock-input').placeholder = l==='edit' ? '•••••••• (gestão)' : '••••••••';
+  document.getElementById('lock-input').value = '';
+  document.getElementById('lock-error').textContent = '';
+}
+
+function doUnlock(){
+  const val = document.getElementById('lock-input').value;
+  const err = document.getElementById('lock-error');
+  if(_lockLevel==='view' && val===PASS_VIEW){ SESSION.mode='view'; startApp(); }
+  else if(_lockLevel==='edit' && val===PASS_EDIT){ SESSION.mode='edit'; startApp(); }
+  else {
+    err.textContent = 'Senha incorreta. Tente novamente.';
+    document.getElementById('lock-input').value='';
+    setTimeout(()=>err.textContent='',3000);
+  }
+}
+
+function startApp(){
+  document.getElementById('lock-screen').classList.add('hidden');
+  applyMode(); initTheme(); initWeek();
+  const saved = localStorage.getItem('saa-db-v5');
+  if(saved){ try{ const p=JSON.parse(saved); if(p.coords)DB.coords=p.coords; if(p.integrated)DB.integrated=p.integrated; }catch(e){} }
+  renderAll();
+}
+
+function lockApp(){
+  SESSION.mode=null;
+  document.getElementById('lock-screen').classList.remove('hidden');
+  document.getElementById('lock-input').value='';
+  document.getElementById('lock-error').textContent='';
+  setLockLevel('view');
+}
+
+function applyMode(){
+  const edit = SESSION.mode==='edit';
+  const badge = document.getElementById('mode-badge');
+  badge.className = 'mode-badge '+(edit?'mb-edit':'mb-view');
+  badge.textContent = edit ? '✏️ Modo Editar' : '👁 Somente Visualizar';
+  ['btn-import','btn-save'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=edit?'':'none'; });
+  const qup = document.getElementById('qup-panel');
+  if(qup) qup.style.display = edit ? '' : 'none';
+}
+function isEdit(){ return SESSION.mode==='edit'; }
+
+// ══════════════════════════════════════════════
+// DATABASE
+// ══════════════════════════════════════════════
+let DB = {
+  coords: {
+    cglic: {
+      acro:"CGLIC", nome:"Coordenação-Geral de Licitações e Contratos",
+      desc:"Condução de pregões eletrônicos, dispensas e inexigibilidades do MS.",
+      insight:"Tempo médio de contratação 57% acima da meta. Identificar gargalo na fase de aprovação jurídica.",
+      kpis:[
+        {id:"L1",nome:"Pregões concluídos no prazo",realizado:72,meta:85,unidade:"%",spark:[80,78,75,73,72]},
+        {id:"L2",nome:"Pregões realizados no mês",realizado:8,meta:10,unidade:"qtd",spark:[5,6,7,8,8]},
+        {id:"L3",nome:"Tempo médio de contratação",realizado:47,meta:30,unidade:"dias",spark:[38,40,42,45,47],inverso:true},
+        {id:"L4",nome:"Impugnações recebidas",realizado:2,meta:0,unidade:"qtd",spark:[0,1,0,1,2],inverso:true},
+        {id:"L5",nome:"Economia gerada vs. referência",realizado:13,meta:10,unidade:"%",spark:[11,10,12,11,13]},
+        {id:"L6",nome:"Dispensas no período",realizado:14,meta:20,unidade:"qtd",spark:[12,11,13,15,14]}
+      ]
+    },
+    cginfra:{
+      acro:"CGINFRA", nome:"Coordenação-Geral de Infraestrutura",
+      desc:"Gestão de contratos de engenharia, manutenção predial, vigilância e infraestrutura física.",
+      insight:"Indicadores dentro da meta. Acelerar manutenção preventiva do parque tecnológico.",
+      kpis:[
+        {id:"I1",nome:"Obras/reformas no prazo",realizado:83,meta:80,unidade:"%",spark:[75,78,80,82,83]},
+        {id:"I2",nome:"Chamados resolvidos no SLA",realizado:94,meta:90,unidade:"%",spark:[88,90,91,93,94]},
+        {id:"I3",nome:"SLA médio de atendimento",realizado:18,meta:24,unidade:"horas",spark:[24,22,20,19,18],inverso:true},
+        {id:"I4",nome:"Equipamentos com manut. preventiva",realizado:72,meta:80,unidade:"%",spark:[60,63,66,70,72]},
+        {id:"I5",nome:"Falhas críticas de infraestrutura",realizado:0,meta:0,unidade:"qtd",spark:[1,0,0,0,0],inverso:true}
+      ]
+    },
+    codipe:{
+      acro:"CODIPE", nome:"Coordenação de Desenvolvimento de Pessoas",
+      desc:"Capacitação, avaliação de desempenho e qualidade de vida dos servidores.",
+      insight:"42% dos servidores sem capacitação no ciclo. Acelerar matrículas no PDC.",
+      kpis:[
+        {id:"P1",nome:"Servidores capacitados (PDC)",realizado:58,meta:80,unidade:"%",spark:[30,40,48,54,58]},
+        {id:"P2",nome:"Horas médias de capacitação",realizado:22,meta:40,unidade:"h/ano",spark:[10,14,18,20,22]},
+        {id:"P3",nome:"Avaliações de desempenho em dia",realizado:91,meta:100,unidade:"%",spark:[82,85,88,90,91]},
+        {id:"P4",nome:"Taxa de frequência (assiduidade)",realizado:96.4,meta:95,unidade:"%",spark:[95,95.8,96,96.2,96.4]},
+        {id:"P5",nome:"Afastamentos por saúde na semana",realizado:5,meta:10,unidade:"serv.",spark:[7,6,8,5,5],inverso:true},
+        {id:"P6",nome:"Cargos vagos não providos",realizado:8,meta:10,unidade:"%",spark:[12,11,10,9,8],inverso:true}
+      ]
+    },
+    cgfisc:{
+      acro:"CGFISC", nome:"Coordenação-Geral de Fiscalização de Contratos",
+      desc:"Fiscalização da execução contratual, medições, notificações e gestão de riscos.",
+      insight:"CRÍTICO: 4 contratos com risco de descontinuidade. Prioridade máxima.",
+      kpis:[
+        {id:"F1",nome:"Contratos ativos fiscalizados",realizado:142,meta:142,unidade:"qtd",spark:[138,140,141,141,142]},
+        {id:"F2",nome:"Contratos vencendo em 60 dias",realizado:12,meta:5,unidade:"qtd",spark:[5,6,8,10,12],inverso:true},
+        {id:"F3",nome:"Contratos com risco identificado",realizado:4,meta:0,unidade:"qtd",spark:[1,2,2,3,4],inverso:true},
+        {id:"F4",nome:"Tempo médio de fiscalização",realizado:3.2,meta:4,unidade:"dias/mês",spark:[4.1,3.8,3.5,3.3,3.2],inverso:true},
+        {id:"F5",nome:"Sanções aplicadas a fornecedores",realizado:2,meta:0,unidade:"qtd",spark:[0,0,1,1,2],inverso:true},
+        {id:"F6",nome:"Medições aprovadas no prazo",realizado:88,meta:95,unidade:"%",spark:[92,90,89,89,88]}
+      ]
+    },
+    cgdi:{
+      acro:"CGDI", nome:"Coordenação-Geral de Gestão Documental e Informação",
+      desc:"Gestão do acervo documental, protocolos SEI, digitalização e conformidade LGPD.",
+      insight:"18 processos SEI com prazo vencido. Revisar fluxo de triagem urgente.",
+      kpis:[
+        {id:"D1",nome:"Processos SEI tramitados no prazo",realizado:84,meta:90,unidade:"%",spark:[88,87,85,84,84]},
+        {id:"D2",nome:"Processos com prazo vencido",realizado:18,meta:0,unidade:"qtd",spark:[8,10,14,16,18],inverso:true},
+        {id:"D3",nome:"Tempo médio de resposta a demandas",realizado:4.2,meta:5,unidade:"dias",spark:[5.5,5.0,4.8,4.5,4.2],inverso:true},
+        {id:"D4",nome:"Digitalização do acervo físico",realizado:87,meta:100,unidade:"%",spark:[70,75,80,84,87]},
+        {id:"D5",nome:"Demandas TCU/CGU respondidas",realizado:100,meta:100,unidade:"%",spark:[95,98,100,100,100]},
+        {id:"D6",nome:"Conformidade LGPD (processos)",realizado:91,meta:90,unidade:"%",spark:[80,83,87,89,91]}
+      ]
+    },
+    npm:{
+      acro:"NPM", nome:"Núcleo de Monitoramento",
+      desc:"Consolidação, monitoramento e reporte dos indicadores estratégicos da SAA.",
+      insight:"Todos os indicadores dentro da meta. Foco: finalizar mapeamento de KPIs com menor maturidade.",
+      kpis:[
+        {id:"N1",nome:"Coordenações com painel atualizado",realizado:9,meta:9,unidade:"qtd",spark:[6,7,7,8,9]},
+        {id:"N2",nome:"Relatórios gerenciais no prazo",realizado:100,meta:100,unidade:"%",spark:[90,95,100,100,100]},
+        {id:"N3",nome:"KPIs com dados coletados",realizado:92,meta:90,unidade:"%",spark:[80,84,88,90,92]},
+        {id:"N4",nome:"Alertas gerados e comunicados",realizado:8,meta:8,unidade:"qtd",spark:[3,5,6,7,8]},
+        {id:"N5",nome:"Reuniões de resultado no mês",realizado:4,meta:4,unidade:"qtd",spark:[3,4,4,4,4]}
+      ]
+    },
+    cgof:{
+      acro:"CGOF", nome:"Coordenação-Geral de Orçamento e Finanças",
+      desc:"Execução orçamentária, financeira e contábil. Empenhos, liquidações e pagamentos.",
+      insight:"67% executado com meta de 80% até dezembro. Antecipar liquidações.",
+      kpis:[
+        {id:"O1",nome:"Execução orçamentária (% do teto)",realizado:67,meta:80,unidade:"%",spark:[30,42,52,60,67]},
+        {id:"O2",nome:"Empenhos liquidados sem pendência",realizado:93,meta:95,unidade:"%",spark:[89,90,91,92,93]},
+        {id:"O3",nome:"Restos a pagar / total empenhado",realizado:18,meta:15,unidade:"%",spark:[22,21,20,19,18],inverso:true},
+        {id:"O4",nome:"Despesas sem cobertura orçamentária",realizado:0,meta:0,unidade:"qtd",spark:[0,0,0,0,0],inverso:true},
+        {id:"O5",nome:"Prazo médio de pagamento",realizado:24,meta:30,unidade:"dias",spark:[28,27,26,25,24],inverso:true},
+        {id:"O6",nome:"Notas de crédito aprovadas no prazo",realizado:97,meta:95,unidade:"%",spark:[93,94,95,96,97]}
+      ]
+    },
+    natt:{
+      acro:"NATT", nome:"Núcleo de Apoio ao Trabalho e Trabalhadora",
+      desc:"Saúde, bem-estar, condições de trabalho e qualidade de vida dos servidores.",
+      insight:"Indicadores dentro da meta. Monitorar aumento gradual de demandas de apoio psicossocial.",
+      kpis:[
+        {id:"T1",nome:"Atendimentos de apoio realizados",realizado:38,meta:30,unidade:"qtd",spark:[28,30,33,36,38]},
+        {id:"T2",nome:"Demandas de saúde atendidas",realizado:96,meta:90,unidade:"%",spark:[90,92,94,95,96]},
+        {id:"T3",nome:"Ações de qualidade de vida/mês",realizado:3,meta:2,unidade:"qtd",spark:[2,2,3,2,3]},
+        {id:"T4",nome:"NPS interno (satisfação servidores)",realizado:74,meta:60,unidade:"NPS",spark:[65,67,70,72,74]}
+      ]
+    },
+    projetos:{
+      acro:"Projetos", nome:"Núcleo de Projetos da Cooperação SAA",
+      desc:"Projetos de cooperação técnica, acordos internacionais e entregas institucionais.",
+      insight:"54% dos projetos com marcos no prazo. Revisar cronograma com CGOF urgente.",
+      kpis:[
+        {id:"PR1",nome:"Projetos com marcos no prazo",realizado:54,meta:80,unidade:"%",spark:[70,68,65,58,54]},
+        {id:"PR2",nome:"Projetos ativos em execução",realizado:11,meta:10,unidade:"qtd",spark:[9,10,10,11,11]},
+        {id:"PR3",nome:"Entregas realizadas no ciclo",realizado:7,meta:8,unidade:"qtd",spark:[5,6,5,7,7]},
+        {id:"PR4",nome:"Projetos com risco de atraso",realizado:4,meta:0,unidade:"qtd",spark:[1,2,3,3,4],inverso:true},
+        {id:"PR5",nome:"Execução financeira dos projetos",realizado:61,meta:75,unidade:"%",spark:[40,48,53,57,61]},
+        {id:"PR6",nome:"Relatórios de cooperação no prazo",realizado:100,meta:100,unidade:"%",spark:[90,95,100,100,100]}
+      ]
+    }
+  },
+  integrated:[
+    {nome:"Tempo médio de contratação (ponta a ponta)",tags:["CGLIC","CGOF","CGFISC"],val:"47",unit:"dias",meta:"≤ 30d",status:"warn",trend:"↑ +8d vs semana anterior",trendClass:"tr-r"},
+    {nome:"Execução orçamentária vinculada a contratos",tags:["CGOF","CGFISC"],val:"61%",unit:"",meta:"≥ 80%",status:"warn",trend:"→ estável",trendClass:"tr-n"},
+    {nome:"Tempo médio de tramitação de processos",tags:["CGDI","Todas as áreas"],val:"4.2",unit:"dias",meta:"≤ 5d",status:"good",trend:"↓ -0.8d vs sem. anterior",trendClass:"tr-g"},
+    {nome:"Nível de atendimento de demandas internas",tags:["NATT","CGINFRA","CODIPE"],val:"91%",unit:"",meta:"≥ 85%",status:"good",trend:"↑ +2pp vs sem. anterior",trendClass:"tr-g"},
+    {nome:"Eficiência na execução de projetos",tags:["Projetos","CGOF","CGDI"],val:"54%",unit:"",meta:"≥ 80%",status:"crit",trend:"↓ -5pp vs sem. anterior",trendClass:"tr-r"},
+    {nome:"Índice de conformidade documental",tags:["CGDI","NPM"],val:"88%",unit:"",meta:"≥ 85%",status:"good",trend:"↑ +1pp vs sem. anterior",trendClass:"tr-g"}
+  ],
+  pbi: []
+};
+
+// ══════════════════════════════════════════════
+// STATUS HELPERS
+// ══════════════════════════════════════════════
+function calcStatus(r,m,inv){
+  const rv=Number(r),mv=Number(m);
+  if(isNaN(rv)||isNaN(mv)) return 'nd';
+  if(mv===0) return rv===0?'good':'crit';
+  const ratio = inv ? mv/rv : rv/mv;
+  if(ratio>=1)    return 'good';
+  if(ratio>=0.85) return 'warn';
+  return 'crit';
+}
+function pct(r,m,inv){
+  const rv=Number(r),mv=Number(m);
+  if(isNaN(rv)||isNaN(mv)||mv===0) return 50;
+  const p = inv ? Math.min(100,Math.round((mv/rv)*100)) : Math.min(100,Math.round((rv/mv)*100));
+  return isNaN(p)?0:Math.max(0,p);
+}
+const STC = {
+  good:{ badge:'bg-g', label:'✓ Meta',    bar:'pb-g', color:'var(--good)', pill:'sp-g', semaph:'sg' },
+  warn:{ badge:'bg-w', label:'⚠ Regular', bar:'pb-w', color:'var(--warn)', pill:'sp-w', semaph:'sw' },
+  crit:{ badge:'bg-r', label:'✕ Crítico', bar:'pb-r', color:'var(--crit)', pill:'sp-r', semaph:'sr' },
+  nd:  { badge:'bg-nd',label:'N/D',       bar:'pb-nd',color:'var(--nd)',   pill:'sp-g', semaph:'sg' }
+};
+const S = k => STC[k]||STC.nd;
+
+function sparkHTML(arr, accent){
+  const max=Math.max(...arr,1);
+  return arr.map((v,i)=>{
+    const h=Math.max(2,Math.round((v/max)*18));
+    const last=i===arr.length-1;
+    const col = last ? (accent||'var(--accent)') : 'var(--surface3)';
+    return `<div class="sk" style="height:${h}px;background:${col}"></div>`;
+  }).join('');
+}
+
+// tendência do spark: compara último vs penúltimo
+function sparkTrend(arr){
+  if(!arr||arr.length<2) return '→';
+  const diff = arr[arr.length-1] - arr[arr.length-2];
+  if(diff>0) return '↑';
+  if(diff<0) return '↓';
+  return '→';
+}
+
+// ══════════════════════════════════════════════
+// RENDER OVERVIEW
+// ══════════════════════════════════════════════
+function renderHealth(){
+  const all = Object.values(DB.coords).flatMap(c=>c.kpis);
+  let g=0,w=0,r=0;
+  all.forEach(k=>{const s=calcStatus(k.realizado,k.meta,k.inverso);if(s==='good')g++;else if(s==='warn')w++;else r++;});
+  document.getElementById('health-row').innerHTML=`
+    <div class="hcard hc-g"><div class="hcard-label">Atingindo Meta</div><div class="hcard-val hv-g">${g}</div><div class="hcard-sub">indicadores azuis</div></div>
+    <div class="hcard hc-w"><div class="hcard-label">Regulares</div><div class="hcard-val hv-w">${w}</div><div class="hcard-sub">precisam de atenção</div></div>
+    <div class="hcard hc-r"><div class="hcard-label">Críticos</div><div class="hcard-val hv-r">${r}</div><div class="hcard-sub">fora da meta</div></div>
+    <div class="hcard hc-b"><div class="hcard-label">Total KPIs</div><div class="hcard-val hv-b">${all.length}</div><div class="hcard-sub">${Object.keys(DB.coords).length} áreas</div></div>
+    <div class="hcard hc-p"><div class="hcard-label">Exec. Orçam.</div><div class="hcard-val hv-p">${DB.coords.cgof?.kpis[0]?.realizado??'—'}%</div><div class="hcard-sub">meta ≥ 80%</div></div>`;
+}
+
+function renderCoordGrid(){
+  const keys = Object.keys(DB.coords);
+  document.getElementById('coord-count').textContent = keys.length;
+  const add = isEdit() ? `<button class="add-coord-btn" onclick="showAddCoord()">+ Adicionar Coordenação</button>` : '';
+  document.getElementById('coord-grid').innerHTML = keys.map(key=>{
+    const c = DB.coords[key];
+    const top = c.kpis.slice(0,3).map(k=>{
+      const st=calcStatus(k.realizado,k.meta,k.inverso);
+      const pc=pct(k.realizado,k.meta,k.inverso);
+      return `<div class="coord-row">
+        <div class="coord-row-lbl">${k.nome}</div>
+        <div class="coord-row-val" style="color:${S(st).color}">${k.realizado}${k.unidade==='%'?'%':' '+k.unidade}</div>
+      </div>
+      <div class="coord-bar-wrap"><div class="coord-bar" style="width:${pc}%;background:${S(st).color}"></div></div>`;
+    }).join('');
+    const crits=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+    const warns=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+    const sem=crits>0?'sr':warns>0?'sw':'sg';
+    return `<div class="coord-card" onclick="goTo('${key}')">
+      <div class="coord-card-head">
+        <div><div class="coord-card-acro">${c.acro}</div><div class="coord-card-full">${c.nome}</div></div>
+        <div class="semaph ${sem}"></div>
+      </div>
+      <div class="coord-card-rows">${top}</div>
+      <div class="coord-card-cta">Ver detalhe →</div>
+    </div>`;
+  }).join('')+add;
+}
+
+function renderIntegrated(){
+  document.getElementById('int-grid').innerHTML = DB.integrated.map((item,i)=>{
+    const st=item.status||'nd';
+    const sparkArr = item.sparkData || [];
+    const sparkEl = sparkArr.length ? `<div class="int-spark">${sparkHTML(sparkArr, S(st).color)}</div>` : '';
+    return `<div class="int-card">
+      <div class="int-head"><div class="int-name">${item.nome}</div><span class="badge ${S(st).badge}">${S(st).label}</span></div>
+      <div class="int-tags">${item.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      <div class="int-val" style="color:${S(st).color}" ${isEdit()?`contenteditable="true" onblur="DB.integrated[${i}].val=this.textContent.trim();autoSave()"`:''} >${item.val}</div>
+      <div class="int-meta">${item.unit?item.unit+' · ':''} Meta: ${item.meta}</div>
+      <div class="int-trend ${item.trendClass}">${item.trend}</div>
+      ${sparkEl}
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// RENDER GRÁFICOS — versão executiva
+// ══════════════════════════════════════════════
+function renderGraficos(){
+  renderBarExecucao();
+  renderMatrixKpis();
+  renderPBICharts();
+}
+
+function renderBarExecucao(){
+  const rows = Object.entries(DB.coords).map(([key,c])=>{
+    const kpis=c.kpis; if(!kpis.length) return null;
+    const avgPct=Math.round(kpis.reduce((a,k)=>a+pct(k.realizado,k.meta,k.inverso),0)/kpis.length);
+    const crits=kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+    const warns=kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+    const col=crits>0?'var(--crit)':warns>0?'var(--warn)':'var(--good)';
+    return {acro:c.acro, avgPct, col};
+  }).filter(Boolean).sort((a,b)=>b.avgPct-a.avgPct);
+
+  document.getElementById('bar-execucao').innerHTML = rows.map(r=>`
+    <div class="exec-bar-row">
+      <div class="exec-bar-label">${r.acro}</div>
+      <div class="exec-bar-track">
+        <div class="exec-bar-fill" style="width:${r.avgPct}%;background:${r.col}"></div>
+        <div class="exec-bar-meta" style="left:85%"></div>
+      </div>
+      <div class="exec-bar-pct" style="color:${r.col}">${r.avgPct}%</div>
+    </div>`).join('');
+}
+
+function renderMatrixKpis(){
+  const rows=Object.entries(DB.coords).flatMap(([,c])=>c.kpis.map(k=>{
+    const st=calcStatus(k.realizado,k.meta,k.inverso);
+    const pc=pct(k.realizado,k.meta,k.inverso);
+    const tr=sparkTrend(k.spark);
+    const tCol=k.inverso?(tr==='↓'?'var(--good)':tr==='↑'?'var(--crit)':'var(--text3)'):(tr==='↑'?'var(--good)':tr==='↓'?'var(--crit)':'var(--text3)');
+    return `<tr>
+      <td>${c.acro}</td>
+      <td style="color:var(--text)">${k.nome}</td>
+      <td style="font-family:var(--mono);font-weight:600;color:${S(st).color}">${k.realizado} ${k.unidade}</td>
+      <td style="font-family:var(--mono)">${k.meta} ${k.unidade}</td>
+      <td style="font-family:var(--mono);color:${S(st).color}">${pc}%</td>
+      <td><span class="badge ${S(st).badge}">${S(st).label}</span></td>
+      <td style="color:${tCol};font-family:var(--mono);font-size:13px">${tr}</td>
+    </tr>`;
+  }));
+  document.getElementById('matrix-tbody').innerHTML=rows.join('');
+}
+
+// ── Gráficos do Power BI (DB.pbi) ──
+function renderPBICharts(){
+  const cont=document.getElementById('pbi-charts');
+  if(!cont) return;
+  const charts=DB.pbi||[];
+  if(!charts.length){ cont.innerHTML=''; return; }
+  cont.innerHTML=charts.map((ch,ci)=>{
+    const max=Math.max(...ch.dados.map(d=>d.valor),1);
+    if(ch.tipo==='pie'){
+      const total=ch.dados.reduce((a,d)=>a+d.valor,0);
+      return `<div class="chart-wrap">
+        <div class="chart-title">${ch.titulo}</div>
+        <div class="chart-sub">Total: ${total.toLocaleString('pt-BR')}</div>
+        ${renderSVGPie(ch.dados, total)}
+      </div>`;
+    }
+    // bar chart executivo
+    const barRows=ch.dados.map(d=>{
+      const pctW=Math.round((d.valor/max)*100);
+      return `<div class="exec-bar-row" style="grid-template-columns:110px 1fr 60px">
+        <div class="exec-bar-label" style="font-size:10px;text-align:right">${d.nome}</div>
+        <div class="exec-bar-track">
+          <div class="exec-bar-fill" style="width:${pctW}%;background:var(--accent2)"></div>
+        </div>
+        <div class="exec-bar-pct" style="color:var(--text2)">${d.valor.toLocaleString('pt-BR')}</div>
+      </div>`;
+    }).join('');
+    return `<div class="chart-wrap">
+      <div class="chart-title">${ch.titulo}</div>
+      <div class="chart-sub">Top ${ch.dados.length} itens</div>
+      <div class="exec-bar-chart">${barRows}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderSVGPie(dados, total){
+  const W=220, H=160, cx=80, cy=80, r=60, ir=36;
+  const COLS=['var(--good)','var(--accent2)','var(--warn)','var(--crit)','var(--purple)'];
+  let ang=-Math.PI/2, paths='', legends='';
+  dados.forEach((d,i)=>{
+    const slice=(d.valor/total)*(2*Math.PI);
+    const x1=cx+r*Math.cos(ang), y1=cy+r*Math.sin(ang);
+    const x2=cx+r*Math.cos(ang+slice), y2=cy+r*Math.sin(ang+slice);
+    const xi1=cx+ir*Math.cos(ang), yi1=cy+ir*Math.sin(ang);
+    const xi2=cx+ir*Math.cos(ang+slice), yi2=cy+ir*Math.sin(ang+slice);
+    const lg=slice>Math.PI?1:0;
+    const col=COLS[i%COLS.length];
+    paths+=`<path d="M${xi1},${yi1} A${ir},${ir} 0 ${lg},1 ${xi2},${yi2} L${x2},${y2} A${r},${r} 0 ${lg},0 ${x1},${y1} Z" fill="${col}" opacity=".9"/>`;
+    const pct=Math.round((d.valor/total)*100);
+    const ly=120+i*16;
+    legends+=`<rect x="${W-120}" y="${ly-9}" width="8" height="8" rx="2" fill="${col}"/>
+      <text x="${W-108}" y="${ly}" font-size="10" fill="var(--text2)" font-family="var(--mono)">${d.nome}: ${pct}%</text>`;
+    ang+=slice;
+  });
+  // centro
+  paths+=`<circle cx="${cx}" cy="${cy}" r="${ir-2}" fill="var(--surface2)"/>
+    <text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="11" fill="var(--text2)" font-family="var(--mono)" font-weight="600">${total.toLocaleString('pt-BR')}</text>`;
+  const svgH=Math.max(H, 120+dados.length*16+8);
+  return `<svg viewBox="0 0 ${W} ${svgH}" style="width:100%;max-width:${W}px;overflow:visible">${paths}${legends}</svg>`;
+}
+
+// ══════════════════════════════════════════════
+// COORD DETAIL
+// ══════════════════════════════════════════════
+function renderCoordSections(){
+  const el = document.getElementById('coord-sections');
+  el.innerHTML = Object.keys(DB.coords).map(k=>`<div id="sec-${k}" class="section"></div>`).join('');
+  Object.keys(DB.coords).forEach(k=>fillCoordSection(k));
+}
+
+function fillCoordSection(key){
+  const c = DB.coords[key];
+  const el = document.getElementById(`sec-${key}`);
+  if(!el) return;
+  const crits=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+  const warns=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+  const ost=crits>0?'crit':warns>0?'warn':'good';
+
+  const chips = [
+    'Quais indicadores precisam de atenção urgente?',
+    'Sugira 3 ações de melhoria para esta semana',
+    'Compare com o histórico recente'
+  ];
+
+  const kpis = c.kpis.map((k,i)=>{
+    const kst = calcStatus(k.realizado,k.meta,k.inverso);
+    const pc  = pct(k.realizado,k.meta,k.inverso);
+    const edit = isEdit();
+    const sparkColor = kst==='good'?'var(--good)':kst==='warn'?'var(--warn)':'var(--crit)';
+    return `<div class="kpi-card" id="kpi-${key}-${i}">
+      <div class="kpi-head">
+        <div class="kpi-name" ${edit?`contenteditable="true" onblur="DB.coords['${key}'].kpis[${i}].nome=this.textContent.trim();autoSave()"`:''} >${k.nome}</div>
+        <span class="badge ${S(kst).badge}">${S(kst).label}</span>
+      </div>
+      <div class="kpi-numbers">
+        <div class="kpi-real" style="color:${S(kst).color}">${k.realizado}</div>
+        <div class="kpi-sep">/</div>
+        <div class="kpi-meta-val">${k.meta}</div>
+        <div class="kpi-unit-tag">${k.unidade}</div>
+        ${k.inverso?`<span class="kpi-inv-badge">inverso</span>`:''}
+      </div>
+      ${edit ? `<div class="kpi-edit-row">
+        <div class="kpi-field">
+          <div class="kpi-field-label">Realizado</div>
+          <input class="kpi-input" type="number" value="${k.realizado}" oninput="updateKpi('${key}',${i},'realizado',this.value)">
+        </div>
+        <div class="kpi-field">
+          <div class="kpi-field-label">Meta</div>
+          <input class="kpi-input" type="number" value="${k.meta}" oninput="updateKpi('${key}',${i},'meta',this.value)">
+        </div>
+      </div>
+      <div class="kpi-unit-row">
+        <div class="kpi-unit-label">Unidade</div>
+        <input class="kpi-unit-input" value="${k.unidade}" onblur="DB.coords['${key}'].kpis[${i}].unidade=this.value;autoSave()">
+      </div>` : ''}
+      <div class="prog-wrap"><div class="prog-bar ${S(kst).bar}" style="width:${pc}%"></div></div>
+      <div class="kpi-footer">
+        <div class="kpi-spark">${sparkHTML(k.spark||[50,50,50,50,pc], sparkColor)}</div>
+        <div class="kpi-card-actions">
+          <div class="icon-btn ${!edit?'locked':''}" onclick="removeKpi('${key}',${i})" title="Remover">✕</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const addBtn = isEdit() ? `<button class="add-kpi-btn" onclick="showAddKpi('${key}')">+ Novo Indicador</button>` : '';
+
+  el.innerHTML = `
+    <div class="detail-header">
+      <div>
+        <div class="detail-acro" style="color:${S(ost).color}">
+          <span style="width:7px;height:7px;border-radius:50%;background:${S(ost).color};display:inline-block;box-shadow:0 0 8px ${S(ost).color}"></span>
+          <span ${isEdit()?`contenteditable="true" onblur="DB.coords['${key}'].acro=this.textContent.trim();autoSave();renderSidebar()"`:''} >${c.acro}</span>
+        </div>
+        <div class="detail-name" ${isEdit()?`contenteditable="true" onblur="DB.coords['${key}'].nome=this.textContent.trim();autoSave();renderSidebar()"`:''} >${c.nome}</div>
+        <div class="detail-desc" ${isEdit()?`contenteditable="true" onblur="DB.coords['${key}'].desc=this.textContent.trim();autoSave()"`:''} >${c.desc}</div>
+      </div>
+      <div class="detail-actions">
+        <span class="status-pill ${S(ost).pill}">${S(ost).label}</span>
+        ${isEdit()?`<button class="btn btn-danger" onclick="removeCoord('${key}')">✕ Remover</button>`:''}
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-ico">💡</div>
+      <div>
+        <div class="insight-label">Insight Semanal</div>
+        <div class="insight-text" ${isEdit()?`contenteditable="true" onblur="DB.coords['${key}'].insight=this.textContent.trim();autoSave()"`:''} >${c.insight}</div>
+      </div>
+    </div>
+    <div class="ai-panel" style="margin-bottom:20px">
+      <div class="ai-panel-head">
+        <div class="ai-panel-title">🤖 Análise IA — ${c.acro} <span class="ai-badge">Claude</span></div>
+      </div>
+      <div class="ai-suggestions">${chips.map(ch=>`<span class="ai-chip" onclick="fillAI('${key}','${ch.replace(/'/g,"\\'")}')">${ch}</span>`).join('')}</div>
+      <div class="ai-body">
+        <div class="ai-input-row">
+          <input class="ai-input" id="ai-input-${key}" placeholder="Analise os KPIs, identifique riscos, sugira ações..."/>
+          <button class="ai-send" id="ai-btn-${key}" onclick="askAI('${key}')">Analisar</button>
+        </div>
+        <div class="ai-response" id="ai-resp-${key}"></div>
+      </div>
+    </div>
+    <div class="row-label">Indicadores de Desempenho</div>
+    <div class="kpi-grid">${kpis}${addBtn}</div>`;
+}
+
+// ══════════════════════════════════════════════
+// RENDER ALERTAS
+// ══════════════════════════════════════════════
+function renderAlerts(){
+  const crits=[], warns=[];
+  Object.entries(DB.coords).forEach(([key,c])=>{
+    c.kpis.forEach(k=>{
+      const s=calcStatus(k.realizado,k.meta,k.inverso);
+      if(s==='crit') crits.push({c,k,key});
+      else if(s==='warn') warns.push({c,k,key});
+    });
+  });
+  document.getElementById('alert-pip').textContent = crits.length||'✓';
+  document.getElementById('alert-pip').className = 'nav-badge '+(crits.length>0?'nb-r':'nb-g');
+
+  const mk=(items,cls,ico)=>items.map(({c,k})=>`
+    <div class="alert-item ${cls}">
+      <div class="alert-ico">${ico}</div>
+      <div>
+        <div class="alert-title">${k.nome}</div>
+        <div class="alert-desc">Realizado: <b style="color:var(--${cls==='crit'?'crit':'warn'})">${k.realizado} ${k.unidade}</b> · Meta: <b>${k.meta} ${k.unidade}</b></div>
+        <div class="alert-tag">${c.acro}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('alerts-crit').innerHTML = crits.length?mk(crits,'crit','🔴'):`<p style="color:var(--text3);font-size:13px;padding:8px 0">Nenhum indicador crítico 🎉</p>`;
+  document.getElementById('alerts-warn').innerHTML = warns.length?mk(warns,'warn','🟠'):`<p style="color:var(--text3);font-size:13px;padding:8px 0">Nenhum alerta no momento</p>`;
+  document.getElementById('alerts-info').innerHTML = `<div class="alert-item info"><div class="alert-ico">🔵</div><div><div class="alert-title">Painel atualizado</div><div class="alert-desc">Ciclo semanal · Modo: <b>${SESSION.mode==='edit'?'Edição (Gestão)':'Visualização'}</b></div><div class="alert-tag">NPM · v5.0</div></div></div>`;
+}
+
+function renderSidebar(){
+  document.getElementById('coord-nav').innerHTML = Object.entries(DB.coords).map(([key,c])=>{
+    const crits=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+    const warns=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+    const nbCls=crits>0?'nb-r':warns>0?'nb-y':'nb-g';
+    const nbTxt=crits>0?crits:warns>0?warns:'✓';
+    return `<button class="nav-item" onclick="goTo('${key}')" data-sec="${key}">
+      <span class="nav-dot"></span>${c.acro}
+      <span class="nav-badge ${nbCls}">${nbTxt}</span>
+      <span class="nav-popout" onclick="event.stopPropagation();popoutCoord('${key}')" title="Abrir em nova janela">⧉</span>
+    </button>`;
+  }).join('');
+}
+
+function renderAll(){
+  renderHealth(); renderCoordGrid(); renderIntegrated();
+  renderCoordSections(); renderAlerts(); renderSidebar();
+  renderGraficos(); renderQUP();
+}
+
+// ══════════════════════════════════════════════
+// ATUALIZAÇÃO RÁPIDA (NOVO)
+// ══════════════════════════════════════════════
+let _qupSnapshot = {};
+
+function renderQUP(){
+  if(!isEdit()) return;
+  const grid = document.getElementById('qup-grid');
+  if(!grid) return;
+  _qupSnapshot = {};
+  const items = Object.entries(DB.coords).flatMap(([key,c])=>
+    c.kpis.map((k,i)=>{
+      _qupSnapshot[`${key}_${i}`] = k.realizado;
+      const st = calcStatus(k.realizado,k.meta,k.inverso);
+      return `<div class="qup-item">
+        <div class="qup-item-head">
+          <div class="qup-coord">${c.acro}</div>
+          <span class="badge ${S(st).badge}" id="qup-badge-${key}-${i}">${S(st).label}</span>
+        </div>
+        <div class="qup-kpi-name">${k.nome}</div>
+        <div class="qup-input-row">
+          <input class="qup-input" id="qup-${key}-${i}" type="number" value="${k.realizado}"
+            oninput="previewQUP('${key}',${i},this.value)"
+            placeholder="${k.realizado}">
+          <span class="qup-input-unit">${k.unidade} / meta: ${k.meta}</span>
+        </div>
+      </div>`;
+    })
+  );
+  grid.innerHTML = items.join('');
+}
+
+function previewQUP(key, idx, val){
+  const n = Number(val);
+  if(isNaN(n)) return;
+  const k = DB.coords[key].kpis[idx];
+  const st = calcStatus(n, k.meta, k.inverso);
+  const badge = document.getElementById(`qup-badge-${key}-${idx}`);
+  if(badge){ badge.className=`badge ${S(st).badge}`; badge.textContent=S(st).label; }
+}
+
+function applyQUP(){
+  let count = 0;
+  Object.entries(DB.coords).forEach(([key,c])=>{
+    c.kpis.forEach((k,i)=>{
+      const inp = document.getElementById(`qup-${key}-${i}`);
+      if(inp && inp.value !== ''){
+        const n = Number(inp.value);
+        if(!isNaN(n) && n !== k.realizado){
+          // push to spark
+          const newSpark = [...(k.spark||[0,0,0,0,k.realizado]).slice(1), n];
+          DB.coords[key].kpis[i].realizado = n;
+          DB.coords[key].kpis[i].spark = newSpark;
+          count++;
+        }
+      }
+    });
+  });
+  renderAll(); autoSave();
+  // feedback visual
+  const btn = document.querySelector('.qup-apply-btn');
+  const orig = btn.textContent;
+  btn.textContent = `✓ ${count} indicador${count!==1?'es':''} atualizado${count!==1?'s':''}!`;
+  btn.style.background = 'var(--good)';
+  setTimeout(()=>{ btn.textContent=orig; btn.style.background=''; }, 2500);
+}
+
+function resetQUP(){
+  Object.entries(_qupSnapshot).forEach(([key, val])=>{
+    const [coordKey, idx] = key.split('_');
+    const inp = document.getElementById(`qup-${coordKey}-${idx}`);
+    if(inp) inp.value = val;
+    previewQUP(coordKey, Number(idx), val);
+  });
+}
+
+function toggleQUP(){
+  const body = document.getElementById('qup-body');
+  const arr  = document.getElementById('qup-arrow');
+  body.classList.toggle('open');
+  arr.classList.toggle('open');
+}
+
+// ══════════════════════════════════════════════
+// KPI EDITING
+// ══════════════════════════════════════════════
+function updateKpi(coordKey,idx,field,val){
+  DB.coords[coordKey].kpis[idx][field] = isNaN(Number(val))?val:Number(val);
+  const k=DB.coords[coordKey].kpis[idx];
+  const kst=calcStatus(k.realizado,k.meta,k.inverso);
+  const pc=pct(k.realizado,k.meta,k.inverso);
+  // atualiza visual sem re-render completo
+  const card=document.getElementById(`kpi-${coordKey}-${idx}`);
+  if(card){
+    const bar=card.querySelector('.prog-bar');
+    if(bar){bar.style.width=pc+'%';bar.className='prog-bar '+S(kst).bar;}
+    const badge=card.querySelector('.badge');
+    if(badge){badge.className='badge '+S(kst).badge;badge.textContent=S(kst).label;}
+    const realEl=card.querySelector('.kpi-real');
+    if(realEl){realEl.style.color=S(kst).color;realEl.textContent=k.realizado;}
+  }
+  autoSave(); renderHealth(); renderAlerts(); renderSidebar();
+}
+
+function removeKpi(coordKey,idx){
+  if(!confirm('Remover este indicador?')) return;
+  DB.coords[coordKey].kpis.splice(idx,1);
+  fillCoordSection(coordKey); renderHealth(); renderAlerts(); renderSidebar(); autoSave();
+}
+
+// ══════════════════════════════════════════════
+// ADD COORD / KPI
+// ══════════════════════════════════════════════
+let _pa = null;
+
+function showAddCoord(){
+  document.getElementById('modal-title').textContent='➕ Nova Coordenação / Núcleo';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-field"><div class="modal-label">Sigla</div><input class="modal-input" id="m-acro" placeholder="CGXYZ" maxlength="12"></div>
+    <div class="modal-field"><div class="modal-label">Nome Completo</div><input class="modal-input" id="m-nome" placeholder="Coordenação-Geral de..."></div>
+    <div class="modal-field"><div class="modal-label">Descrição</div><textarea class="modal-input modal-textarea" id="m-desc" placeholder="Responsabilidades..."></textarea></div>`;
+  _pa=()=>{
+    const acro=document.getElementById('m-acro').value.trim();
+    const nome=document.getElementById('m-nome').value.trim();
+    const desc=document.getElementById('m-desc').value.trim();
+    if(!acro||!nome){alert('Preencha sigla e nome.');return;}
+    const key=acro.toLowerCase().replace(/[^a-z0-9]/g,'');
+    DB.coords[key]={acro,nome,desc,insight:'Sem insight definido ainda.',kpis:[]};
+    renderAll(); goTo(key); closeModal(); autoSave();
+  };
+  openModal();
+}
+
+function showAddKpi(coordKey){
+  document.getElementById('modal-title').textContent='➕ Novo Indicador — '+DB.coords[coordKey].acro;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-hint">💡 Use <b>inverso</b> para indicadores onde menor = melhor (prazos, erros, afastamentos).</div>
+    <div class="modal-field"><div class="modal-label">Nome do Indicador</div><input class="modal-input" id="m-kpi-nome" placeholder="Ex: Processos concluídos no prazo"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field"><div class="modal-label">Realizado</div><input class="modal-input" id="m-kpi-r" type="number" placeholder="0"></div>
+      <div class="modal-field"><div class="modal-label">Meta</div><input class="modal-input" id="m-kpi-m" type="number" placeholder="100"></div>
+    </div>
+    <div class="modal-field"><div class="modal-label">Unidade (%, qtd, dias…)</div><input class="modal-input" id="m-kpi-u" placeholder="%"></div>
+    <div class="modal-field" style="flex-direction:row;align-items:center;gap:10px">
+      <input type="checkbox" id="m-kpi-inv" style="width:16px;height:16px;accent-color:var(--accent)">
+      <div class="modal-label" style="margin:0">Inverso — menor é melhor (prazos, falhas, afastamentos)</div>
+    </div>`;
+  _pa=()=>{
+    const nome=document.getElementById('m-kpi-nome').value.trim();
+    const r=Number(document.getElementById('m-kpi-r').value);
+    const m=Number(document.getElementById('m-kpi-m').value);
+    const u=document.getElementById('m-kpi-u').value.trim()||'qtd';
+    const inv=document.getElementById('m-kpi-inv').checked;
+    if(!nome){alert('Digite o nome do indicador.');return;}
+    DB.coords[coordKey].kpis.push({id:'K'+Date.now(),nome,realizado:r,meta:m,unidade:u,inverso:inv,spark:[0,0,0,0,r]});
+    fillCoordSection(coordKey); renderHealth(); renderAlerts(); renderSidebar(); renderQUP();
+    closeModal(); autoSave();
+  };
+  openModal();
+}
+
+function removeCoord(key){
+  if(!confirm(`Remover a coordenação ${DB.coords[key].acro}?`)) return;
+  delete DB.coords[key]; renderAll(); goTo('overview'); autoSave();
+}
+
+function openModal(){ document.getElementById('modal-overlay').classList.add('open'); document.getElementById('modal-confirm').onclick=()=>_pa&&_pa(); }
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+
+// ══════════════════════════════════════════════
+// IA ASSISTANT
+// ══════════════════════════════════════════════
+const AI_CHIPS_OVERVIEW = [
+  'Quais coordenações estão com maior risco?',
+  'Resumo executivo desta semana',
+  'O que priorizar nos próximos 7 dias?',
+];
+
+function renderAIChips(){
+  const el = document.getElementById('ai-chips-overview');
+  if(el) el.innerHTML = AI_CHIPS_OVERVIEW.map(ch=>
+    `<span class="ai-chip" onclick="fillAI('overview','${ch.replace(/'/g,"\\'")}')">${ch}</span>`
+  ).join('');
+}
+
+function fillAI(ctx, text){
+  const inp = document.getElementById(`ai-input-${ctx}`);
+  if(inp){ inp.value=text; inp.focus(); }
+}
+
+async function askAI(context){
+  const inputEl = document.getElementById(`ai-input-${context}`);
+  const btnEl   = document.getElementById(`ai-btn-${context}`);
+  const respEl  = document.getElementById(`ai-resp-${context}`);
+  const question = inputEl.value.trim();
+  if(!question) return;
+
+  btnEl.disabled=true;
+  respEl.className='ai-response visible';
+  respEl.innerHTML=`<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span style="margin-left:10px;font-family:var(--mono);font-size:11px;color:var(--text3)">Analisando dados do painel SAA...</span></div>`;
+
+  let dataCtx='';
+  if(context==='overview'){
+    const summary=Object.entries(DB.coords).map(([k,c])=>{
+      const crits=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+      const warns=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+      const goods=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='good').length;
+      return `${c.acro}: ${goods} no azul, ${warns} laranja, ${crits} críticos`;
+    }).join(' | ');
+    const intSummary=DB.integrated.map(i=>`${i.nome}: ${i.val} (meta ${i.meta})`).join('; ');
+    dataCtx=`DASHBOARD SAA - VISÃO GERAL. Coordenações: ${summary}. KPIs Integrados: ${intSummary}.`;
+  } else if(DB.coords[context]){
+    const c=DB.coords[context];
+    const kpiList=c.kpis.map(k=>{
+      const s=calcStatus(k.realizado,k.meta,k.inverso);
+      const pc=pct(k.realizado,k.meta,k.inverso);
+      return `"${k.nome}": ${k.realizado}${k.unidade} de ${k.meta}${k.unidade} (${pc}% - ${s})`;
+    }).join('; ');
+    dataCtx=`COORDENAÇÃO ${c.acro} - ${c.nome}. INDICADORES: ${kpiList}. INSIGHT ATUAL: ${c.insight}`;
+  }
+
+  const systemPrompt=`Você é um especialista sênior em gestão pública brasileira, indicadores de desempenho (KPIs) e análise organizacional. Você apoia a Subsecretaria de Assuntos Administrativos (SAA) do Ministério da Saúde.
+
+Responda de forma direta, objetiva e orientada à ação. Use linguagem formal mas acessível. Quando listar itens, use bullet points (•). Máximo de 5 parágrafos curtos. Fundamente suas recomendações nos dados apresentados. Priorize riscos e oportunidades de melhoria imediata.
+
+DADOS ATUAIS DO PAINEL: ${dataCtx}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        system:systemPrompt,
+        messages:[{role:'user',content:question}]
+      })
+    });
+    if(!response.ok){ const e=await response.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${response.status}`); }
+    const data = await response.json();
+    const text = data.content?.[0]?.text||'Resposta não disponível.';
+    respEl.innerHTML = text
+      .replace(/\n\n/g,'</p><p style="margin-top:8px">')
+      .replace(/\n/g,'<br>')
+      .replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
+      .replace(/•/g,'<span style="color:var(--accent)">•</span>');
+  } catch(e){
+    respEl.innerHTML=`<span style="color:var(--warn)">⚠ Erro: ${e.message}. Verifique se o painel está aberto dentro do Claude.ai.</span>`;
+  }
+  btnEl.disabled=false;
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.classList.contains('ai-input')){
+    const ctx=e.target.id.replace('ai-input-','');
+    askAI(ctx);
+  }
+});
+
+// ══════════════════════════════════════════════
+// IMPORT / EXPORT / SAVE
+// ══════════════════════════════════════════════
+function showImportModal(){ document.getElementById('import-overlay').classList.add('open'); }
+function closeImport(){ document.getElementById('import-overlay').classList.remove('open'); }
+
+function doImport(){
+  const raw = document.getElementById('import-textarea').value.trim();
+  if(!raw){ alert('Cole o JSON no campo acima.'); return; }
+  try{
+    const p = JSON.parse(raw);
+
+    // ── Formato SAA nativo (coords / integrated) ──
+    if(p.coords || p.integrated){
+      if(p.coords)    DB.coords     = p.coords;
+      if(p.integrated) DB.integrated = p.integrated;
+      if(p.pbi)       DB.pbi        = p.pbi;
+      renderAll(); saveAll(); closeImport();
+      alert('✓ Dados SAA importados com sucesso!');
+      return;
+    }
+
+    // ── Formato Power BI (kpis / graficos) ──
+    if(p.kpis || p.graficos){
+      // KPIs viram cards no overview integrado
+      if(p.kpis && Array.isArray(p.kpis)){
+        p.kpis.forEach(k=>{
+          const existe = DB.integrated.find(i=>i.nome===k.label);
+          if(!existe){
+            DB.integrated.push({
+              nome: k.label,
+              tags: ['Power BI'],
+              val:  String(k.valor),
+              unit: '',
+              meta: '—',
+              status: 'nd',
+              trend: '→',
+              trendClass: 'tr-n'
+            });
+          } else {
+            existe.val = String(k.valor);
+          }
+        });
+      }
+      // Gráficos viram visualizações na aba Gráficos
+      if(p.graficos && Array.isArray(p.graficos)){
+        DB.pbi = p.graficos.map(g=>({
+          titulo: g.titulo,
+          tipo:   g.tipo||'bar',
+          dados:  g.dados||[]
+        }));
+      }
+      renderAll(); saveAll(); closeImport();
+      alert(`✓ Dados Power BI importados!\n• ${(p.kpis||[]).length} KPIs adicionados ao Overview\n• ${(p.graficos||[]).length} gráficos adicionados à aba Gráficos & Análise`);
+      return;
+    }
+
+    alert('Formato não reconhecido.\n\nUse o formato SAA ({"coords":{...}}) ou Power BI ({"kpis":[...],"graficos":[...]}).');
+  }catch(e){ alert('JSON inválido.\n\nErro: '+e.message); }
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`saa_dados_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function autoSave(){
+  localStorage.setItem('saa-db-v5',JSON.stringify(DB));
+  document.getElementById('ts-date').textContent=new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+
+function saveAll(){
+  autoSave();
+  const btn=document.getElementById('btn-save');
+  if(!btn) return;
+  const orig=btn.textContent;
+  btn.textContent='✓ Salvo!'; btn.style.background='var(--good)';
+  setTimeout(()=>{ btn.textContent=orig; btn.style.background=''; },2200);
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+const TITLES={overview:'Dashboard Executivo',graficos:'Gráficos & Análise',alertas:'Alertas e Riscos',integracao:'Integração & Arquitetura'};
+
+function goTo(key){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  const sec=document.getElementById(`sec-${key}`);
+  if(sec) sec.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`[data-sec="${key}"]`)?.classList.add('active');
+  const title=TITLES[key]||(DB.coords[key]?`${DB.coords[key].acro} · ${DB.coords[key].nome}`:key);
+  document.getElementById('bc-curr').textContent=title;
+  document.getElementById('pg-title').innerHTML=title+`<span class="mode-badge ${SESSION.mode==='edit'?'mb-edit':'mb-view'}">${SESSION.mode==='edit'?'✏️ Editar':'👁 Visualizar'}</span>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(key==='graficos') renderGraficos();
+}
+
+// ══════════════════════════════════════════════
+// THEME
+// ══════════════════════════════════════════════
+function toggleTheme(){
+  const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  const on=next==='light';
+  document.getElementById('theme-track').classList.toggle('on',on);
+  document.getElementById('theme-label').textContent=on?'Modo Claro':'Modo Escuro';
+  localStorage.setItem('saa-theme-v5',next);
+}
+function initTheme(){
+  const saved=localStorage.getItem('saa-theme-v5')||'dark';
+  document.documentElement.setAttribute('data-theme',saved);
+  const on=saved==='light';
+  document.getElementById('theme-track').classList.toggle('on',on);
+  document.getElementById('theme-label').textContent=on?'Modo Claro':'Modo Escuro';
+}
+
+// ══════════════════════════════════════════════
+// WEEK INFO
+// ══════════════════════════════════════════════
+function initWeek(){
+  const now=new Date();
+  const mon=new Date(now); mon.setDate(now.getDate()-now.getDay()+1);
+  const fri=new Date(mon); fri.setDate(mon.getDate()+4);
+  const f=d=>d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  const wn=Math.ceil((((now-new Date(now.getFullYear(),0,1))/864e5)+1)/7);
+  document.getElementById('wk-n').textContent=wn;
+  document.getElementById('wk-r').textContent=`${f(mon)}–${f(fri)}`;
+  document.getElementById('ts-date').textContent=now.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+
+// ══════════════════════════════════════════════
+// POP-OUT — abre coordenação em nova janela
+// ══════════════════════════════════════════════
+function popoutCoord(key){
+  const c = DB.coords[key];
+  if(!c) return;
+  const crits=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+  const warns=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+  const ost=crits>0?'crit':warns>0?'warn':'good';
+
+  const kpiRows = c.kpis.map(k=>{
+    const st=calcStatus(k.realizado,k.meta,k.inverso);
+    const pc=pct(k.realizado,k.meta,k.inverso);
+    const col=S(st).color;
+    return `<tr>
+      <td style="padding:10px 14px;border-bottom:1px solid #e5eaf2;font-size:13px;color:#1a2a3a">${k.nome}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #e5eaf2;font-family:monospace;font-weight:700;color:${col}">${k.realizado} ${k.unidade}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #e5eaf2;font-family:monospace;color:#6b82a0">${k.meta} ${k.unidade}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #e5eaf2;font-family:monospace;font-weight:600;color:${col}">${pc}%</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #e5eaf2">
+        <span style="font-size:10px;padding:3px 8px;border-radius:4px;font-family:monospace;background:${col}20;color:${col};border:1px solid ${col}40">${S(st).label}</span>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const statusColor = ost==='good'?'#1a8a5a':ost==='warn'?'#b45309':'#c0283d';
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head>
+  <meta charset="UTF-8"><title>${c.acro} · SAA/MS</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,sans-serif;background:#f5f7fa;color:#1a2a3a;padding:0}
+  .header{background:#005B9A;color:#fff;padding:22px 32px;display:flex;justify-content:space-between;align-items:flex-start}
+  .header h1{font-size:20px;font-weight:700;margin-bottom:3px}.header p{font-size:12px;opacity:.75}
+  .status-tag{font-size:11px;padding:4px 12px;border-radius:20px;font-weight:600;background:${statusColor}30;color:${statusColor};border:1px solid ${statusColor}50;margin-top:8px;display:inline-block}
+  .insight{background:#fff7ed;border-left:3px solid #b45309;padding:12px 18px;margin:20px 32px;border-radius:6px;font-size:13px;color:#6b4010}
+  .section{padding:0 32px 32px}h2{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#6b82a0;margin:24px 0 12px;padding-bottom:6px;border-bottom:1px solid #e5eaf2}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,40,100,.08)}
+  th{background:#f0f5fb;padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#6b82a0;font-weight:600;border-bottom:2px solid #e5eaf2}
+  .footer{text-align:center;font-size:10px;color:#9aafca;padding:16px;border-top:1px solid #e5eaf2;font-family:monospace}
+  </style></head><body>
+  <div class="header">
+    <div>
+      <p style="font-size:10px;letter-spacing:.12em;opacity:.65;margin-bottom:6px">MINISTÉRIO DA SAÚDE · SAA</p>
+      <h1>${c.acro}</h1>
+      <p>${c.nome}</p>
+      <span class="status-tag">${S(ost).label}</span>
+    </div>
+    <div style="text-align:right;font-size:11px;opacity:.7">
+      <div>${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}</div>
+      <div style="margin-top:4px">Sala de Situação v5</div>
+    </div>
+  </div>
+  <div class="insight">💡 <b>Insight:</b> ${c.insight}</div>
+  <div class="section">
+    <h2>Indicadores de Desempenho</h2>
+    <table><thead><tr><th>Indicador</th><th>Realizado</th><th>Meta</th><th>% Ating.</th><th>Status</th></tr></thead>
+    <tbody>${kpiRows}</tbody></table>
+  </div>
+  <div class="footer">Desenvolvido por Lucas Macedo · SAA/MS · ${new Date().toLocaleDateString('pt-BR')}</div>
+  </body></html>`;
+
+  const w = window.open('','_blank','width=800,height=620,resizable=yes,scrollbars=yes');
+  w.document.write(html);
+  w.document.close();
+}
+
+// ══════════════════════════════════════════════
+// COMPARTILHAR WHATSAPP
+// ══════════════════════════════════════════════
+function shareWhatsApp(){
+  const all = Object.values(DB.coords).flatMap(c=>c.kpis);
+  let g=0,w=0,r=0;
+  all.forEach(k=>{const s=calcStatus(k.realizado,k.meta,k.inverso);if(s==='good')g++;else if(s==='warn')w++;else r++;});
+  const url = window.location.href;
+  const msg = `📊 *SAA · Sala de Situação — ${new Date().toLocaleDateString('pt-BR')}*\n\n`+
+    `✅ Metas atingidas: *${g}* indicadores\n`+
+    `⚠️ Atenção: *${w}* indicadores\n`+
+    `🔴 Críticos: *${r}* indicadores\n\n`+
+    `Acesse o painel completo:\n${url}\n\n`+
+    `_Ministério da Saúde · SAA_`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ══════════════════════════════════════════════
+// EXPORT MENU TOGGLE
+// ══════════════════════════════════════════════
+function toggleExportMenu(){
+  document.getElementById('export-menu').classList.toggle('open');
+}
+document.addEventListener('click', e=>{
+  const grp = document.getElementById('export-group');
+  if(grp && !grp.contains(e.target)) document.getElementById('export-menu')?.classList.remove('open');
+});
+
+// ══════════════════════════════════════════════
+// EXPORT PDF
+// ══════════════════════════════════════════════
+function exportPDF(){
+  document.getElementById('export-menu').classList.remove('open');
+  const all=Object.values(DB.coords).flatMap(c=>c.kpis);
+  let g=0,w2=0,r=0;
+  all.forEach(k=>{const s=calcStatus(k.realizado,k.meta,k.inverso);if(s==='good')g++;else if(s==='warn')w2++;else r++;});
+
+  const coordRows = Object.values(DB.coords).map(c=>{
+    const crits=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+    const warns=c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+    const avg=Math.round(c.kpis.reduce((a,k)=>a+pct(k.realizado,k.meta,k.inverso),0)/(c.kpis.length||1));
+    const col=crits>0?'#c0283d':warns>0?'#b45309':'#1a8a5a';
+    return `<tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:600">${c.acro}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px;color:#555">${c.nome}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;font-weight:700;color:${col}">${avg}%</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;color:#c0283d">${crits}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;color:#b45309">${warns}</td>
+    </tr>`;
+  }).join('');
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#1a2a3a;padding:28px 32px;font-size:13px}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:3px solid #005B9A;margin-bottom:20px}
+    .header h1{font-size:18px;font-weight:700;color:#005B9A;margin-bottom:2px}
+    .header p{font-size:11px;color:#6b82a0}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+    .kpi{background:#f0f5fb;border-radius:6px;padding:12px 14px;border-left:3px solid #005B9A}
+    .kpi-n{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b82a0;margin-bottom:4px}
+    .kpi-v{font-size:24px;font-weight:700;color:#005B9A}
+    h2{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#6b82a0;margin-bottom:10px;font-weight:600}
+    table{width:100%;border-collapse:collapse;margin-bottom:20px}
+    th{background:#005B9A;color:#fff;padding:8px 12px;text-align:left;font-size:11px;font-weight:600}
+    .footer{margin-top:24px;padding-top:12px;border-top:1px solid #e5eaf2;font-size:10px;color:#9aafca;display:flex;justify-content:space-between}
+    @media print{body{padding:0}@page{margin:20mm}}
+  </style></head><body>
+  <div class="header">
+    <div>
+      <p>MINISTÉRIO DA SAÚDE · SUBSECRETARIA DE ASSUNTOS ADMINISTRATIVOS</p>
+      <h1>Relatório Executivo — Sala de Situação SAA</h1>
+      <p>${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}</p>
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-n">Atingindo Meta</div><div class="kpi-v" style="color:#1a8a5a">${g}</div></div>
+    <div class="kpi"><div class="kpi-n">Regulares</div><div class="kpi-v" style="color:#b45309">${w2}</div></div>
+    <div class="kpi"><div class="kpi-n">Críticos</div><div class="kpi-v" style="color:#c0283d">${r}</div></div>
+    <div class="kpi"><div class="kpi-n">Total KPIs</div><div class="kpi-v">${all.length}</div></div>
+  </div>
+  <h2>Desempenho por Coordenação</h2>
+  <table><thead><tr><th>Sigla</th><th>Nome</th><th style="text-align:center">Atingimento</th><th style="text-align:center">Críticos</th><th style="text-align:center">Atenção</th></tr></thead>
+  <tbody>${coordRows}</tbody></table>
+  <div class="footer">
+    <span>Desenvolvido por Lucas Macedo · SAA/MS</span>
+    <span>Sala de Situação v5 · ${new Date().toLocaleDateString('pt-BR')}</span>
+  </div>
+  </body></html>`;
+
+  const w=window.open('','_blank','width=860,height=700');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>w.print(),600);
+}
+
+// ══════════════════════════════════════════════
+// EXPORT WORD (.doc via HTML Blob)
+// ══════════════════════════════════════════════
+function exportWord(){
+  document.getElementById('export-menu').classList.remove('open');
+  const all=Object.values(DB.coords).flatMap(c=>c.kpis);
+  let g=0,w2=0,r=0;
+  all.forEach(k=>{const s=calcStatus(k.realizado,k.meta,k.inverso);if(s==='good')g++;else if(s==='warn')w2++;else r++;});
+
+  const coordTables = Object.values(DB.coords).map(c=>{
+    const rows=c.kpis.map(k=>{
+      const st=calcStatus(k.realizado,k.meta,k.inverso);
+      const pc=pct(k.realizado,k.meta,k.inverso);
+      return `<tr><td>${k.nome}</td><td>${k.realizado} ${k.unidade}</td><td>${k.meta} ${k.unidade}</td><td>${pc}%</td><td>${S(st).label}</td></tr>`;
+    }).join('');
+    return `<h3>${c.acro} — ${c.nome}</h3>
+    <p><i>Insight: ${c.insight}</i></p>
+    <table border="1" cellpadding="6" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:16px">
+      <thead style="background:#005B9A;color:white"><tr><th>Indicador</th><th>Realizado</th><th>Meta</th><th>% Ating.</th><th>Status</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }).join('');
+
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+  <head><meta charset="UTF-8">
+  <style>body{font-family:Calibri,Arial;font-size:11pt;color:#1a2a3a}
+  h1{color:#005B9A;font-size:16pt}h2{color:#003F72;font-size:13pt;margin-top:16pt}h3{color:#005B9A;font-size:11pt}
+  table{width:100%;border-collapse:collapse}td,th{padding:5pt 8pt;border:1pt solid #cdd7e5;font-size:10pt}
+  th{background:#005B9A;color:white}</style></head>
+  <body>
+  <h1>Relatório Executivo — SAA · Sala de Situação</h1>
+  <p>Ministério da Saúde · Subsecretaria de Assuntos Administrativos</p>
+  <p><b>Data:</b> ${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}</p>
+  <h2>Resumo Executivo</h2>
+  <table><thead><tr><th>Indicadores atingindo meta</th><th>Regulares</th><th>Críticos</th><th>Total KPIs</th></tr></thead>
+  <tbody><tr><td>${g}</td><td>${w2}</td><td>${r}</td><td>${all.length}</td></tr></tbody></table>
+  <h2>Detalhamento por Coordenação</h2>
+  ${coordTables}
+  <p style="margin-top:24pt;font-size:9pt;color:#9aafca">Desenvolvido por Lucas Macedo · SAA/MS · Sala de Situação v5 · ${new Date().toLocaleDateString('pt-BR')}</p>
+  </body></html>`;
+
+  const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`SAA_Relatorio_${new Date().toISOString().slice(0,10)}.doc`;
+  a.click();
+}
+
+// ══════════════════════════════════════════════
+// EXPORT EXCEL (.csv → .xlsx via blob)
+// ══════════════════════════════════════════════
+function exportExcel(){
+  document.getElementById('export-menu').classList.remove('open');
+  const BOM='\uFEFF';
+  let csv=BOM+'Coordenação;Indicador;Realizado;Meta;Unidade;% Atingido;Status;Inverso\n';
+  Object.values(DB.coords).forEach(c=>{
+    c.kpis.forEach(k=>{
+      const st=calcStatus(k.realizado,k.meta,k.inverso);
+      const pc=pct(k.realizado,k.meta,k.inverso);
+      csv+=`${c.acro};"${k.nome}";${k.realizado};${k.meta};"${k.unidade}";${pc}%;${S(st).label};${k.inverso?'Sim':'Não'}\n`;
+    });
+  });
+  csv+='\n;Desenvolvido por Lucas Macedo · SAA/MS\n';
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`SAA_Indicadores_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// renderiza chips de IA no overview
+renderAIChips();
+</script>
+</body>
+</html>
