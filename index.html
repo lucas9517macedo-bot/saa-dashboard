@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SAA · Sala de Situação v5 | Ministério da Saúde</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-/* ═══════════════════════════════════
-   DESIGN TOKENS v5
 ═══════════════════════════════════ */
 :root {
   --radius: 10px;
@@ -1018,21 +1017,40 @@ body::after{ display:none }
 </div>
 
 <div class="modal-overlay" id="import-overlay">
-  <div class="modal">
+  <div class="modal" style="max-width:560px">
     <div class="modal-title">⬆ Importar Dados</div>
-    <div class="modal-hint">
-      Aceita <b>dois formatos</b>:<br>
-      <b style="color:var(--accent)">Formato SAA</b> — <code>{"coords":{...},"integrated":[...]}</code><br>
-      <b style="color:var(--accent2)">Formato Power BI</b> — <code>{"kpis":[{"label":"...","valor":0}],"graficos":[...]}</code><br>
-      <span style="opacity:.6">Cole o JSON exportado do Power BI ou do painel SAA diretamente abaixo.</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;background:var(--surface2);border-radius:var(--radius-sm);padding:4px;margin-bottom:16px">
+      <button class="lock-tab active" id="tab-json" onclick="switchImportTab('json')">📋 JSON</button>
+      <button class="lock-tab" id="tab-excel" onclick="switchImportTab('excel')">📊 Excel</button>
+      <button class="lock-tab" id="tab-cogad" onclick="switchImportTab('cogad')">🏛 COGAD</button>
     </div>
-    <div class="modal-field">
-      <div class="modal-label">Cole o JSON aqui</div>
-      <textarea class="modal-input modal-textarea" id="import-textarea" style="min-height:200px;font-family:var(--mono);font-size:11px" placeholder='{"kpis":[{"label":"Total de Processos","valor":5151}],"graficos":[...]}'></textarea>
+    <div id="import-tab-json">
+      <div class="modal-hint">Cole JSON no formato SAA <code>{"coords":{...}}</code> ou Power BI <code>{"kpis":[...]}</code></div>
+      <div class="modal-field">
+        <div class="modal-label">JSON</div>
+        <textarea class="modal-input modal-textarea" id="import-textarea" style="min-height:150px;font-family:var(--mono);font-size:11px" placeholder='{"kpis":[{"label":"Total","valor":5151}]}'></textarea>
+      </div>
+      <div class="modal-footer"><button class="btn" onclick="closeImport()">Cancelar</button><button class="btn btn-primary" onclick="doImport()">Importar</button></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeImport()">Cancelar</button>
-      <button class="btn btn-primary" onclick="doImport()">Importar</button>
+    <div id="import-tab-excel" style="display:none">
+      <div class="modal-hint">Selecione qualquer <b>.xlsx</b> exportado do Power BI. O sistema detecta as colunas e gera os KPIs automaticamente.</div>
+      <div style="border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:24px;text-align:center;margin-bottom:12px;cursor:pointer" onclick="document.getElementById('excel-file-input').click()">
+        <div style="font-size:24px;margin-bottom:6px">📊</div>
+        <div style="font-size:13px;color:var(--text2)">Clique para selecionar .xlsx</div>
+        <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this)">
+      </div>
+      <div id="excel-preview" style="display:none;font-size:11px;color:var(--text2);background:var(--surface2);border-radius:var(--radius-sm);padding:10px;margin-bottom:10px;max-height:140px;overflow-y:auto;font-family:var(--mono)"></div>
+      <div class="modal-footer"><button class="btn" onclick="closeImport()">Cancelar</button><button class="btn btn-primary" id="btn-import-excel" onclick="doImportExcel()" disabled>Importar Excel</button></div>
+    </div>
+    <div id="import-tab-cogad" style="display:none">
+      <div class="modal-hint">Importe o <b>Resumo dos Processos</b> da COGAD direto do Power BI — sem converter nada. Os KPIs são calculados automaticamente.</div>
+      <div style="border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:24px;text-align:center;margin-bottom:12px;cursor:pointer" onclick="document.getElementById('cogad-file-input').click()">
+        <div style="font-size:24px;margin-bottom:6px">🏛️</div>
+        <div style="font-size:13px;color:var(--text2)">Selecionar Resumo_dos_Processos.xlsx</div>
+        <input type="file" id="cogad-file-input" accept=".xlsx,.xls" style="display:none" onchange="handleCOGADFile(this)">
+      </div>
+      <div id="cogad-preview" style="display:none;font-size:12px;color:var(--text2);background:var(--surface2);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;line-height:1.8"></div>
+      <div class="modal-footer"><button class="btn" onclick="closeImport()">Cancelar</button><button class="btn btn-primary" id="btn-import-cogad" onclick="doImportCOGAD()" disabled>Atualizar COGAD</button></div>
     </div>
   </div>
 </div>
@@ -1100,7 +1118,19 @@ function isEdit(){ return SESSION.mode==='edit'; }
 // ══════════════════════════════════════════════
 let DB = {
   coords: {
-    cglic: {
+    cogad:{
+      acro:"COGAD", nome:"Coordenação de Gestão de Atos e Documentos",
+      desc:"Gestão de processos SEI, demandas judiciais, ofícios e despachos. Atendimento a demandas de PGU, TCU, SIC, CGU e demais órgãos.",
+      insight:"Taxa de atendimento em 98,5%. Atenção: 163 processos vencidos e 3 vencem hoje. Monitorar demandas PGU (4.036) e TCU (3.161).",
+      kpis:[
+        {id:"CG1",nome:"Total de Processos SEI",realizado:12348,meta:12348,unidade:"qtd",spark:[11200,11600,11900,12100,12348]},
+        {id:"CG2",nome:"Demandas Atendidas",realizado:12163,meta:12348,unidade:"qtd",spark:[11000,11300,11700,11900,12163]},
+        {id:"CG3",nome:"Taxa de Atendimento",realizado:98.5,meta:95,unidade:"%",spark:[96,97,97.5,98,98.5]},
+        {id:"CG4",nome:"Processos Vencidos",realizado:163,meta:0,unidade:"qtd",spark:[180,175,170,165,163],inverso:true},
+        {id:"CG5",nome:"Vencem Hoje",realizado:3,meta:0,unidade:"qtd",spark:[5,4,4,3,3],inverso:true},
+        {id:"CG6",nome:"No Prazo (ativos)",realizado:16,meta:20,unidade:"qtd",spark:[10,12,14,15,16]}
+      ]
+    },
       acro:"CGLIC", nome:"Coordenação-Geral de Licitações e Contratos",
       desc:"Condução de pregões eletrônicos, dispensas e inexigibilidades do MS.",
       insight:"Tempo médio de contratação 57% acima da meta. Identificar gargalo na fase de aprovação jurídica.",
@@ -1822,7 +1852,7 @@ Responda de forma direta, objetiva e orientada à ação. Use linguagem formal m
 
 DADOS ATUAIS DO PAINEL: ${dataCtx}`;
 
-  const GEMINI_KEY = 'AIzaSyCxEj7o0fCiVUjZjU3VXQwn8D-xnEXzveU';
+  const GEMINI_KEY = 'AIzaSyB-S8I90SroP3sZtIP65eV9n-gMdFIoNs0';
 
   try {
     const response = await fetch(
@@ -2222,6 +2252,126 @@ function exportExcel(){
   a.href=URL.createObjectURL(blob);
   a.download=`SAA_Indicadores_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
+}
+
+// ══════════════════════════════════════════════
+// IMPORT TABS
+// ══════════════════════════════════════════════
+function switchImportTab(tab){
+  ['json','excel','cogad'].forEach(t=>{
+    document.getElementById(`import-tab-${t}`).style.display = t===tab?'':'none';
+    document.getElementById(`tab-${t}`).classList.toggle('active', t===tab);
+  });
+}
+
+// ══════════════════════════════════════════════
+// IMPORTAR EXCEL GENÉRICO
+// ══════════════════════════════════════════════
+let _excelData = null;
+function handleExcelFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, {type:'binary'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws);
+      _excelData = data;
+      const prev = document.getElementById('excel-preview');
+      prev.style.display = 'block';
+      prev.innerHTML = `✓ ${file.name}<br>${data.length} linhas · ${Object.keys(data[0]||{}).length} colunas<br><br>Colunas: ${Object.keys(data[0]||{}).join(', ')}`;
+      document.getElementById('btn-import-excel').disabled = false;
+    } catch(err){ alert('Erro ao ler arquivo: '+err.message); }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function doImportExcel(){
+  if(!_excelData || !_excelData.length){ alert('Nenhum dado carregado.'); return; }
+  // Detecta colunas numéricas e cria KPIs automaticamente
+  const cols = Object.keys(_excelData[0]);
+  const numCols = cols.filter(c => typeof _excelData[0][c] === 'number');
+  const kpis = numCols.slice(0,6).map((col,i)=>{
+    const vals = _excelData.map(r=>Number(r[col])||0).filter(v=>v>0);
+    const total = vals.reduce((a,b)=>a+b,0);
+    return { id:`EX${i+1}`, nome:col, realizado:total, meta:total, unidade:'qtd', spark:[0,0,0,0,total] };
+  });
+  if(!DB.coords['excel_import']){
+    DB.coords['excel_import'] = { acro:'Excel', nome:'Dados Importados (Excel)', desc:'Dados importados automaticamente via planilha.', insight:'Dados carregados via importação Excel.', kpis:[] };
+  }
+  DB.coords['excel_import'].kpis = kpis;
+  renderAll(); saveAll(); closeImport();
+  alert(`✓ ${kpis.length} KPIs importados com sucesso!`);
+}
+
+// ══════════════════════════════════════════════
+// IMPORTAR COGAD — Resumo dos Processos
+// ══════════════════════════════════════════════
+let _cogadData = null;
+function handleCOGADFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, {type:'binary'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws);
+      _cogadData = data;
+
+      // Calcular KPIs
+      const total = data.length;
+      const atendidos = data.filter(r=>String(r['Status']||'').includes('Atendida')).length;
+      const vencidos  = data.filter(r=>String(r['Status']||'').toLowerCase()==='vencido').length;
+      const noPrazo   = data.filter(r=>String(r['Status']||'').toLowerCase()==='no prazo').length;
+      const venceHoje = data.filter(r=>String(r['Status']||'').toLowerCase()==='vence hoje').length;
+      const taxa      = total>0 ? Math.round((atendidos/total)*100*10)/10 : 0;
+
+      const prev = document.getElementById('cogad-preview');
+      prev.style.display = 'block';
+      prev.innerHTML = `
+        <b style="color:var(--accent)">✓ ${file.name} carregado</b><br><br>
+        📊 Total de processos: <b>${total.toLocaleString('pt-BR')}</b><br>
+        ✅ Demandas atendidas: <b>${atendidos.toLocaleString('pt-BR')}</b><br>
+        📈 Taxa de atendimento: <b>${taxa}%</b><br>
+        🔴 Processos vencidos: <b>${vencidos}</b><br>
+        ⏰ Vencem hoje: <b>${venceHoje}</b><br>
+        🟢 No prazo (ativos): <b>${noPrazo}</b>
+      `;
+      document.getElementById('btn-import-cogad').disabled = false;
+    } catch(err){ alert('Erro ao ler arquivo COGAD: '+err.message); }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function doImportCOGAD(){
+  if(!_cogadData || !_cogadData.length){ alert('Nenhum dado carregado.'); return; }
+  const data = _cogadData;
+  const total     = data.length;
+  const atendidos = data.filter(r=>String(r['Status']||'').includes('Atendida')).length;
+  const vencidos  = data.filter(r=>String(r['Status']||'').toLowerCase()==='vencido').length;
+  const noPrazo   = data.filter(r=>String(r['Status']||'').toLowerCase()==='no prazo').length;
+  const vendeHoje = data.filter(r=>String(r['Status']||'').toLowerCase()==='vence hoje').length;
+  const taxa      = total>0 ? Math.round((atendidos/total)*100*10)/10 : 0;
+
+  // Atualizar KPIs da COGAD
+  const cogad = DB.coords['cogad'];
+  if(cogad){
+    cogad.kpis[0].realizado = total;
+    cogad.kpis[0].meta = total;
+    cogad.kpis[1].realizado = atendidos;
+    cogad.kpis[1].meta = total;
+    cogad.kpis[2].realizado = taxa;
+    cogad.kpis[3].realizado = vencidos;
+    cogad.kpis[4].realizado = vendeHoje;
+    cogad.kpis[5].realizado = noPrazo;
+    // Empurrar spark
+    cogad.kpis.forEach(k=>{ k.spark=[...k.spark.slice(1), k.realizado]; });
+    cogad.insight = `Atualizado em ${new Date().toLocaleDateString('pt-BR')}. Taxa de atendimento: ${taxa}%. ${vencidos} processos vencidos${vendeHoje>0?', '+vendeHoje+' vencem hoje':''}.`;
+  }
+  renderAll(); saveAll(); closeImport();
+  alert(`✓ COGAD atualizada!\n${total.toLocaleString('pt-BR')} processos · ${taxa}% atendidos · ${vencidos} vencidos`);
 }
 
 // renderiza chips de IA no overview
