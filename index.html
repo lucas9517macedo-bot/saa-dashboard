@@ -1945,33 +1945,62 @@ function renderRiskSummaryCards(){
 function renderRiskMatrix(){
   const el = document.getElementById('risk-matrix-svg');
   if(!el) return;
-  // Matriz 3x3: Probabilidade (baixa/média/alta) x Impacto (baixo/médio/alto)
-  const W=240, H=180, pad=30;
-  const cw=(W-pad)/3, ch=(H-pad)/3;
-  const cols=[['var(--good-a)','var(--warn-a)','var(--crit-a)'],['var(--warn-a)','var(--warn-a)','var(--crit-a)'],['var(--crit-a)','var(--crit-a)','var(--crit-a)']];
-  let cells='', labels='';
+
+  // Cores rgba diretas — SVG não suporta var() CSS
+  const verde   = 'rgba(26,138,90,.15)';
+  const laranja  = 'rgba(180,83,9,.15)';
+  const vermelho = 'rgba(192,40,61,.20)';
+
+  // Matriz 3x3 [linha=prob (alto→baixo)][col=impacto (baixo→alto)]
+  const grade = [
+    [laranja,  vermelho, vermelho],
+    [verde,    laranja,  vermelho],
+    [verde,    verde,    laranja ],
+  ];
+  const lblImpacto = ['Baixo','Médio','Alto'];
+  const lblProb    = ['Alto','Méd.','Baixo'];
+
+  const W=280, H=200, padL=42, padB=28;
+  const cols3=(W-padL)/3, rows3=(H-padB)/3;
+
+  let cells='';
+  // células
   for(let r=0;r<3;r++) for(let c=0;c<3;c++){
-    cells+=`<rect x="${pad+c*cw}" y="${r*ch}" width="${cw-2}" height="${ch-2}" rx="3" fill="${cols[2-r][c]}" stroke="var(--border2)" stroke-width=".5"/>`;
+    const x=padL+c*cols3, y=r*rows3;
+    cells+=`<rect x="${x+1}" y="${y+1}" width="${cols3-2}" height="${rows3-2}"
+      rx="4" fill="${grade[r][c]}" stroke="rgba(255,255,255,.06)" stroke-width="1"/>`;
   }
-  labels+=`<text x="${pad+cw*0.5}" y="${H-2}" font-size="8" text-anchor="middle" fill="var(--text3)" font-family="var(--mono)">Baixo</text>`;
-  labels+=`<text x="${pad+cw*1.5}" y="${H-2}" font-size="8" text-anchor="middle" fill="var(--text3)" font-family="var(--mono)">Médio</text>`;
-  labels+=`<text x="${pad+cw*2.5}" y="${H-2}" font-size="8" text-anchor="middle" fill="var(--text3)" font-family="var(--mono)">Alto</text>`;
-  labels+=`<text x="${pad-4}" y="${ch*0.5+5}" font-size="7" text-anchor="end" fill="var(--text3)" font-family="var(--mono)">Alto</text>`;
-  labels+=`<text x="${pad-4}" y="${ch*1.5+5}" font-size="7" text-anchor="end" fill="var(--text3)" font-family="var(--mono)">Méd.</text>`;
-  labels+=`<text x="${pad-4}" y="${ch*2.5+5}" font-size="7" text-anchor="end" fill="var(--text3)" font-family="var(--mono)">Baixo</text>`;
-  // Plotar KPIs críticos e em atenção como pontos
-  const all = Object.values(DB.coords).flatMap(c=>c.kpis.map(k=>({...k,coord:c.acro})));
+  // labels eixo x (impacto)
+  lblImpacto.forEach((l,i)=>{
+    cells+=`<text x="${padL+i*cols3+cols3/2}" y="${H-2}" text-anchor="middle"
+      font-size="9" fill="#7a96b4" font-family="DM Mono,monospace">${l}</text>`;
+  });
+  // labels eixo y (probabilidade)
+  lblProb.forEach((l,i)=>{
+    cells+=`<text x="${padL-4}" y="${i*rows3+rows3/2+4}" text-anchor="end"
+      font-size="9" fill="#7a96b4" font-family="DM Mono,monospace">${l}</text>`;
+  });
+  // título eixos
+  cells+=`<text x="${padL+(W-padL)/2}" y="${H+12}" text-anchor="middle"
+    font-size="8" fill="#7a96b4" font-family="DM Mono,monospace">← Impacto →</text>`;
+
+  // Plotar KPIs críticos/atenção como pontos
+  const all = Object.values(DB.coords).flatMap(c=>
+    c.kpis.map(k=>({...k, coord:c.acro}))
+  );
   all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)!=='good').forEach(k=>{
     const st=calcStatus(k.realizado,k.meta,k.inverso);
     const pc=pct(k.realizado,k.meta,k.inverso);
-    const imp=pc<50?2:pc<75?1:0; // impacto: 0=baixo,1=meio,2=alto (invertido para y)
-    const prob=st==='crit'?2:1;    // probabilidade
-    const cx2=pad+imp*cw+cw/2, cy2=(2-prob)*ch+ch/2;
-    cells+=`<circle cx="${cx2}" cy="${cy2}" r="5" fill="${st==='crit'?'var(--crit)':'var(--warn)'}" opacity=".8">
-      <title>${k.nome} (${k.coord})</title></circle>`;
+    const imp = pc<50?2 : pc<75?1 : 0;   // impacto: 2=alto, 1=médio, 0=baixo
+    const prob= st==='crit'?0 : 1;         // prob: 0=alto, 1=médio (linha da matriz)
+    const cx2 = padL + imp*cols3 + cols3/2;
+    const cy2 = prob*rows3 + rows3/2;
+    const col2= st==='crit' ? '#c0283d' : '#b45309';
+    cells+=`<circle cx="${cx2}" cy="${cy2}" r="5" fill="${col2}" opacity=".85" stroke="white" stroke-width="1">
+      <title>${k.nome} (${k.coord}) — ${pc}%</title></circle>`;
   });
-  labels+=`<text x="${pad+(W-pad)/2}" y="${H+12}" font-size="8" text-anchor="middle" fill="var(--text3)" font-family="var(--mono)">← Impacto →</text>`;
-  el.innerHTML=`<svg viewBox="-5 -5 ${W+10} ${H+20}" style="width:100%">${cells}${labels}</svg>`;
+
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H+16}" style="width:100%;max-width:${W}px">${cells}</svg>`;
 }
 
 function renderPriorityAlerts(){
