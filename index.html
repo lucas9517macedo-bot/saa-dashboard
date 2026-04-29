@@ -801,6 +801,9 @@ body::after{ display:none }
 
     <div class="nav-section">
       <div class="nav-label">Config.</div>
+      <button class="nav-item" onclick="goTo('importar')" data-sec="importar">
+        <span class="nav-dot"></span>⬆ Importar Dados
+      </button>
       <button class="nav-item" onclick="goTo('integracao')" data-sec="integracao">
         <span class="nav-dot"></span>Integração & Arquitetura
       </button>
@@ -1073,6 +1076,158 @@ body::after{ display:none }
         <!-- Cards regionais detalhados -->
         <div class="row-label">Detalhamento por Região</div>
         <div id="cr-region-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:24px"></div>
+      </div>
+
+      <!-- ── IMPORTAR DADOS ── -->
+      <div id="sec-importar" class="section">
+        <div class="sec-head">
+          <div class="sec-title">⬆ Importar <em>Dados</em></div>
+          <div class="sec-sub">Importe dados de qualquer fonte em 3 passos — sem precisar editar JSON ou código</div>
+        </div>
+
+        <!-- Passos visuais -->
+        <div style="display:flex;align-items:center;gap:0;margin-bottom:28px;flex-wrap:wrap;gap:8px">
+          <div id="imp-step-1-ind" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:var(--radius);background:var(--accent);color:var(--bg);font-size:12px;font-weight:600">
+            <span style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">1</span>
+            Importar fonte
+          </div>
+          <div style="height:2px;width:24px;background:var(--border2)"></div>
+          <div id="imp-step-2-ind" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border2);color:var(--text3);font-size:12px;font-weight:600">
+            <span style="width:20px;height:20px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:10px">2</span>
+            Confirmar mapeamento
+          </div>
+          <div style="height:2px;width:24px;background:var(--border2)"></div>
+          <div id="imp-step-3-ind" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border2);color:var(--text3);font-size:12px;font-weight:600">
+            <span style="width:20px;height:20px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:10px">3</span>
+            Atualizar dashboard
+          </div>
+          <button class="btn" onclick="downloadModeloExcel()" style="margin-left:auto">⬇ Baixar modelo padrão (.xlsx)</button>
+        </div>
+
+        <!-- PASSO 1 -->
+        <div id="imp-step-1" style="display:block">
+          <div class="row-label">Escolha a fonte de dados</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px">
+
+            <!-- Excel/CSV -->
+            <div class="chart-wrap" style="cursor:pointer;text-align:center;transition:all var(--trans)"
+              onclick="document.getElementById('imp-file-input').click()"
+              onmouseover="this.style.borderColor='var(--accent)'"
+              onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:36px;margin-bottom:10px">📊</div>
+              <div style="font-weight:600;color:var(--text);margin-bottom:4px">Excel / CSV</div>
+              <div style="font-size:11px;color:var(--text3)">.xlsx · .xls · .csv<br>Power BI exportado</div>
+              <input type="file" id="imp-file-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="impHandleFile(this)">
+            </div>
+
+            <!-- Colar tabela -->
+            <div class="chart-wrap" style="cursor:pointer;text-align:center;transition:all var(--trans)"
+              onclick="impShowPaste()"
+              onmouseover="this.style.borderColor='var(--accent)'"
+              onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:36px;margin-bottom:10px">📋</div>
+              <div style="font-weight:600;color:var(--text);margin-bottom:4px">Colar Tabela</div>
+              <div style="font-size:11px;color:var(--text3)">Copie do Excel, Word<br>ou Power BI e cole aqui</div>
+            </div>
+
+            <!-- Google Sheets -->
+            <div class="chart-wrap" style="cursor:pointer;text-align:center;transition:all var(--trans)"
+              onclick="impShowSheets()"
+              onmouseover="this.style.borderColor='var(--accent)'"
+              onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:36px;margin-bottom:10px">🔗</div>
+              <div style="font-weight:600;color:var(--text);margin-bottom:4px">Google Sheets</div>
+              <div style="font-size:11px;color:var(--text3)">Cole o link público<br>da planilha</div>
+            </div>
+
+            <!-- Atualização Rápida por coord -->
+            <div class="chart-wrap" style="cursor:pointer;text-align:center;transition:all var(--trans)"
+              onclick="impShowManual()"
+              onmouseover="this.style.borderColor='var(--accent)'"
+              onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:36px;margin-bottom:10px">✏️</div>
+              <div style="font-weight:600;color:var(--text);margin-bottom:4px">Entrada Manual</div>
+              <div style="font-size:11px;color:var(--text3)">Digite ou ajuste<br>KPIs diretamente</div>
+            </div>
+          </div>
+
+          <!-- Sub-painéis de entrada -->
+          <div id="imp-paste-panel" style="display:none" class="chart-wrap">
+            <div class="chart-title">📋 Colar Tabela</div>
+            <div class="chart-sub">Copie qualquer tabela do Excel, Word ou Power BI (Ctrl+C) e cole abaixo (Ctrl+V)</div>
+            <textarea id="imp-paste-area"
+              style="width:100%;min-height:160px;margin-top:12px;background:var(--surface2);
+              border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+              padding:12px;font-family:var(--mono);font-size:12px;color:var(--text);
+              outline:none;resize:vertical;transition:border-color var(--trans)"
+              onfocus="this.style.borderColor='var(--accent)'"
+              onblur="this.style.borderColor='var(--border2)'"
+              placeholder="Cole aqui a tabela copiada do Excel, Word ou Power BI...&#10;&#10;Exemplo:&#10;UF	Status	Quantidade	Indicador&#10;AM	Concluído	12	Demandas atendidas&#10;PA	Em andamento	8	Demandas atendidas"></textarea>
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+              <button class="btn" onclick="document.getElementById('imp-paste-panel').style.display='none'">Cancelar</button>
+              <button class="btn btn-primary" onclick="impProcessPaste()">Analisar dados colados →</button>
+            </div>
+          </div>
+
+          <div id="imp-sheets-panel" style="display:none" class="chart-wrap">
+            <div class="chart-title">🔗 Google Sheets</div>
+            <div class="chart-sub">Cole o link público da planilha (Arquivo → Compartilhar → "Qualquer pessoa com o link")</div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <input id="imp-sheets-url"
+                style="flex:1;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+                padding:10px 14px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none"
+                placeholder="https://docs.google.com/spreadsheets/d/...">
+              <button class="btn btn-primary" onclick="impProcessSheets()">Importar →</button>
+            </div>
+            <div id="imp-sheets-status" style="margin-top:8px;font-size:12px;color:var(--text3)"></div>
+          </div>
+
+          <div id="imp-manual-panel" style="display:none" class="chart-wrap">
+            <div class="chart-title">✏️ Entrada Manual por Coordenação</div>
+            <div class="chart-sub">Selecione a coordenação e preencha os valores dos indicadores</div>
+            <div style="display:flex;gap:10px;margin-top:12px;align-items:center;flex-wrap:wrap">
+              <select id="imp-manual-coord" class="modal-input" style="width:200px" onchange="impRenderManual()">
+                <option value="">Selecione a coordenação...</option>
+              </select>
+              <span style="font-size:11px;color:var(--text3)">Os campos aparecerão abaixo para preenchimento</span>
+            </div>
+            <div id="imp-manual-fields" style="margin-top:14px"></div>
+          </div>
+        </div>
+
+        <!-- PASSO 2 — Mapeamento -->
+        <div id="imp-step-2" style="display:none">
+          <div class="row-label">Confirmar mapeamento de colunas</div>
+          <div id="imp-detection-msg" style="background:var(--good-a);border:1px solid rgba(26,138,90,.2);
+            border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;
+            font-size:13px;color:var(--text2)"></div>
+          <div id="imp-mapping-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-bottom:16px"></div>
+          <div id="imp-preview-table-wrap" style="overflow-x:auto;margin-bottom:16px">
+            <table id="imp-preview-table" style="width:100%;border-collapse:collapse;font-size:11px">
+              <thead id="imp-preview-head"></thead>
+              <tbody id="imp-preview-body"></tbody>
+            </table>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+            <button class="btn" onclick="impGoStep(1)">← Voltar</button>
+            <div style="display:flex;gap:8px">
+              <select id="imp-target-coord" class="modal-input" style="width:180px">
+                <option value="auto">🤖 Detectar automaticamente</option>
+              </select>
+              <button class="btn btn-primary" onclick="impGoStep(3)">Aplicar ao dashboard →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASSO 3 — Resultado -->
+        <div id="imp-step-3" style="display:none">
+          <div id="imp-result-msg" style="border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;font-size:13px;line-height:1.8"></div>
+          <div id="imp-result-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px"></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn" onclick="impGoStep(1)">← Nova importação</button>
+            <button class="btn btn-primary" onclick="goTo('overview')">Ver dashboard →</button>
+          </div>
+        </div>
       </div>
 
       <!-- ── INTEGRAÇÃO ── -->
@@ -2459,6 +2614,7 @@ const TITLES={
   graficos:'Gráficos & Análise',
   alertas:'Alertas e Riscos',
   'coasup-regional':'COASUP · Painel Regional',
+  importar:'Importar Dados',
   integracao:'Integração & Arquitetura'
 };
 
@@ -2656,6 +2812,9 @@ function goTo(key){
   window.scrollTo({top:0,behavior:'smooth'});
   if(key==='graficos') renderGraficos();
   if(key==='coasup-regional') renderCOASUPRegionalPage();
+  if(key==='importar') initImportSection();
+
+// renderiza chips de IA no overview
 }
 
 // ══════════════════════════════════════════════
@@ -3041,7 +3200,413 @@ function doImportCOGAD(){
   alert(`✓ COGAD atualizada!\n${total.toLocaleString('pt-BR')} processos · ${taxa}% atendidos · ${vencidos} vencidos`);
 }
 
-// renderiza chips de IA no overview
+// ══════════════════════════════════════════════
+// ENGINE DE IMPORTAÇÃO AVANÇADA
+// ══════════════════════════════════════════════
+
+// Colunas padrão que o sistema reconhece automaticamente
+const IMP_COL_MAP = {
+  coordenacao:  ['coordenacao','coord','area','setor','nucleo'],
+  regiao:       ['regiao','região','region'],
+  uf:           ['uf','estado','state','sigla'],
+  indicador:    ['indicador','kpi','indicador','nome','indicator','metrica'],
+  valor:        ['valor','value','realizado','quantidade','qtd','total','resultado'],
+  meta:         ['meta','target','objetivo','goal'],
+  unidade:      ['unidade','unit','tipo'],
+  status:       ['status','situacao','situação','state'],
+  data:         ['data','date','periodo','semana','mes','mês'],
+  responsavel:  ['responsavel','responsável','resp','gestor'],
+  risco:        ['risco','risk','criticidade','criticality'],
+  regiao_br:    ['regiao_br','região','norte','nordeste','sudeste','sul','centrooeste'],
+};
+
+const STATUS_MAP = {
+  'concluido':'good','concluída':'good','concluído':'good','atendido':'good','atendida':'good',
+  'ok':'good','atingido':'good','meta':'good','✓':'good',
+  'andamento':'warn','em andamento':'warn','parcial':'warn','regular':'warn','⚠':'warn',
+  'pendente':'crit','atrasado':'crit','critico':'crit','crítico':'crit','vencido':'crit',
+  'nao atendido':'crit','não atendido':'crit','✕':'crit',
+};
+
+let _impData = { raw:[], headers:[], mapping:{}, source:'' };
+
+// ── Inicialização da seção ──
+function initImportSection(){
+  // Popular select de coordenações
+  const sel = document.getElementById('imp-manual-coord');
+  const selTarget = document.getElementById('imp-target-coord');
+  if(sel && sel.options.length===1){
+    Object.entries(DB.coords).forEach(([key,c])=>{
+      const o1=document.createElement('option'); o1.value=key; o1.textContent=`${c.acro} — ${c.nome}`; sel.appendChild(o1);
+      if(selTarget){ const o2=document.createElement('option'); o2.value=key; o2.textContent=c.acro; selTarget.appendChild(o2); }
+    });
+  }
+}
+
+// ── Navegação entre passos ──
+function impGoStep(n){
+  [1,2,3].forEach(i=>{
+    const el=document.getElementById(`imp-step-${i}`);
+    if(el) el.style.display=i===n?'block':'none';
+    // atualizar indicadores visuais
+    const ind=document.getElementById(`imp-step-${i}-ind`);
+    if(ind){
+      if(i<n){
+        ind.style.background='var(--good)'; ind.style.color='#fff'; ind.style.border='none';
+      } else if(i===n){
+        ind.style.background='var(--accent)'; ind.style.color='var(--bg)'; ind.style.border='none';
+      } else {
+        ind.style.background='var(--surface)'; ind.style.color='var(--text3)';
+        ind.style.border='1px solid var(--border2)';
+      }
+    }
+  });
+  if(n===2){ impRenderMapping(); }
+  if(n===3){ impApplyToDashboard(); }
+}
+
+// ── Handle arquivo ──
+function impHandleFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  _impData.source = file.name;
+  const isCSV = file.name.toLowerCase().endsWith('.csv');
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      let data = [];
+      if(isCSV){
+        // CSV parser simples
+        const lines = e.target.result.split('\n').filter(l=>l.trim());
+        const sep = lines[0].includes(';')?';':',';
+        const headers = lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));
+        data = lines.slice(1).map(line=>{
+          const vals=line.split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
+          const obj={};
+          headers.forEach((h,i)=>obj[h]=vals[i]||'');
+          return obj;
+        }).filter(r=>Object.values(r).some(v=>v));
+      } else {
+        const wb=XLSX.read(e.target.result,{type:'binary'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        data=XLSX.utils.sheet_to_json(ws,{defval:''});
+      }
+      _impData.raw=data;
+      _impData.headers=data.length?Object.keys(data[0]):[];
+      impAutoDetect();
+      impGoStep(2);
+    } catch(err){ alert('Erro ao ler arquivo: '+err.message); }
+  };
+  isCSV ? reader.readAsText(file,'utf-8') : reader.readAsBinaryString(file);
+}
+
+// ── Processar texto colado ──
+function impShowPaste(){ document.getElementById('imp-paste-panel').style.display='block'; }
+function impShowSheets(){ document.getElementById('imp-sheets-panel').style.display='block'; }
+function impShowManual(){ document.getElementById('imp-manual-panel').style.display='block'; initImportSection(); }
+
+function impProcessPaste(){
+  const raw = document.getElementById('imp-paste-area').value.trim();
+  if(!raw){ alert('Cole algum dado primeiro.'); return; }
+  try {
+    // Detectar separador: tab (Excel/Word) ou ponto e vírgula
+    const lines = raw.split('\n').filter(l=>l.trim());
+    const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
+    const headers = lines[0].split(sep).map(h=>h.trim());
+    const data = lines.slice(1).map(line=>{
+      const vals=line.split(sep).map(v=>v.trim());
+      const obj={};
+      headers.forEach((h,i)=>obj[h]=vals[i]||'');
+      return obj;
+    }).filter(r=>Object.values(r).some(v=>v));
+    _impData.raw=data; _impData.headers=headers; _impData.source='Dados colados';
+    impAutoDetect(); impGoStep(2);
+  } catch(e){ alert('Erro ao processar: '+e.message); }
+}
+
+// ── Google Sheets ──
+async function impProcessSheets(){
+  const url = document.getElementById('imp-sheets-url').value.trim();
+  const status = document.getElementById('imp-sheets-status');
+  if(!url){ alert('Cole o link da planilha.'); return; }
+  // Extrair ID da planilha
+  const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if(!match){ alert('Link inválido. Use o link de compartilhamento público do Google Sheets.'); return; }
+  const id = match[1];
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv`;
+  status.textContent='⏳ Conectando ao Google Sheets...';
+  try {
+    const resp = await fetch(csvUrl);
+    if(!resp.ok) throw new Error('Planilha não acessível. Verifique se está pública.');
+    const text = await resp.text();
+    const lines = text.split('\n').filter(l=>l.trim());
+    const sep = ',';
+    const headers = lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));
+    const data = lines.slice(1).map(line=>{
+      const vals=line.split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
+      const obj={}; headers.forEach((h,i)=>obj[h]=vals[i]||''); return obj;
+    }).filter(r=>Object.values(r).some(v=>v));
+    _impData.raw=data; _impData.headers=headers; _impData.source='Google Sheets';
+    impAutoDetect(); impGoStep(2);
+  } catch(e){ status.style.color='var(--crit)'; status.textContent='❌ '+e.message; }
+}
+
+// ── Detecção automática de colunas ──
+function impAutoDetect(){
+  const mapping={};
+  _impData.headers.forEach(h=>{
+    const hn=h.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+    for(const [field, aliases] of Object.entries(IMP_COL_MAP)){
+      if(!mapping[field] && aliases.some(a=>hn.includes(a))){ mapping[field]=h; break; }
+    }
+  });
+  _impData.mapping=mapping;
+}
+
+// ── Renderizar tela de mapeamento ──
+function impRenderMapping(){
+  const el = document.getElementById('imp-mapping-grid');
+  const msg = document.getElementById('imp-detection-msg');
+  const thead = document.getElementById('imp-preview-head');
+  const tbody = document.getElementById('imp-preview-body');
+  if(!el) return;
+
+  const detected = Object.keys(_impData.mapping).length;
+  const rows = _impData.raw.length;
+  // Detectar coordenação pelo conteúdo
+  let coordDetected = '';
+  if(_impData.mapping.coordenacao){
+    const vals = [...new Set(_impData.raw.map(r=>r[_impData.mapping.coordenacao]))].filter(Boolean);
+    coordDetected = vals.slice(0,3).join(', ');
+  }
+  // Detectar status counts
+  let critCount=0, warnCount=0;
+  if(_impData.mapping.risco||_impData.mapping.status){
+    _impData.raw.forEach(r=>{
+      const v=String(r[_impData.mapping.risco||_impData.mapping.status]||'').toLowerCase();
+      if(['alto','critico','crítico','vencido','pendente'].some(x=>v.includes(x))) critCount++;
+      else if(['medio','médio','atencao','atenção','andamento'].some(x=>v.includes(x))) warnCount++;
+    });
+  }
+
+  msg.innerHTML = `✓ <b>${rows} registros</b> detectados · <b>${detected} colunas</b> mapeadas automaticamente`+
+    (coordDetected?` · Coordenações: <b>${coordDetected}</b>`:'') +
+    (critCount>0?` · <span style="color:var(--crit)">⚠ ${critCount} registros com risco alto</span>`:'') +
+    (warnCount>0?` · <span style="color:var(--warn)">${warnCount} em atenção</span>`:'');
+
+  const FIELD_LABELS={
+    coordenacao:'Coordenação',regiao:'Região',uf:'UF',indicador:'Indicador',
+    valor:'Valor realizado',meta:'Meta',unidade:'Unidade',status:'Status',
+    data:'Data',responsavel:'Responsável',risco:'Nível de risco'
+  };
+
+  el.innerHTML = Object.entries(FIELD_LABELS).map(([field,label])=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
+      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:5px">${label}</div>
+      <select style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:4px;
+        padding:6px 8px;font-size:11px;color:var(--text);outline:none" id="map-${field}"
+        onchange="_impData.mapping['${field}']=this.value">
+        <option value="">— não mapear —</option>
+        ${_impData.headers.map(h=>`<option value="${h}" ${_impData.mapping[field]===h?'selected':''}>${h}</option>`).join('')}
+      </select>
+    </div>`).join('');
+
+  // Preview das primeiras 5 linhas
+  const preview = _impData.raw.slice(0,5);
+  thead.innerHTML=`<tr>${_impData.headers.map(h=>`<th style="padding:6px 10px;background:var(--surface2);
+    border-bottom:2px solid var(--border2);font-family:var(--mono);font-size:9px;
+    text-transform:uppercase;color:var(--text3);white-space:nowrap">${h}</th>`).join('')}</tr>`;
+  tbody.innerHTML=preview.map(row=>`<tr>${_impData.headers.map(h=>`<td style="padding:6px 10px;
+    border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);
+    white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis">${row[h]??''}</td>`).join('')}</tr>`).join('');
+}
+
+// ── Entrada manual por coordenação ──
+function impRenderManual(){
+  const key = document.getElementById('imp-manual-coord').value;
+  const el = document.getElementById('imp-manual-fields');
+  if(!key||!el){ el.innerHTML=''; return; }
+  const c = DB.coords[key];
+  if(!c) return;
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+      ${c.kpis.map((k,i)=>`
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
+          <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.35">${k.nome}</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input id="man-${key}-${i}" type="number" value="${k.realizado}"
+              style="flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:4px;
+              padding:6px 8px;font-family:var(--mono);font-size:13px;font-weight:600;
+              color:var(--text);outline:none"
+              onchange="DB.coords['${key}'].kpis[${i}].realizado=Number(this.value);autoSave()">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${k.unidade} / meta ${k.meta}</span>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:8px">
+      <button class="btn btn-primary" onclick="impManualApply('${key}')">✓ Salvar dados de ${c.acro}</button>
+    </div>`;
+}
+
+function impManualApply(key){
+  const c=DB.coords[key];
+  c.kpis.forEach((k,i)=>{
+    const inp=document.getElementById(`man-${key}-${i}`);
+    if(inp){ const n=Number(inp.value); if(!isNaN(n)){
+      c.kpis[i].spark=[...c.kpis[i].spark.slice(1),n];
+      c.kpis[i].realizado=n;
+    }}
+  });
+  renderAll(); autoSave();
+  impGoStep(3);
+  _impData.source=`Entrada manual — ${c.acro}`;
+  document.getElementById('imp-result-msg').innerHTML=
+    `<div style="background:var(--good-a);border:1px solid rgba(26,138,90,.2);border-radius:var(--radius);padding:18px">
+      ✅ <b>Dados de ${c.acro} atualizados!</b><br>
+      <span style="color:var(--text3)">${c.kpis.length} indicadores salvos e aplicados ao dashboard.</span>
+    </div>`;
+  impBuildResultCards([{label:'Indicadores atualizados',val:c.kpis.length,col:'var(--good)'}]);
+}
+
+// ── Aplicar dados ao dashboard ──
+function impApplyToDashboard(){
+  // Reler mapeamento dos selects
+  Object.keys(_impData.mapping).forEach(field=>{
+    const sel=document.getElementById(`map-${field}`);
+    if(sel) _impData.mapping[field]=sel.value;
+  });
+
+  const data=_impData.raw;
+  if(!data.length){ impGoStep(1); return; }
+
+  const m=_impData.mapping;
+  let applied=0, critCount=0, warnCount=0, coordsAffected=new Set();
+
+  // Agrupar por coordenação e indicador
+  const groups={};
+  data.forEach(row=>{
+    const coordRaw=(m.coordenacao?String(row[m.coordenacao]||''):'').trim();
+    const indNome=(m.indicador?String(row[m.indicador]||''):'').trim();
+    const valorRaw=(m.valor?row[m.valor]:null);
+    const metaRaw=(m.meta?row[m.meta]:null);
+    const statusRaw=(m.status?String(row[m.status]||''):'');
+    const riscoRaw=(m.risco?String(row[m.risco]||''):'');
+    const unidade=(m.unidade?String(row[m.unidade]||''):'qtd').trim()||'qtd';
+
+    // Calcular valor numérico
+    const valor=parseFloat(String(valorRaw||'0').replace(/[^0-9.,\-]/g,'').replace(',','.'));
+    const meta=parseFloat(String(metaRaw||'0').replace(/[^0-9.,\-]/g,'').replace(',','.'));
+
+    // Detectar risco/status
+    const stStr=(statusRaw+riscoRaw).toLowerCase();
+    if(['alto','critico','crítico','pendente','vencido'].some(x=>stStr.includes(x))) critCount++;
+    else if(['medio','médio','andamento','atencao'].some(x=>stStr.includes(x))) warnCount++;
+
+    // Tentar associar à coordenação existente
+    let coordKey=null;
+    if(coordRaw){
+      const cn=coordRaw.toLowerCase();
+      coordKey=Object.keys(DB.coords).find(k=>
+        DB.coords[k].acro.toLowerCase()===cn ||
+        DB.coords[k].nome.toLowerCase().includes(cn) ||
+        cn.includes(DB.coords[k].acro.toLowerCase())
+      );
+    }
+    // Se detectou coordenação no select de destino
+    const selTarget=document.getElementById('imp-target-coord');
+    if(selTarget?.value && selTarget.value!=='auto') coordKey=selTarget.value;
+
+    if(coordKey && indNome && !isNaN(valor)){
+      const c=DB.coords[coordKey];
+      const existing=c.kpis.find(k=>k.nome.toLowerCase()===indNome.toLowerCase());
+      if(existing){
+        existing.spark=[...existing.spark.slice(1),valor];
+        existing.realizado=valor;
+        if(!isNaN(meta)&&meta>0) existing.meta=meta;
+        existing.unidade=unidade||existing.unidade;
+      } else if(indNome){
+        c.kpis.push({
+          id:'IMP'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+          nome:indNome, realizado:valor, meta:!isNaN(meta)&&meta>0?meta:valor,
+          unidade, spark:[0,0,0,0,valor]
+        });
+      }
+      coordsAffected.add(coordKey);
+      applied++;
+    }
+  });
+
+  // Se não encontrou coordenações, criar grupo genérico
+  if(applied===0 && data.length>0){
+    const selTarget=document.getElementById('imp-target-coord');
+    const targetKey=selTarget?.value&&selTarget.value!=='auto'?selTarget.value:null;
+    if(targetKey){
+      const c=DB.coords[targetKey];
+      data.forEach((row,i)=>{
+        const indNome=m.indicador?String(row[m.indicador]||`Indicador ${i+1}`):`Indicador ${i+1}`;
+        const valor=parseFloat(String(m.valor?row[m.valor]:0).replace(/[^0-9.,\-]/g,'').replace(',','.'))||0;
+        const meta=parseFloat(String(m.meta?row[m.meta]:0).replace(/[^0-9.,\-]/g,'').replace(',','.'))||valor;
+        if(isNaN(valor)) return;
+        const existing=c.kpis.find(k=>k.nome.toLowerCase()===indNome.toLowerCase());
+        if(existing){ existing.spark=[...existing.spark.slice(1),valor]; existing.realizado=valor; }
+        else c.kpis.push({id:'IMP'+Date.now()+i,nome:indNome,realizado:valor,meta:meta||valor,unidade:'qtd',spark:[0,0,0,0,valor]});
+        coordsAffected.add(targetKey); applied++;
+      });
+    }
+  }
+
+  renderAll(); autoSave();
+
+  // Mensagem de resultado
+  const msgEl=document.getElementById('imp-result-msg');
+  const coordNames=[...coordsAffected].map(k=>DB.coords[k]?.acro||k).join(', ');
+  msgEl.innerHTML=applied>0
+    ? `<div style="background:var(--good-a);border:1px solid rgba(26,138,90,.2);border-radius:var(--radius);padding:18px;line-height:1.9">
+        ✅ <b>${applied} registros aplicados ao dashboard</b><br>
+        ${coordsAffected.size>0?`Coordenações atualizadas: <b>${coordNames}</b><br>`:''}
+        ${critCount>0?`<span style="color:var(--crit)">⚠ ${critCount} registros com risco alto identificados</span><br>`:''}
+        ${warnCount>0?`<span style="color:var(--warn)">${warnCount} registros em atenção</span><br>`:''}
+        Fonte: <b>${_impData.source}</b>
+      </div>`
+    : `<div style="background:var(--warn-a);border:1px solid rgba(180,83,9,.2);border-radius:var(--radius);padding:18px">
+        ⚠ <b>Nenhum dado foi aplicado automaticamente.</b><br>
+        Verifique se a coluna <b>Coordenação</b> foi mapeada corretamente, ou selecione uma coordenação de destino no passo 2.
+      </div>`;
+
+  impBuildResultCards([
+    {label:'Registros importados',val:applied,col:'var(--good)'},
+    {label:'Coordenações afetadas',val:coordsAffected.size,col:'var(--accent)'},
+    {label:'Alertas críticos',val:critCount,col:critCount>0?'var(--crit)':'var(--text3)'},
+    {label:'Em atenção',val:warnCount,col:warnCount>0?'var(--warn)':'var(--text3)'},
+  ]);
+}
+
+function impBuildResultCards(cards){
+  const el=document.getElementById('imp-result-cards');
+  if(!el) return;
+  el.innerHTML=cards.map(c=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid ${c.col};
+      border-radius:var(--radius);padding:14px 16px;text-align:center">
+      <div style="font-family:var(--display);font-size:28px;font-weight:800;color:${c.col}">${c.val}</div>
+      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:4px">${c.label}</div>
+    </div>`).join('');
+}
+
+// ── Baixar modelo Excel ──
+function downloadModeloExcel(){
+  const csv='\uFEFF'+'Coordenacao;Regiao;UF;Indicador;Valor;Meta;Unidade;Status;Data;Responsavel;Risco\n'+
+    'COASUP;Norte;AM;Demandas concluídas;12;15;qtd;Concluído;2025-W17;Gestor A;Baixo\n'+
+    'COASUP;Nordeste;BA;Demandas em andamento;5;3;qtd;Em andamento;2025-W17;Gestor B;Médio\n'+
+    'COGAD;-;-;Taxa de atendimento;98.5;95;%;Concluído;2025-W17;NPM;Baixo\n'+
+    'CGFISC;-;-;Contratos vencendo em 60 dias;12;5;qtd;Crítico;2025-W17;CGFISC;Alto\n';
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='SAA_Modelo_Importacao.csv';
+  a.click();
+}
+
+// chamar initImportSection quando navegar para a aba
 renderAIChips();
 </script>
 </body>
