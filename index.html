@@ -746,21 +746,16 @@ body::after{ display:none }
       <div class="lock-sub">Ministério da Saúde<br>Subsecretaria de Assuntos Administrativos · v5</div>
     </div>
     <div class="lock-card">
-      <div class="lock-tabs">
-        <button class="lock-tab active" id="lvl-view-btn" onclick="setLockLevel('view')">👁 Visualizar</button>
-        <button class="lock-tab" id="lvl-edit-btn" onclick="setLockLevel('edit')">✏️ Editar</button>
-      </div>
       <div class="lock-field">
-        <div class="lock-field-label">Senha de acesso</div>
+        <div class="lock-field-label">Senha de acesso institucional</div>
         <input class="lock-input" type="password" id="lock-input"
-          placeholder="••••••••" onkeydown="if(event.key==='Enter')doUnlock()">
+          placeholder="••••••••" onkeydown="if(event.key==='Enter')doUnlock()" autocomplete="off">
       </div>
-      <button class="lock-btn" onclick="doUnlock()">Entrar no painel</button>
+      <button class="lock-btn" onclick="doUnlock()">Acessar o painel</button>
       <div class="lock-error" id="lock-error"></div>
     </div>
-    <div class="lock-hint">
-      <b>Visualizar:</b> <code>saa2025</code> &nbsp;·&nbsp; <b>Editar:</b> <code>saa@gestao</code><br>
-      <span style="opacity:.5;font-size:9px">Altere PASS_VIEW e PASS_EDIT no código antes de publicar</span>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;margin-top:8px">
+      SAA/MS · Acesso restrito · v5.1
     </div>
   </div>
 </div>
@@ -899,42 +894,134 @@ body::after{ display:none }
       <div id="sec-graficos" class="section">
         <div class="sec-head">
           <div class="sec-title">Gráficos & <em>Análise</em></div>
-          <div class="sec-sub">Visão comparativa de desempenho entre todas as coordenações</div>
-        </div>
-        <div id="chart-execucao" class="chart-wrap">
-          <div class="chart-title">Execução vs Meta por Coordenação</div>
-          <div class="chart-sub">Atingimento médio dos KPIs por área · linha pontilhada = meta 85%</div>
-          <div class="exec-bar-chart" id="bar-execucao"></div>
+          <div class="sec-sub">Visão executiva integrada · atualização automática conforme dados inseridos</div>
         </div>
 
-        <!-- Gráficos importados do Power BI -->
+        <!-- Cards analíticos topo -->
+        <div id="analytic-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px"></div>
+
+        <!-- Grid gráficos principais -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <!-- Barras horizontais: atingimento por coord -->
+          <div class="chart-wrap">
+            <div class="chart-title">Atingimento por Coordenação</div>
+            <div class="chart-sub">% médio de KPIs atingindo a meta · referência 85%</div>
+            <div class="exec-bar-chart" id="bar-execucao" style="margin-top:4px"></div>
+          </div>
+          <!-- Donut: distribuição de status -->
+          <div class="chart-wrap" style="display:flex;flex-direction:column">
+            <div class="chart-title">Distribuição de Status</div>
+            <div class="chart-sub">Proporção de indicadores por nível de desempenho</div>
+            <div id="donut-status" style="flex:1;display:flex;align-items:center;justify-content:center;min-height:160px"></div>
+          </div>
+        </div>
+
+        <!-- Gráficos Power BI importados -->
         <div id="pbi-charts" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:16px"></div>
 
+        <!-- Painel COASUP Regional -->
+        <div class="chart-wrap" style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div>
+              <div class="chart-title">COASUP · Painel Regional</div>
+              <div class="chart-sub">Distribuição de ações por região brasileira · atualização automática</div>
+            </div>
+            <span class="badge bg-nd" style="font-size:10px">COASUP</span>
+          </div>
+          <!-- Cards regionais + donut -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px">
+            <div id="coasup-regional-bars"></div>
+            <div id="coasup-regional-donut" style="display:flex;align-items:center;justify-content:center"></div>
+          </div>
+          <!-- Cards UFs -->
+          <div id="coasup-uf-cards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px"></div>
+        </div>
+
+        <!-- Matriz completa -->
         <div id="matrix-status" class="matrix-wrap">
-          <div class="matrix-title">Matriz de Status dos Indicadores</div>
-          <div class="matrix-sub">Todos os KPIs com status atual e tendência semanal</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+            <div>
+              <div class="matrix-title">Matriz de Indicadores</div>
+              <div class="matrix-sub">Todos os KPIs com status, atingimento e tendência semanal</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <select id="matrix-filter-coord" class="kpi-unit-input" style="width:110px" onchange="renderMatrixKpis()">
+                <option value="">Todas as áreas</option>
+              </select>
+              <select id="matrix-filter-status" class="kpi-unit-input" style="width:100px" onchange="renderMatrixKpis()">
+                <option value="">Todos status</option>
+                <option value="good">✓ Meta</option>
+                <option value="warn">⚠ Regular</option>
+                <option value="crit">✕ Crítico</option>
+              </select>
+            </div>
+          </div>
           <table class="matrix-table" id="matrix-kpis">
-            <thead>
-              <tr>
-                <th>Área</th><th>Indicador</th><th>Realizado</th><th>Meta</th><th>% Ating.</th><th>Status</th><th>Tend.</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Área</th><th>Indicador</th><th>Realizado</th><th>Meta</th><th>% Ating.</th><th>Status</th><th>Tend.</th></tr></thead>
             <tbody id="matrix-tbody"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- ── ALERTAS ── -->
       <div id="sec-alertas" class="section">
         <div class="sec-head">
           <div class="sec-title">Alertas e <em>Riscos</em></div>
-          <div class="sec-sub">Monitoramento preventivo automatizado · ciclo semanal</div>
+          <div class="sec-sub">Monitoramento preventivo com semáforo de risco · ciclo semanal</div>
         </div>
-        <div class="row-label">Críticos</div>
+
+        <!-- Cards resumo de risco -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:20px" id="risk-summary-cards"></div>
+
+        <!-- Filtros -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;margin-right:4px">Filtrar:</div>
+          <select id="filter-coord" class="kpi-unit-input" style="width:120px" onchange="renderAlertsFiltered()">
+            <option value="">Todas as áreas</option>
+          </select>
+          <select id="filter-regiao" class="kpi-unit-input" style="width:120px" onchange="renderAlertsFiltered()">
+            <option value="">Todas as regiões</option>
+            <option value="Norte">Norte</option>
+            <option value="Nordeste">Nordeste</option>
+            <option value="Centro-Oeste">Centro-Oeste</option>
+            <option value="Sudeste">Sudeste</option>
+            <option value="Sul">Sul</option>
+          </select>
+          <select id="filter-nivel" class="kpi-unit-input" style="width:110px" onchange="renderAlertsFiltered()">
+            <option value="">Todos os níveis</option>
+            <option value="crit">🔴 Crítico</option>
+            <option value="warn">🟡 Médio</option>
+            <option value="low">🟢 Baixo</option>
+          </select>
+          <select id="filter-status-alert" class="kpi-unit-input" style="width:120px" onchange="renderAlertsFiltered()">
+            <option value="">Todos os status</option>
+            <option value="open">Em aberto</option>
+            <option value="progress">Em andamento</option>
+            <option value="done">Resolvido</option>
+          </select>
+          <button class="btn" onclick="clearAlertFilters()">↺ Limpar filtros</button>
+          <button class="btn btn-primary locked" id="btn-add-risk" onclick="showAddRisk()" style="margin-left:auto">+ Adicionar Risco</button>
+        </div>
+
+        <!-- Matriz de risco 4x4 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <div class="chart-wrap">
+            <div class="chart-title">Matriz de Risco</div>
+            <div class="chart-sub">Probabilidade vs Impacto</div>
+            <div id="risk-matrix-svg" style="margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">Alertas Prioritários</div>
+            <div class="chart-sub">Top riscos que requerem ação imediata</div>
+            <div id="priority-alerts" style="margin-top:8px;display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+        </div>
+
+        <!-- Lista de alertas filtrados -->
+        <div class="row-label">🔴 Críticos</div>
         <div class="alert-grid" id="alerts-crit"></div>
-        <div class="row-label">Atenção</div>
+        <div class="row-label">🟡 Atenção</div>
         <div class="alert-grid" id="alerts-warn"></div>
-        <div class="row-label">Informativos</div>
+        <div class="row-label">🟢 Informativos</div>
         <div class="alert-grid" id="alerts-info"></div>
       </div>
 
@@ -967,11 +1054,11 @@ body::after{ display:none }
             <div class="step-row"><div class="step-n">4</div>URL: <code style="color:var(--accent)">usuario.github.io/saa-dashboard</code></div>
           </div>
           <div class="arch-card">
-            <div class="arch-title">🔑 Sistema de Senhas</div>
+            <div class="arch-title">🔑 Sistema de Acesso</div>
             <div class="arch-body">
-              <b style="color:var(--text)">Modo Visualizar</b> — acesso somente leitura. Senha: <code style="color:var(--accent)">saa2025</code><br><br>
-              <b style="color:var(--text)">Modo Editar</b> — acesso completo. Senha: <code style="color:var(--accent)">saa@gestao</code><br><br>
-              Altere <code style="color:var(--accent)">PASS_VIEW</code> e <code style="color:var(--accent)">PASS_EDIT</code> no JS.
+              <b style="color:var(--text)">Acesso padrão</b> — senha institucional fornecida pelo NPM/SAA.<br><br>
+              <b style="color:var(--text)">Acesso edição</b> — credenciais de gestão, fornecidas pelo administrador do sistema.<br><br>
+              Para solicitar ou redefinir credenciais, contate o NPM.
             </div>
           </div>
           <div class="arch-card">
@@ -1057,32 +1144,27 @@ body::after{ display:none }
 
 <script>
 // ══════════════════════════════════════════════
-// SENHAS — altere antes de publicar
+// SENHAS — senha única de acesso
 // ══════════════════════════════════════════════
-const PASS_VIEW = 'saa2025';
-const PASS_EDIT = 'saa@gestao';
+const PASS_MAIN = 'saa2026';   // senha única de acesso
+const PASS_EDIT = 'saa@gestao2026'; // senha modo edição (oculta)
 
 let SESSION = { mode: null };
 let _lockLevel = 'view';
 
-function setLockLevel(l){
-  _lockLevel = l;
-  document.getElementById('lvl-view-btn').classList.toggle('active', l==='view');
-  document.getElementById('lvl-edit-btn').classList.toggle('active', l==='edit');
-  document.getElementById('lock-input').placeholder = l==='edit' ? '•••••••• (gestão)' : '••••••••';
-  document.getElementById('lock-input').value = '';
-  document.getElementById('lock-error').textContent = '';
-}
+function setLockLevel(l){ _lockLevel = l; }
 
 function doUnlock(){
   const val = document.getElementById('lock-input').value;
   const err = document.getElementById('lock-error');
-  if(_lockLevel==='view' && val===PASS_VIEW){ SESSION.mode='view'; startApp(); }
-  else if(_lockLevel==='edit' && val===PASS_EDIT){ SESSION.mode='edit'; startApp(); }
-  else {
+  if(val === PASS_MAIN){
+    SESSION.mode = 'view'; startApp();
+  } else if(val === PASS_EDIT){
+    SESSION.mode = 'edit'; startApp();
+  } else {
     err.textContent = 'Senha incorreta. Tente novamente.';
-    document.getElementById('lock-input').value='';
-    setTimeout(()=>err.textContent='',3000);
+    document.getElementById('lock-input').value = '';
+    setTimeout(()=>err.textContent='', 3000);
   }
 }
 
@@ -1118,6 +1200,36 @@ function isEdit(){ return SESSION.mode==='edit'; }
 // ══════════════════════════════════════════════
 let DB = {
   coords: {
+    coasup:{
+      acro:"COASUP", nome:"Coordenação de Apoio às Superintendências",
+      desc:"Apoio técnico e operacional às Superintendências do Ministério da Saúde nos estados. Gestão de demandas, orientações técnicas, processos e ações prioritárias por UF e região.",
+      insight:"18 de 27 UFs atendidas. Região Norte com maior criticidade. Prazo médio acima da meta — priorizar demandas pendentes da semana.",
+      regioes:{
+        norte:    {nome:"Norte",    ufs:["AC","AM","AP","PA","RO","RR","TO"], acoes:12, concluidas:7,  andamento:3, pendentes:2, criticas:1},
+        nordeste: {nome:"Nordeste", ufs:["AL","BA","CE","MA","PB","PE","PI","RN","SE"], acoes:18, concluidas:11, andamento:5, pendentes:2, criticas:0},
+        centrooeste:{nome:"Centro-Oeste",ufs:["DF","GO","MS","MT"], acoes:9, concluidas:6, andamento:2, pendentes:1, criticas:0},
+        sudeste:  {nome:"Sudeste",  ufs:["ES","MG","RJ","SP"], acoes:15, concluidas:10, andamento:4, pendentes:1, criticas:0},
+        sul:      {nome:"Sul",      ufs:["PR","RS","SC"], acoes:8,  concluidas:6,  andamento:1, pendentes:1, criticas:1}
+      },
+      kpis:[
+        {id:"CS01",nome:"Superintendências apoiadas",         realizado:22, meta:27, unidade:"qtd", spark:[15,17,19,21,22]},
+        {id:"CS02",nome:"Estados/UFs atendidos",              realizado:18, meta:27, unidade:"UF",  spark:[10,13,15,16,18]},
+        {id:"CS03",nome:"Regiões brasileiras atendidas",      realizado:5,  meta:5,  unidade:"qtd", spark:[3,4,4,5,5]},
+        {id:"CS04",nome:"Demandas recebidas no ciclo",        realizado:62, meta:60, unidade:"qtd", spark:[45,50,55,58,62]},
+        {id:"CS05",nome:"Demandas concluídas",                realizado:40, meta:45, unidade:"qtd", spark:[25,28,32,36,40]},
+        {id:"CS06",nome:"Demandas em andamento",              realizado:14, meta:10, unidade:"qtd", spark:[20,18,16,15,14], inverso:true},
+        {id:"CS07",nome:"Demandas pendentes",                 realizado:8,  meta:5,  unidade:"qtd", spark:[12,11,10,9,8],  inverso:true},
+        {id:"CS08",nome:"Tempo médio de atendimento",         realizado:12, meta:10, unidade:"dias",spark:[16,15,14,13,12],inverso:true},
+        {id:"CS09",nome:"Percentual de execução das ações",   realizado:76, meta:85, unidade:"%",   spark:[60,65,68,72,76]},
+        {id:"CS10",nome:"Reuniões realizadas no ciclo",       realizado:9,  meta:8,  unidade:"qtd", spark:[5,6,7,8,9]},
+        {id:"CS11",nome:"Orientações técnicas prestadas",     realizado:24, meta:20, unidade:"qtd", spark:[14,16,18,21,24]},
+        {id:"CS12",nome:"Documentos/processos analisados",    realizado:87, meta:80, unidade:"qtd", spark:[60,68,74,80,87]},
+        {id:"CS13",nome:"Riscos identificados por UF",        realizado:6,  meta:0,  unidade:"qtd", spark:[8,8,7,6,6],    inverso:true},
+        {id:"CS14",nome:"Demandas críticas no ciclo",         realizado:2,  meta:0,  unidade:"qtd", spark:[4,3,3,2,2],    inverso:true},
+        {id:"CS15",nome:"Ações prioritárias concluídas",      realizado:7,  meta:8,  unidade:"qtd", spark:[4,5,6,6,7]},
+        {id:"CS16",nome:"Índice de Apoio às Superintendências",realizado:78, meta:85, unidade:"%",  spark:[62,66,70,74,78]}
+      ]
+    },
     cogad:{
       acro:"COGAD", nome:"Coordenação de Gestão de Atos e Documentos",
       desc:"Gestão de processos SEI, demandas judiciais, ofícios e despachos. Atendimento a demandas de PGU, TCU, SIC, CGU e demais órgãos.",
@@ -1365,9 +1477,122 @@ function renderIntegrated(){
 // RENDER GRÁFICOS — versão executiva
 // ══════════════════════════════════════════════
 function renderGraficos(){
+  renderAnalyticCards();
   renderBarExecucao();
+  renderDonutStatus();
+  renderCOASUPRegional();
   renderMatrixKpis();
   renderPBICharts();
+  // popular filtro de coordenação na matriz
+  const sel = document.getElementById('matrix-filter-coord');
+  if(sel && sel.options.length===1){
+    Object.entries(DB.coords).forEach(([,c])=>{
+      const o=document.createElement('option'); o.value=c.acro; o.textContent=c.acro; sel.appendChild(o);
+    });
+  }
+}
+
+// ── COASUP Regional ──
+function renderCOASUPRegional(){
+  const regioes = DB.coords.coasup?.regioes;
+  if(!regioes) return;
+
+  const cores = {
+    norte:'#0e7490', nordeste:'#b45309', centrooeste:'#5b5ea6',
+    sudeste:'#1a8a5a', sul:'#005B9A'
+  };
+  const lista = Object.entries(regioes);
+  const totalAcoes = lista.reduce((a,[,r])=>a+r.acoes,0);
+
+  // Barras regionais
+  const barsEl = document.getElementById('coasup-regional-bars');
+  if(barsEl) barsEl.innerHTML = lista.map(([key,r])=>{
+    const pctConc = Math.round((r.concluidas/r.acoes)*100);
+    const col = cores[key]||'var(--accent)';
+    const semaforo = r.criticas>0?'var(--crit)':r.pendentes>2?'var(--warn)':'var(--good)';
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text2)">${r.nome}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${r.criticas>0?`<span style="font-family:var(--mono);font-size:9px;color:var(--crit)">⚠ ${r.criticas} crít.</span>`:''}
+          <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:${col}">${pctConc}%</span>
+        </div>
+      </div>
+      <div style="height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;position:relative">
+        <div style="height:100%;width:${pctConc}%;background:${col};border-radius:3px;transition:width .8s ease"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:3px;font-family:var(--mono);font-size:9px;color:var(--text3)">
+        <span>✓ ${r.concluidas}</span><span>→ ${r.andamento}</span><span>⏳ ${r.pendentes}</span>
+        <span style="margin-left:auto">${r.ufs.length} UFs · ${r.acoes} ações</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Donut regional
+  const donutEl = document.getElementById('coasup-regional-donut');
+  if(donutEl){
+    const W=220,H=200,cx=80,cy=90,r2=65,ir=40;
+    let ang=-Math.PI/2, paths='', legs='';
+    lista.forEach(([key,r],i)=>{
+      const slice=(r.acoes/totalAcoes)*(2*Math.PI);
+      const col=cores[key]||'#999';
+      const x1=cx+r2*Math.cos(ang),y1=cy+r2*Math.sin(ang);
+      const x2=cx+r2*Math.cos(ang+slice),y2=cy+r2*Math.sin(ang+slice);
+      const xi1=cx+ir*Math.cos(ang),yi1=cy+ir*Math.sin(ang);
+      const xi2=cx+ir*Math.cos(ang+slice),yi2=cy+ir*Math.sin(ang+slice);
+      const lg=slice>Math.PI?1:0;
+      paths+=`<path d="M${xi1},${yi1} A${ir},${ir} 0 ${lg},1 ${xi2},${yi2} L${x2},${y2} A${r2},${r2} 0 ${lg},0 ${x1},${y1} Z" fill="${col}" opacity=".9"/>`;
+      const ly=20+i*28;
+      const pct2=Math.round((r.acoes/totalAcoes)*100);
+      legs+=`<rect x="${W-120}" y="${ly}" width="8" height="8" rx="2" fill="${col}"/>
+        <text x="${W-108}" y="${ly+8}" font-size="10" fill="var(--text2)" font-family="var(--font)">${r.nome}</text>
+        <text x="${W-5}" y="${ly+8}" font-size="10" fill="${col}" font-family="var(--mono)" font-weight="600" text-anchor="end">${pct2}%</text>`;
+      ang+=slice;
+    });
+    paths+=`<circle cx="${cx}" cy="${cy}" r="${ir-3}" fill="var(--surface2)"/>
+      <text x="${cx}" y="${cy-5}" text-anchor="middle" font-size="18" fill="var(--text)" font-family="var(--display)" font-weight="800">${totalAcoes}</text>
+      <text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="8" fill="var(--text3)" font-family="var(--mono)">ações</text>`;
+    donutEl.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px">${paths}${legs}</svg>`;
+  }
+
+  // Cards por região
+  const cardsEl = document.getElementById('coasup-uf-cards');
+  if(cardsEl) cardsEl.innerHTML = lista.map(([key,r])=>{
+    const col=cores[key]||'var(--accent)';
+    const pct2=Math.round((r.concluidas/r.acoes)*100);
+    const sem=r.criticas>0?'var(--crit)':r.pendentes>2?'var(--warn)':'var(--good)';
+    return `<div style="background:var(--surface2);border:1px solid var(--border);border-top:3px solid ${col};border-radius:var(--radius-sm);padding:10px 12px">
+      <div style="font-family:var(--display);font-size:12px;font-weight:700;color:${col};margin-bottom:4px">${r.nome}</div>
+      <div style="font-family:var(--display);font-size:22px;font-weight:800;color:${sem};line-height:1">${pct2}%</div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px">execução · ${r.acoes} ações</div>
+      <div style="font-size:9px;color:var(--text3);margin-top:4px">${r.ufs.join(' · ')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderAnalyticCards(){
+  const el = document.getElementById('analytic-cards');
+  if(!el) return;
+  const all = Object.values(DB.coords).flatMap(c=>c.kpis);
+  const total = all.length;
+  const g = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='good').length;
+  const w = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+  const r = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+  const pctG = total?Math.round((g/total)*100):0;
+  const coords = Object.keys(DB.coords).length;
+
+  el.innerHTML = [
+    {label:'Total de KPIs', val:total, sub:'indicadores monitorados', col:'var(--accent)', top:'var(--accent)'},
+    {label:'Atingindo Meta', val:g, sub:`${pctG}% do total`, col:'var(--good)', top:'var(--good)'},
+    {label:'Em Atenção', val:w, sub:'requerem acompanhamento', col:'var(--warn)', top:'var(--warn)'},
+    {label:'Críticos', val:r, sub:'fora da meta', col:'var(--crit)', top:'var(--crit)'},
+    {label:'Coordenações', val:coords, sub:'áreas monitoradas', col:'var(--accent2)', top:'var(--accent2)'},
+  ].map(c=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid ${c.top}">
+      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:6px">${c.label}</div>
+      <div style="font-family:var(--display);font-size:28px;font-weight:800;color:${c.col};line-height:1">${c.val}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">${c.sub}</div>
+    </div>`).join('');
 }
 
 function renderBarExecucao(){
@@ -1380,7 +1605,9 @@ function renderBarExecucao(){
     return {acro:c.acro, avgPct, col};
   }).filter(Boolean).sort((a,b)=>b.avgPct-a.avgPct);
 
-  document.getElementById('bar-execucao').innerHTML = rows.map(r=>`
+  const el = document.getElementById('bar-execucao');
+  if(!el) return;
+  el.innerHTML = rows.map(r=>`
     <div class="exec-bar-row">
       <div class="exec-bar-label">${r.acro}</div>
       <div class="exec-bar-track">
@@ -1391,23 +1618,67 @@ function renderBarExecucao(){
     </div>`).join('');
 }
 
+function renderDonutStatus(){
+  const el = document.getElementById('donut-status');
+  if(!el) return;
+  const all = Object.values(DB.coords).flatMap(c=>c.kpis);
+  const g = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='good').length;
+  const w = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+  const r = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+  const total = all.length || 1;
+  const dados = [
+    {nome:'Meta atingida', valor:g, col:'#1a8a5a'},
+    {nome:'Em atenção', valor:w, col:'#b45309'},
+    {nome:'Crítico', valor:r, col:'#c0283d'},
+  ].filter(d=>d.valor>0);
+
+  // SVG Donut
+  const W=260, H=200, cx=90, cy=90, r2=70, ir=44;
+  let ang=-Math.PI/2, paths='', legs='';
+  dados.forEach((d,i)=>{
+    const slice=(d.valor/total)*(2*Math.PI);
+    const x1=cx+r2*Math.cos(ang), y1=cy+r2*Math.sin(ang);
+    const x2=cx+r2*Math.cos(ang+slice), y2=cy+r2*Math.sin(ang+slice);
+    const xi1=cx+ir*Math.cos(ang), yi1=cy+ir*Math.sin(ang);
+    const xi2=cx+ir*Math.cos(ang+slice), yi2=cy+ir*Math.sin(ang+slice);
+    const lg=slice>Math.PI?1:0;
+    paths+=`<path d="M${xi1},${yi1} A${ir},${ir} 0 ${lg},1 ${xi2},${yi2} L${x2},${y2} A${r2},${r2} 0 ${lg},0 ${x1},${y1} Z" fill="${d.col}" opacity=".9"/>`;
+    const ly=30+i*32;
+    legs+=`<rect x="${W-130}" y="${ly}" width="10" height="10" rx="2" fill="${d.col}"/>
+      <text x="${W-115}" y="${ly+9}" font-size="11" fill="var(--text2)" font-family="var(--font)">${d.nome}</text>
+      <text x="${W-5}" y="${ly+9}" font-size="11" fill="${d.col}" font-family="var(--mono)" font-weight="600" text-anchor="end">${Math.round((d.valor/total)*100)}%</text>`;
+    ang+=slice;
+  });
+  paths+=`<circle cx="${cx}" cy="${cy}" r="${ir-3}" fill="var(--surface2)"/>
+    <text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="20" fill="var(--text)" font-family="var(--display)" font-weight="800">${total}</text>
+    <text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="9" fill="var(--text3)" font-family="var(--mono)">KPIs</text>`;
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px">${paths}${legs}</svg>`;
+}
+
 function renderMatrixKpis(){
-  const rows=Object.entries(DB.coords).flatMap(([,c])=>c.kpis.map(k=>{
-    const st=calcStatus(k.realizado,k.meta,k.inverso);
-    const pc=pct(k.realizado,k.meta,k.inverso);
-    const tr=sparkTrend(k.spark);
-    const tCol=k.inverso?(tr==='↓'?'var(--good)':tr==='↑'?'var(--crit)':'var(--text3)'):(tr==='↑'?'var(--good)':tr==='↓'?'var(--crit)':'var(--text3)');
-    return `<tr>
-      <td>${c.acro}</td>
-      <td style="color:var(--text)">${k.nome}</td>
-      <td style="font-family:var(--mono);font-weight:600;color:${S(st).color}">${k.realizado} ${k.unidade}</td>
-      <td style="font-family:var(--mono)">${k.meta} ${k.unidade}</td>
-      <td style="font-family:var(--mono);color:${S(st).color}">${pc}%</td>
-      <td><span class="badge ${S(st).badge}">${S(st).label}</span></td>
-      <td style="color:${tCol};font-family:var(--mono);font-size:13px">${tr}</td>
-    </tr>`;
-  }));
-  document.getElementById('matrix-tbody').innerHTML=rows.join('');
+  const filterCoord = document.getElementById('matrix-filter-coord')?.value||'';
+  const filterStatus = document.getElementById('matrix-filter-status')?.value||'';
+  const rows=Object.entries(DB.coords).flatMap(([,c])=>{
+    if(filterCoord && c.acro!==filterCoord) return [];
+    return c.kpis.map(k=>{
+      const st=calcStatus(k.realizado,k.meta,k.inverso);
+      if(filterStatus && st!==filterStatus) return null;
+      const pc=pct(k.realizado,k.meta,k.inverso);
+      const tr=sparkTrend(k.spark);
+      const tCol=k.inverso?(tr==='↓'?'var(--good)':tr==='↑'?'var(--crit)':'var(--text3)'):(tr==='↑'?'var(--good)':tr==='↓'?'var(--crit)':'var(--text3)');
+      return `<tr>
+        <td>${c.acro}</td>
+        <td style="color:var(--text)">${k.nome}</td>
+        <td style="font-family:var(--mono);font-weight:600;color:${S(st).color}">${k.realizado} ${k.unidade}</td>
+        <td style="font-family:var(--mono)">${k.meta} ${k.unidade}</td>
+        <td style="font-family:var(--mono);color:${S(st).color}">${pc}%</td>
+        <td><span class="badge ${S(st).badge}">${S(st).label}</span></td>
+        <td style="color:${tCol};font-family:var(--mono);font-size:13px">${tr}</td>
+      </tr>`;
+    }).filter(Boolean);
+  });
+  const tbody = document.getElementById('matrix-tbody');
+  if(tbody) tbody.innerHTML=rows.join('');
 }
 
 // ── Gráficos do Power BI (DB.pbi) ──
@@ -1580,30 +1851,154 @@ function fillCoordSection(key){
 // RENDER ALERTAS
 // ══════════════════════════════════════════════
 function renderAlerts(){
-  const crits=[], warns=[];
-  Object.entries(DB.coords).forEach(([key,c])=>{
-    c.kpis.forEach(k=>{
-      const s=calcStatus(k.realizado,k.meta,k.inverso);
-      if(s==='crit') crits.push({c,k,key});
-      else if(s==='warn') warns.push({c,k,key});
+  renderAlertsFiltered();
+  renderRiskSummaryCards();
+  renderRiskMatrix();
+  renderPriorityAlerts();
+  // popular filtro coordenação
+  const sel = document.getElementById('filter-coord');
+  if(sel && sel.options.length===1){
+    Object.entries(DB.coords).forEach(([,c])=>{
+      const o=document.createElement('option'); o.value=c.acro; o.textContent=c.acro; sel.appendChild(o);
     });
-  });
-  document.getElementById('alert-pip').textContent = crits.length||'✓';
-  document.getElementById('alert-pip').className = 'nav-badge '+(crits.length>0?'nb-r':'nb-g');
+  }
+  const pip = document.getElementById('alert-pip');
+  const crits = Object.values(DB.coords).flatMap(c=>c.kpis).filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+  if(pip){ pip.textContent=crits||'✓'; pip.className='nav-badge '+(crits>0?'nb-r':'nb-g'); }
+}
 
-  const mk=(items,cls,ico)=>items.map(({c,k})=>`
-    <div class="alert-item ${cls}">
-      <div class="alert-ico">${ico}</div>
+function renderRiskSummaryCards(){
+  const el = document.getElementById('risk-summary-cards');
+  if(!el) return;
+  const all = Object.values(DB.coords).flatMap(c=>c.kpis);
+  const crits = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+  const warns = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+  const goods = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='good').length;
+  const cards=[
+    {ico:'🔴',label:'Riscos Críticos',val:crits,col:'var(--crit)',bg:'var(--crit-a)'},
+    {ico:'🟡',label:'Em Atenção',val:warns,col:'var(--warn)',bg:'var(--warn-a)'},
+    {ico:'🟢',label:'Normalizados',val:goods,col:'var(--good)',bg:'var(--good-a)'},
+    {ico:'📊',label:'Total Monitorado',val:all.length,col:'var(--accent)',bg:'var(--ms-blue-a)'},
+  ];
+  el.innerHTML=cards.map(c=>`
+    <div style="background:${c.bg};border:1px solid ${c.col}30;border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px">
+      <div style="font-size:22px">${c.ico}</div>
       <div>
+        <div style="font-family:var(--display);font-size:24px;font-weight:800;color:${c.col};line-height:1">${c.val}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">${c.label}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderRiskMatrix(){
+  const el = document.getElementById('risk-matrix-svg');
+  if(!el) return;
+  // Matriz 3x3: Probabilidade (baixa/média/alta) x Impacto (baixo/médio/alto)
+  const W=240, H=180, pad=30;
+  const cw=(W-pad)/3, ch=(H-pad)/3;
+  const cols=[['var(--good-a)','var(--warn-a)','var(--crit-a)'],['var(--warn-a)','var(--warn-a)','var(--crit-a)'],['var(--crit-a)','var(--crit-a)','var(--crit-a)']];
+  let cells='', labels='';
+  for(let r=0;r<3;r++) for(let c=0;c<3;c++){
+    cells+=`<rect x="${pad+c*cw}" y="${r*ch}" width="${cw-2}" height="${ch-2}" rx="3" fill="${cols[2-r][c]}" stroke="var(--border2)" stroke-width=".5"/>`;
+  }
+  labels+=`<text x="${pad+cw*0.5}" y="${H-2}" font-size="8" text-anchor="middle" fill="var(--text3)" font-family="var(--mono)">Baixo</text>`;
+  labels+=`<text x="${pad+cw*1.5}" y="${H-2}" font-size="8" text-anchor="middle" fill="var(--text3)" font-family="var(--mono)">Médio</text>`;
+  labels+=`<text x="${pad+cw*2.5}" y="${H-2}" font-size="8" text-anchor="middle" fill="var(--text3)" font-family="var(--mono)">Alto</text>`;
+  labels+=`<text x="${pad-4}" y="${ch*0.5+5}" font-size="7" text-anchor="end" fill="var(--text3)" font-family="var(--mono)">Alto</text>`;
+  labels+=`<text x="${pad-4}" y="${ch*1.5+5}" font-size="7" text-anchor="end" fill="var(--text3)" font-family="var(--mono)">Méd.</text>`;
+  labels+=`<text x="${pad-4}" y="${ch*2.5+5}" font-size="7" text-anchor="end" fill="var(--text3)" font-family="var(--mono)">Baixo</text>`;
+  // Plotar KPIs críticos e em atenção como pontos
+  const all = Object.values(DB.coords).flatMap(c=>c.kpis.map(k=>({...k,coord:c.acro})));
+  all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)!=='good').forEach(k=>{
+    const st=calcStatus(k.realizado,k.meta,k.inverso);
+    const pc=pct(k.realizado,k.meta,k.inverso);
+    const imp=pc<50?2:pc<75?1:0; // impacto: 0=baixo,1=meio,2=alto (invertido para y)
+    const prob=st==='crit'?2:1;    // probabilidade
+    const cx2=pad+imp*cw+cw/2, cy2=(2-prob)*ch+ch/2;
+    cells+=`<circle cx="${cx2}" cy="${cy2}" r="5" fill="${st==='crit'?'var(--crit)':'var(--warn)'}" opacity=".8">
+      <title>${k.nome} (${k.coord})</title></circle>`;
+  });
+  labels+=`<text x="${pad+(W-pad)/2}" y="${H+12}" font-size="8" text-anchor="middle" fill="var(--text3)" font-family="var(--mono)">← Impacto →</text>`;
+  el.innerHTML=`<svg viewBox="-5 -5 ${W+10} ${H+20}" style="width:100%">${cells}${labels}</svg>`;
+}
+
+function renderPriorityAlerts(){
+  const el = document.getElementById('priority-alerts');
+  if(!el) return;
+  const crits = Object.entries(DB.coords).flatMap(([,c])=>
+    c.kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit')
+      .map(k=>({...k, coord:c.acro, pc:pct(k.realizado,k.meta,k.inverso)}))
+  ).sort((a,b)=>a.pc-b.pc).slice(0,5);
+  if(!crits.length){ el.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:8px">Nenhum alerta crítico ✓</div>`; return; }
+  el.innerHTML=crits.map(k=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--crit-a);border-radius:6px;border-left:3px solid var(--crit)">
+      <span style="font-size:14px">🔴</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${k.nome}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${k.coord} · ${k.realizado}${k.unidade} / meta ${k.meta}${k.unidade}</div>
+      </div>
+      <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--crit);flex-shrink:0">${k.pc}%</span>
+    </div>`).join('');
+}
+
+function renderAlertsFiltered(){
+  const filterCoord = document.getElementById('filter-coord')?.value||'';
+  const filterNivel = document.getElementById('filter-nivel')?.value||'';
+  const filterStatus = document.getElementById('filter-status-alert')?.value||'';
+
+  const all = Object.entries(DB.coords).flatMap(([,c])=>
+    c.kpis.map(k=>({...k, coord:c.acro, coordNome:c.nome}))
+  ).filter(k=>{
+    if(filterCoord && k.coord!==filterCoord) return false;
+    const st=calcStatus(k.realizado,k.meta,k.inverso);
+    if(filterNivel==='crit' && st!=='crit') return false;
+    if(filterNivel==='warn' && st!=='warn') return false;
+    if(filterNivel==='low' && st!=='good') return false;
+    return true;
+  });
+
+  const crits = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit');
+  const warns = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn');
+  const goods = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='good');
+
+  const mkAlert=(items,cls,ico,semaforo)=>items.map(k=>`
+    <div class="alert-item ${cls}" style="position:relative">
+      <div class="alert-ico">${ico}</div>
+      <div style="flex:1">
         <div class="alert-title">${k.nome}</div>
-        <div class="alert-desc">Realizado: <b style="color:var(--${cls==='crit'?'crit':'warn'})">${k.realizado} ${k.unidade}</b> · Meta: <b>${k.meta} ${k.unidade}</b></div>
-        <div class="alert-tag">${c.acro}</div>
+        <div class="alert-desc">Realizado: <b style="color:${S(cls==='crit'?'crit':cls==='warn'?'warn':'good').color}">${k.realizado} ${k.unidade}</b> · Meta: <b>${k.meta} ${k.unidade}</b></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
+          <div class="alert-tag">${k.coord}</div>
+          <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px;background:${semaforo}30;color:${semaforo}">${S(cls==='crit'?'crit':cls==='warn'?'warn':'good').label}</span>
+        </div>
       </div>
     </div>`).join('');
 
-  document.getElementById('alerts-crit').innerHTML = crits.length?mk(crits,'crit','🔴'):`<p style="color:var(--text3);font-size:13px;padding:8px 0">Nenhum indicador crítico 🎉</p>`;
-  document.getElementById('alerts-warn').innerHTML = warns.length?mk(warns,'warn','🟠'):`<p style="color:var(--text3);font-size:13px;padding:8px 0">Nenhum alerta no momento</p>`;
-  document.getElementById('alerts-info').innerHTML = `<div class="alert-item info"><div class="alert-ico">🔵</div><div><div class="alert-title">Painel atualizado</div><div class="alert-desc">Ciclo semanal · Modo: <b>${SESSION.mode==='edit'?'Edição (Gestão)':'Visualização'}</b></div><div class="alert-tag">NPM · v5.0</div></div></div>`;
+  const el_c=document.getElementById('alerts-crit');
+  const el_w=document.getElementById('alerts-warn');
+  const el_i=document.getElementById('alerts-info');
+  if(el_c) el_c.innerHTML=crits.length?mkAlert(crits,'crit','🔴','var(--crit)'):`<p style="color:var(--text3);font-size:13px;padding:8px 0">Nenhum alerta crítico 🎉</p>`;
+  if(el_w) el_w.innerHTML=warns.length?mkAlert(warns,'warn','🟡','var(--warn)'):`<p style="color:var(--text3);font-size:13px;padding:8px 0">Nenhum alerta de atenção</p>`;
+  if(el_i) el_i.innerHTML=`<div class="alert-item info"><div class="alert-ico">🟢</div><div><div class="alert-title">Sistema monitorando ${goods.length} indicadores normalizados</div><div class="alert-desc">Painel atualizado · Modo: <b>${SESSION.mode==='edit'?'Edição':'Visualização'}</b> · v5.1</div><div class="alert-tag">NPM · SAA/MS</div></div></div>`;
+}
+
+function clearAlertFilters(){
+  ['filter-coord','filter-regiao','filter-nivel','filter-status-alert'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  renderAlertsFiltered();
+}
+
+function showAddRisk(){
+  document.getElementById('modal-title').textContent='⚠️ Registrar Risco / Alerta';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-hint">Registre um risco ou ponto de atenção para acompanhamento semanal.</div>
+    <div class="modal-field"><div class="modal-label">Coordenação</div>
+      <select class="modal-input" id="risk-coord">${Object.entries(DB.coords).map(([k,c])=>`<option value="${k}">${c.acro}</option>`).join('')}</select></div>
+    <div class="modal-field"><div class="modal-label">Descrição do Risco</div><input class="modal-input" id="risk-desc" placeholder="Descreva o risco ou ponto crítico"></div>
+    <div class="modal-field"><div class="modal-label">Plano de Ação</div><textarea class="modal-input modal-textarea" id="risk-plan" placeholder="Descreva as ações previstas..." style="min-height:60px"></textarea></div>`;
+  _pa=()=>{ alert('Risco registrado. Integração com sistema de riscos em desenvolvimento.'); closeModal(); };
+  openModal();
 }
 
 function renderSidebar(){
