@@ -1374,7 +1374,25 @@ function startApp(){
   document.getElementById('lock-screen').classList.add('hidden');
   applyMode(); initTheme(); initWeek();
   const saved = localStorage.getItem('saa-db-v5');
-  if(saved){ try{ const p=JSON.parse(saved); if(p.coords)DB.coords=p.coords; if(p.integrated)DB.integrated=p.integrated; }catch(e){} }
+  if(saved){
+    try{
+      const p=JSON.parse(saved);
+      if(p.coords){
+        // Preservar dados estruturais (regioes) que não ficam no localStorage
+        Object.entries(p.coords).forEach(([key,c])=>{
+          if(DB.coords[key]){
+            DB.coords[key].kpis = c.kpis || DB.coords[key].kpis;
+            DB.coords[key].insight = c.insight || DB.coords[key].insight;
+            // regioes: manter do DB padrão se não vier do saved
+            if(c.regioes) DB.coords[key].regioes = c.regioes;
+          }
+        });
+        // Adicionar coords novas que vieram do saved
+        Object.entries(p.coords).forEach(([key,c])=>{ if(!DB.coords[key]) DB.coords[key]=c; });
+      }
+      if(p.integrated) DB.integrated=p.integrated;
+    }catch(e){}
+  }
   renderAll();
 }
 
@@ -2627,8 +2645,20 @@ const CR_CORES = {
 };
 
 function renderCOASUPRegionalPage(){
-  const regioes = DB.coords.coasup?.regioes;
-  if(!regioes) return;
+  // Garantir que regioes existe mesmo se vier do localStorage
+  const coasup = DB.coords.coasup;
+  if(!coasup) return;
+  if(!coasup.regioes){
+    coasup.regioes = {
+      norte:      {nome:"Norte",      ufs:["AC","AM","AP","PA","RO","RR","TO"],         acoes:12, concluidas:7,  andamento:3, pendentes:2, criticas:1},
+      nordeste:   {nome:"Nordeste",   ufs:["AL","BA","CE","MA","PB","PE","PI","RN","SE"],acoes:18, concluidas:11, andamento:5, pendentes:2, criticas:0},
+      centrooeste:{nome:"C-Oeste",    ufs:["DF","GO","MS","MT"],                         acoes:9,  concluidas:6,  andamento:2, pendentes:1, criticas:0},
+      sudeste:    {nome:"Sudeste",    ufs:["ES","MG","RJ","SP"],                         acoes:15, concluidas:10, andamento:4, pendentes:1, criticas:0},
+      sul:        {nome:"Sul",        ufs:["PR","RS","SC"],                               acoes:8,  concluidas:6,  andamento:1, pendentes:1, criticas:1}
+    };
+  }
+
+  const regioes = coasup.regioes;
   const lista = Object.entries(regioes);
   const totalAcoes = lista.reduce((a,[,r])=>a+r.acoes,0);
   const totalConc  = lista.reduce((a,[,r])=>a+r.concluidas,0);
@@ -2638,163 +2668,220 @@ function renderCOASUPRegionalPage(){
   const totalUFs   = lista.reduce((a,[,r])=>a+r.ufs.length,0);
   const pctGeral   = Math.round((totalConc/totalAcoes)*100);
 
-  // ── Cards topo ──
+  // Paleta executiva refinada
+  const CORES = {
+    norte:'#0891b2', nordeste:'#d97706', centrooeste:'#7c3aed',
+    sudeste:'#059669', sul:'#1d4ed8'
+  };
+
+  // ── CARDS TOPO ──
   const tc = document.getElementById('cr-top-cards');
   if(tc) tc.innerHTML = [
-    {ico:'🗺',lbl:'Regiões',       val:5,         sub:'Brasil completo',     col:'#005B9A'},
-    {ico:'📍',lbl:'UFs atendidas', val:totalUFs,  sub:'de 27 estados',       col:'#0e7490'},
-    {ico:'📋',lbl:'Total de ações',val:totalAcoes,sub:'ciclo atual',          col:'#5b5ea6'},
-    {ico:'✅',lbl:'Concluídas',    val:totalConc, sub:`${pctGeral}% do total`,col:'#1a8a5a'},
-    {ico:'🔄',lbl:'Em andamento',  val:totalAnd,  sub:'monitoradas',          col:'#4a9fd4'},
-    {ico:'⏳',lbl:'Pendentes',     val:totalPend, sub:'requerem ação',        col:'#b45309'},
-    {ico:'🔴',lbl:'Críticas',      val:totalCrit, sub:'atenção imediata',     col:'#c0283d'},
+    {ico:'🗺', lbl:'Regiões',        val:5,          sub:'cobertura nacional',  col:'#1d4ed8'},
+    {ico:'📍', lbl:'UFs atendidas',  val:totalUFs,   sub:'de 27 estados',       col:'#0891b2'},
+    {ico:'📋', lbl:'Total de ações', val:totalAcoes, sub:'ciclo atual',          col:'#7c3aed'},
+    {ico:'✅', lbl:'Concluídas',     val:totalConc,  sub:`${pctGeral}% do total`,col:'#059669'},
+    {ico:'🔄', lbl:'Em andamento',   val:totalAnd,   sub:'em execução',          col:'#2563eb'},
+    {ico:'⏳', lbl:'Pendentes',      val:totalPend,  sub:'requerem ação',        col:'#d97706'},
+    {ico:'⚠️', lbl:'Críticas',       val:totalCrit,  sub:'atenção imediata',     col:'#dc2626'},
   ].map(c=>`
-    <div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid ${c.col};
-      border-radius:var(--radius);padding:14px 16px">
-      <div style="font-size:18px;margin-bottom:6px">${c.ico}</div>
-      <div style="font-family:var(--display);font-size:26px;font-weight:800;color:${c.col};line-height:1">${c.val}</div>
-      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;
-        color:var(--text3);margin-top:3px">${c.lbl}</div>
-      <div style="font-size:10px;color:var(--text3);margin-top:2px">${c.sub}</div>
+    <div style="background:var(--surface);border:1px solid var(--border);
+      border-top:3px solid ${c.col};border-radius:var(--radius);padding:16px;
+      position:relative;overflow:hidden;transition:box-shadow var(--trans)">
+      <div style="position:absolute;right:12px;top:12px;font-size:20px;opacity:.15">${c.ico}</div>
+      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;
+        letter-spacing:.12em;color:var(--text3);margin-bottom:8px">${c.lbl}</div>
+      <div style="font-family:var(--display);font-size:30px;font-weight:800;
+        color:${c.col};line-height:1;margin-bottom:4px">${c.val}</div>
+      <div style="font-size:10px;color:var(--text3)">${c.sub}</div>
     </div>`).join('');
 
-  // ── Barras horizontais ──
+  // ── BARRAS HORIZONTAIS EXECUTIVAS ──
   const barsEl = document.getElementById('cr-bars');
   if(barsEl) barsEl.innerHTML = lista.map(([key,r])=>{
-    const col=CR_CORES[key]||'var(--accent)';
-    const pct=Math.round((r.concluidas/r.acoes)*100);
-    const sem=r.criticas>0?'#c0283d':pct<70?'#b45309':'#1a8a5a';
-    return `<div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
-          <span style="font-size:12px;font-weight:600;color:var(--text)">${r.nome}</span>
-          <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${r.ufs.length} UFs · ${r.acoes} ações</span>
-          ${r.criticas>0?`<span style="font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;
-            background:#c0283d20;color:#c0283d">⚠ ${r.criticas} crít.</span>`:''}
+    const col = CORES[key]||'#2563eb';
+    const pct = Math.round((r.concluidas/r.acoes)*100);
+    const sem = r.criticas>0?'#dc2626':pct<70?'#d97706':'#059669';
+    const semLbl = r.criticas>0?'CRÍTICO':pct<70?'ATENÇÃO':'OK';
+    return `
+    <div style="padding:14px 16px;background:var(--surface2);border-radius:var(--radius-sm);
+      border:1px solid var(--border);border-left:4px solid ${col}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${r.nome}</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${r.ufs.length} UFs</div>
+          ${r.criticas>0?`<span style="font-family:var(--mono);font-size:9px;padding:2px 7px;
+            border-radius:3px;background:#dc262620;color:#dc2626;font-weight:600">⚠ ${r.criticas} CRÍT.</span>`:''}
         </div>
-        <span style="font-family:var(--display);font-size:14px;font-weight:800;color:${sem}">${pct}%</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:3px;
+            background:${sem}18;color:${sem};font-weight:700;letter-spacing:.06em">${semLbl}</span>
+          <span style="font-family:var(--display);font-size:18px;font-weight:800;color:${sem}">${pct}%</span>
+        </div>
       </div>
-      <div style="height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;position:relative">
-        <div style="height:100%;width:${pct}%;background:${sem};border-radius:4px;transition:width 1s ease"></div>
-        <div style="position:absolute;top:0;bottom:0;left:85%;width:1px;background:var(--border2)"></div>
+      <!-- barra principal -->
+      <div style="height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;margin-bottom:10px">
+        <div style="height:100%;width:${pct}%;background:${sem};border-radius:4px;
+          transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
       </div>
-      <div style="display:flex;gap:12px;margin-top:4px;font-family:var(--mono);font-size:9px;color:var(--text3)">
-        <span style="color:#1a8a5a">✓ ${r.concluidas}</span>
-        <span style="color:#4a9fd4">→ ${r.andamento}</span>
-        <span style="color:#b45309">⏳ ${r.pendentes}</span>
+      <!-- mini métricas -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+        ${[
+          {lbl:'Concluídas', val:r.concluidas, col:'#059669'},
+          {lbl:'Andamento',  val:r.andamento,  col:'#2563eb'},
+          {lbl:'Pendentes',  val:r.pendentes,  col:'#d97706'},
+          {lbl:'UFs',        val:r.ufs.length, col:col},
+        ].map(m=>`<div style="text-align:center;padding:6px 4px;background:var(--surface);
+          border-radius:4px;border:1px solid var(--border)">
+          <div style="font-family:var(--display);font-size:14px;font-weight:700;color:${m.col}">${m.val}</div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;
+            letter-spacing:.06em;margin-top:1px">${m.lbl}</div>
+        </div>`).join('')}
       </div>
     </div>`;
   }).join('');
 
-  // ── Donut redesenhado com gaps e cores fortes ──
+  // ── DONUT EXECUTIVO ──
   const donutEl = document.getElementById('cr-donut');
   if(donutEl){
-    const W=290,H=240,cx=100,cy=110,R=88,ir=54;
+    const W=320, H=260, cx=110, cy=120, R=95, ir=58;
     let ang=-Math.PI/2, paths='', legs='';
     lista.forEach(([key,r],i)=>{
-      const col=CR_CORES[key]||'#999';
+      const col=CORES[key]||'#2563eb';
+      if(r.acoes===0) return;
       const slice=(r.acoes/totalAcoes)*(2*Math.PI);
-      const gap=0.03;
+      const gap=0.04;
       const a1=ang+gap, a2=ang+slice-gap;
       const gx1=cx+R*Math.cos(a1), gy1=cy+R*Math.sin(a1);
       const gx2=cx+R*Math.cos(a2), gy2=cy+R*Math.sin(a2);
-      const gxi1=cx+ir*Math.cos(a1),gyi1=cy+ir*Math.sin(a1);
-      const gxi2=cx+ir*Math.cos(a2),gyi2=cy+ir*Math.sin(a2);
+      const gxi1=cx+ir*Math.cos(a1), gyi1=cy+ir*Math.sin(a1);
+      const gxi2=cx+ir*Math.cos(a2), gyi2=cy+ir*Math.sin(a2);
       const glg=slice>Math.PI?1:0;
-      paths+=`<path d="M${gxi1},${gyi1} A${ir},${ir} 0 ${glg},1 ${gxi2},${gyi2} L${gx2},${gy2} A${R},${R} 0 ${glg},0 ${gx1},${gy1} Z"
-        fill="${col}" stroke="var(--surface)" stroke-width="2.5"><title>${r.nome}: ${r.acoes} ações</title></path>`;
-      const ly=16+i*40;
-      const pct2=Math.round((r.acoes/totalAcoes)*100);
-      const pctC=Math.round((r.concluidas/r.acoes)*100);
-      legs+=`
-        <rect x="${W-150}" y="${ly}" width="10" height="10" rx="2" fill="${col}"/>
-        <text x="${W-135}" y="${ly+9}" font-size="11" fill="var(--text2)" font-weight="500">${r.nome}</text>
-        <text x="${W-5}" y="${ly+9}" font-size="11" fill="${col}" font-weight="700" text-anchor="end">${pct2}%</text>
-        <text x="${W-5}" y="${ly+22}" font-size="9" fill="var(--text3)" text-anchor="end">${r.acoes} ações · ${pctC}% conc.</text>`;
+      paths+=`<path d="M${gxi1},${gyi1} A${ir},${ir} 0 ${glg},1 ${gxi2},${gyi2}
+        L${gx2},${gy2} A${R},${R} 0 ${glg},0 ${gx1},${gy1} Z"
+        fill="${col}" stroke="var(--surface)" stroke-width="3" opacity=".95">
+        <title>${r.nome}: ${r.acoes} ações (${Math.round((r.acoes/totalAcoes)*100)}%)</title></path>`;
+      // label no arco
+      const midAng=ang+slice/2;
+      const lx=cx+(R+16)*Math.cos(midAng), ly=cy+(R+16)*Math.sin(midAng);
+      const pctFatia=Math.round((r.acoes/totalAcoes)*100);
+      if(slice>0.35){
+        paths+=`<text x="${lx}" y="${ly+4}" text-anchor="middle" font-size="9" fill="${col}"
+          font-family="DM Mono,monospace" font-weight="700">${pctFatia}%</text>`;
+      }
+      // legenda
+      const ly2=24+i*38;
+      const pctConc=Math.round((r.concluidas/r.acoes)*100);
+      legs+=`<rect x="${W-160}" y="${ly2}" width="12" height="12" rx="3" fill="${col}"/>
+        <text x="${W-142}" y="${ly2+10}" font-size="12" fill="var(--text2)" font-weight="600">${r.nome}</text>
+        <text x="${W-5}" y="${ly2+10}" font-size="11" fill="${col}" font-weight="700"
+          text-anchor="end">${r.acoes} ações</text>
+        <text x="${W-5}" y="${ly2+22}" font-size="9" fill="var(--text3)"
+          text-anchor="end">${pctConc}% concluídas</text>`;
       ang+=slice;
     });
-    paths+=`
-      <circle cx="${cx}" cy="${cy}" r="${ir-3}" fill="var(--surface2)" stroke="var(--border)"/>
-      <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="24" fill="var(--text)" font-weight="800">${totalAcoes}</text>
-      <text x="${cx}" y="${cy+10}" text-anchor="middle" font-size="9" fill="var(--text3)" letter-spacing=".08em">AÇÕES TOTAIS</text>
-      <text x="${cx}" y="${cy+24}" text-anchor="middle" font-size="10" fill="#1a8a5a" font-weight="600">${pctGeral}% concluídas</text>`;
-    donutEl.innerHTML=`<svg viewBox="-5 -15 ${W+5} ${H+15}" style="width:100%;max-width:${W}px">${paths}${legs}</svg>`;
+    // Centro
+    paths+=`<circle cx="${cx}" cy="${cy}" r="${ir-4}" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+      <text x="${cx}" y="${cy-14}" text-anchor="middle" font-size="26" fill="var(--text)"
+        font-family="Syne,sans-serif" font-weight="800">${totalAcoes}</text>
+      <text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="9" fill="var(--text3)"
+        font-family="DM Mono,monospace" letter-spacing=".1em">AÇÕES</text>
+      <text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="11" fill="#059669"
+        font-family="DM Mono,monospace" font-weight="700">${pctGeral}%</text>
+      <text x="${cx}" y="${cy+33}" text-anchor="middle" font-size="8" fill="var(--text3)"
+        font-family="DM Mono,monospace">concluídas</text>`;
+    donutEl.innerHTML=`<svg viewBox="0 -10 ${W} ${H+10}" style="width:100%;max-width:${W}px;overflow:visible">${paths}${legs}</svg>`;
   }
 
-  // ── Barras empilhadas ──
+  // ── BARRAS EMPILHADAS ──
   const stackEl = document.getElementById('cr-stacked');
   if(stackEl) stackEl.innerHTML = lista.map(([key,r])=>{
-    const col=CR_CORES[key]||'var(--accent)';
+    const col=CORES[key]||'#2563eb';
     const t=r.acoes;
     const wC=Math.round((r.concluidas/t)*100);
     const wA=Math.round((r.andamento/t)*100);
     const wP=Math.round((r.pendentes/t)*100);
     const wCr=Math.round((r.criticas/t)*100);
-    return `<div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <span style="font-size:11px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px">
-          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${col}"></span>${r.nome}
-        </span>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${r.ufs.join(' · ')}</span>
+    return `
+    <div style="display:grid;grid-template-columns:90px 1fr 50px;align-items:center;gap:12px">
+      <div style="text-align:right">
+        <div style="font-size:11px;font-weight:700;color:var(--text)">${r.nome}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${t} ações</div>
       </div>
-      <div style="height:14px;border-radius:4px;overflow:hidden;display:flex;background:var(--surface3)">
-        <div style="width:${wC}%;background:#1a8a5a" title="Concluídas: ${r.concluidas}"></div>
-        <div style="width:${wA}%;background:#4a9fd4" title="Em andamento: ${r.andamento}"></div>
-        <div style="width:${wP}%;background:#b45309" title="Pendentes: ${r.pendentes}"></div>
-        ${r.criticas>0?`<div style="width:${wCr}%;background:#c0283d"></div>`:''}
+      <div>
+        <div style="height:16px;border-radius:4px;overflow:hidden;display:flex;
+          background:var(--surface3);gap:1px">
+          <div style="width:${wC}%;background:#059669" title="Concluídas: ${r.concluidas}"></div>
+          <div style="width:${wA}%;background:#2563eb" title="Andamento: ${r.andamento}"></div>
+          <div style="width:${wP}%;background:#d97706" title="Pendentes: ${r.pendentes}"></div>
+          ${r.criticas>0?`<div style="width:${wCr}%;background:#dc2626"></div>`:''}
+        </div>
+        <div style="display:flex;gap:10px;margin-top:3px;font-family:var(--mono);font-size:9px">
+          <span style="color:#059669">✓ ${r.concluidas}</span>
+          <span style="color:#2563eb">→ ${r.andamento}</span>
+          <span style="color:#d97706">⏳ ${r.pendentes}</span>
+          ${r.criticas>0?`<span style="color:#dc2626">⚠ ${r.criticas}</span>`:''}
+        </div>
       </div>
-      <div style="display:flex;gap:12px;margin-top:3px;font-family:var(--mono);font-size:9px">
-        <span style="color:#1a8a5a">✓ ${r.concluidas}</span>
-        <span style="color:#4a9fd4">→ ${r.andamento}</span>
-        <span style="color:#b45309">⏳ ${r.pendentes}</span>
-        ${r.criticas>0?`<span style="color:#c0283d">⚠ ${r.criticas}</span>`:''}
-        <span style="color:var(--text3);margin-left:auto">${t} total</span>
+      <div style="font-family:var(--display);font-size:16px;font-weight:800;
+        color:${r.criticas>0?'#dc2626':Math.round((r.concluidas/t)*100)<70?'#d97706':'#059669'}">
+        ${Math.round((r.concluidas/t)*100)}%
       </div>
     </div>`;
   }).join('');
 
-  // ── Cards detalhados por região ──
+  // ── CARDS REGIONAIS DETALHADOS ──
   const rcEl = document.getElementById('cr-region-cards');
   if(rcEl) rcEl.innerHTML = lista.map(([key,r])=>{
-    const col=CR_CORES[key]||'var(--accent)';
+    const col=CORES[key]||'#2563eb';
     const pct=Math.round((r.concluidas/r.acoes)*100);
-    const sem=r.criticas>0?'#c0283d':pct<70?'#b45309':'#1a8a5a';
-    const semLabel=r.criticas>0?'Crítico':pct<70?'Atenção':'Controlado';
-    return `<div style="background:var(--surface);border:1px solid var(--border);
-      border-radius:var(--radius);padding:18px 20px;border-left:4px solid ${col}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-        <div>
-          <div style="font-family:var(--display);font-size:14px;font-weight:800;color:${col}">${r.nome}</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px">${r.ufs.length} UFs · ${r.acoes} ações</div>
+    const sem=r.criticas>0?'#dc2626':pct<70?'#d97706':'#059669';
+    const semLbl=r.criticas>0?'Crítico':pct<70?'Atenção':'Controlado';
+    // sparkline das UFs
+    const sparkH=24, sparkW=80;
+    const barW=sparkW/r.ufs.length-1;
+    const sparkBars=r.ufs.map((uf,i)=>`<rect x="${i*(barW+1)}" y="0" width="${barW}" height="${sparkH}"
+      rx="1" fill="${col}" opacity="${0.3+i*(0.7/r.ufs.length)}">
+      <title>${uf}</title></rect>`).join('');
+    return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+      overflow:hidden;transition:box-shadow var(--trans)">
+      <!-- Cabeçalho colorido -->
+      <div style="background:${col};padding:16px 18px;position:relative;overflow:hidden">
+        <div style="position:absolute;right:-10px;top:-10px;width:80px;height:80px;
+          border-radius:50%;background:rgba(255,255,255,.08)"></div>
+        <div style="font-family:var(--display);font-size:15px;font-weight:800;color:#fff;margin-bottom:2px">${r.nome}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.7)">${r.ufs.length} estados · ${r.acoes} ações monitoradas</div>
+        <div style="margin-top:10px;display:flex;align-items:baseline;gap:8px">
+          <div style="font-family:var(--display);font-size:36px;font-weight:800;color:#fff;line-height:1">${pct}%</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.7)">execução</div>
+          <div style="margin-left:auto;font-family:var(--mono);font-size:10px;padding:3px 10px;
+            border-radius:12px;background:rgba(255,255,255,.2);color:#fff;font-weight:700">${semLbl}</div>
         </div>
-        <span style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;
-          background:${sem}20;color:${sem};border:1px solid ${sem}40">${semLabel}</span>
-      </div>
-      <div style="font-family:var(--display);font-size:32px;font-weight:800;color:${sem};line-height:1;margin-bottom:8px">${pct}%</div>
-      <div style="height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-bottom:12px">
-        <div style="height:100%;width:${pct}%;background:${sem};border-radius:3px"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">
-        <div style="background:var(--surface2);border-radius:4px;padding:6px 8px">
-          <div style="color:var(--text3);font-family:var(--mono);font-size:9px">Concluídas</div>
-          <div style="font-weight:700;color:#1a8a5a">${r.concluidas}</div>
-        </div>
-        <div style="background:var(--surface2);border-radius:4px;padding:6px 8px">
-          <div style="color:var(--text3);font-family:var(--mono);font-size:9px">Em andamento</div>
-          <div style="font-weight:700;color:#4a9fd4">${r.andamento}</div>
-        </div>
-        <div style="background:var(--surface2);border-radius:4px;padding:6px 8px">
-          <div style="color:var(--text3);font-family:var(--mono);font-size:9px">Pendentes</div>
-          <div style="font-weight:700;color:#b45309">${r.pendentes}</div>
-        </div>
-        <div style="background:var(--surface2);border-radius:4px;padding:6px 8px">
-          <div style="color:var(--text3);font-family:var(--mono);font-size:9px">Críticas</div>
-          <div style="font-weight:700;color:${r.criticas>0?'#c0283d':'var(--text3)'}">${r.criticas}</div>
+        <!-- Barra de progresso no header -->
+        <div style="margin-top:10px;height:4px;background:rgba(255,255,255,.2);border-radius:2px">
+          <div style="height:100%;width:${pct}%;background:#fff;border-radius:2px;opacity:.9"></div>
         </div>
       </div>
-      <div style="margin-top:10px;font-size:9px;color:var(--text3);font-family:var(--mono);line-height:1.7">
-        ${r.ufs.join(' · ')}
+      <!-- Métricas -->
+      <div style="padding:14px 18px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          ${[
+            {lbl:'Concluídas',  val:r.concluidas, col:'#059669', bg:'#05966912'},
+            {lbl:'Em andamento',val:r.andamento,  col:'#2563eb', bg:'#2563eb12'},
+            {lbl:'Pendentes',   val:r.pendentes,  col:'#d97706', bg:'#d9770612'},
+            {lbl:'Críticas',    val:r.criticas,   col:r.criticas>0?'#dc2626':'var(--text3)', bg:r.criticas>0?'#dc262612':'var(--surface2)'},
+          ].map(m=>`<div style="background:${m.bg};border-radius:6px;padding:8px 10px;border:1px solid ${m.col}20">
+            <div style="font-family:var(--display);font-size:18px;font-weight:800;color:${m.col}">${m.val}</div>
+            <div style="font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">${m.lbl}</div>
+          </div>`).join('')}
+        </div>
+        <!-- UFs -->
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.8">
+          ${r.ufs.map(uf=>`<span style="display:inline-block;background:var(--surface2);
+            border:1px solid var(--border);border-radius:3px;padding:1px 5px;
+            margin:2px;color:var(--text2)">${uf}</span>`).join('')}
+        </div>
       </div>
     </div>`;
   }).join('');
