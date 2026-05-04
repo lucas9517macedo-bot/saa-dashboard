@@ -740,7 +740,95 @@ body::after{ display:none }
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
 
-/* ── Narrativa / Registro de Situação ── */
+/* ══════════════════════════════════
+   MODAL DETALHES DO KPI
+══════════════════════════════════ */
+.kpi-detail-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  backdrop-filter:blur(4px);z-index:2000;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;opacity:0;pointer-events:none;transition:opacity var(--trans);
+}
+.kpi-detail-overlay.open{opacity:1;pointer-events:all}
+.kpi-detail-modal{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:14px;width:100%;max-width:680px;max-height:88vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:var(--shadow-lg);
+  transform:translateY(16px);transition:transform var(--trans-slow);
+}
+.kpi-detail-overlay.open .kpi-detail-modal{transform:translateY(0)}
+.kpi-detail-header{
+  padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  background:linear-gradient(135deg,var(--surface2),var(--surface));
+}
+.kpi-detail-header-left h2{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px}
+.kpi-detail-header-left p{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.kpi-detail-close{
+  background:none;border:none;cursor:pointer;color:var(--text3);
+  font-size:18px;padding:4px;border-radius:6px;transition:all var(--trans);flex-shrink:0;
+}
+.kpi-detail-close:hover{background:var(--crit-a);color:var(--crit)}
+.kpi-detail-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  padding:14px 22px;border-bottom:1px solid var(--border);
+  background:var(--surface2);
+}
+.kpi-stat-item{text-align:center;padding:8px}
+.kpi-stat-val{font-family:var(--display);font-size:22px;font-weight:800;line-height:1;margin-bottom:3px}
+.kpi-stat-lbl{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+.kpi-detail-body{flex:1;overflow-y:auto;padding:16px 22px}
+.kpi-detail-toolbar{
+  display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;
+}
+.kpi-detail-search{
+  flex:1;min-width:120px;background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:8px 12px;font-family:var(--font);
+  font-size:12px;color:var(--text);outline:none;transition:border-color var(--trans);
+}
+.kpi-detail-search:focus{border-color:var(--accent)}
+.detail-item{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 14px;margin-bottom:8px;transition:border-color var(--trans);
+  display:flex;align-items:flex-start;gap:12px;
+}
+.detail-item:hover{border-color:var(--border2)}
+.detail-item-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;
+}
+.detail-item-body{flex:1;min-width:0}
+.detail-item-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.detail-item-meta{font-size:11px;color:var(--text2);line-height:1.5}
+.detail-item-tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.detail-tag{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;
+  background:var(--surface3);color:var(--text2)}
+.detail-item-actions{display:flex;gap:4px;flex-shrink:0}
+.detail-btn-edit{
+  background:none;border:1px solid var(--border2);border-radius:4px;
+  padding:4px 8px;font-size:10px;cursor:pointer;color:var(--text3);
+  transition:all var(--trans);
+}
+.detail-btn-edit:hover{border-color:var(--accent);color:var(--accent)}
+.detail-btn-del{
+  background:none;border:1px solid var(--border2);border-radius:4px;
+  padding:4px 8px;font-size:10px;cursor:pointer;color:var(--text3);
+  transition:all var(--trans);
+}
+.detail-btn-del:hover{border-color:var(--crit);color:var(--crit)}
+.kpi-detail-footer{
+  padding:14px 22px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;
+  background:var(--surface2);
+}
+/* botão ver detalhes no kpi card */
+.kpi-detail-btn{
+  display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;
+  color:var(--accent);cursor:pointer;background:var(--ms-blue-a,var(--good-a));
+  border:1px solid var(--accent);border-radius:4px;padding:3px 8px;
+  transition:all var(--trans);text-transform:uppercase;letter-spacing:.05em;
+}
+.kpi-detail-btn:hover{background:var(--accent);color:#fff}
 .narrativa-panel{
   background:var(--surface);border:1px solid var(--border);
   border-left:4px solid var(--accent2);border-radius:var(--radius);
@@ -1418,7 +1506,111 @@ body::after{ display:none }
   Desenvolvido por <b>Lucas Macedo</b> · SAA/MS · Sala de Situação v5
 </div>
 
-<!-- MODALS -->
+<!-- ══ MODAL DETALHES DO KPI ══ -->
+<div class="kpi-detail-overlay" id="kpi-detail-overlay">
+  <div class="kpi-detail-modal">
+    <div class="kpi-detail-header">
+      <div class="kpi-detail-header-left">
+        <h2 id="kd-title">—</h2>
+        <p id="kd-coord">—</p>
+      </div>
+      <button class="kpi-detail-close" onclick="closeKpiDetail()">✕</button>
+    </div>
+    <div class="kpi-detail-stats">
+      <div class="kpi-stat-item">
+        <div class="kpi-stat-val" id="kd-realizado" style="color:var(--accent)">—</div>
+        <div class="kpi-stat-lbl">Realizado</div>
+      </div>
+      <div class="kpi-stat-item">
+        <div class="kpi-stat-val" id="kd-total-items">—</div>
+        <div class="kpi-stat-lbl">Itens cadastrados</div>
+      </div>
+      <div class="kpi-stat-item">
+        <div class="kpi-stat-val" id="kd-meta">—</div>
+        <div class="kpi-stat-lbl">Meta</div>
+      </div>
+    </div>
+    <div class="kpi-detail-body">
+      <div class="kpi-detail-toolbar">
+        <input class="kpi-detail-search" id="kd-search"
+          placeholder="🔍 Buscar por nome, número, status..."
+          oninput="filterDetailItems()">
+        <select id="kd-filter-status" class="kpi-unit-input" style="width:120px" onchange="filterDetailItems()">
+          <option value="">Todos</option>
+          <option value="ativo">Ativo</option>
+          <option value="concluido">Concluído</option>
+          <option value="atrasado">Atrasado</option>
+          <option value="critico">Crítico</option>
+          <option value="andamento">Em andamento</option>
+          <option value="pendente">Pendente</option>
+        </select>
+        <button class="btn btn-primary" id="kd-add-btn" onclick="showAddDetailItem()"
+          style="font-size:11px;padding:7px 14px;display:none">+ Adicionar</button>
+      </div>
+      <div id="kd-items-list"></div>
+      <div id="kd-empty" style="display:none;text-align:center;padding:32px;color:var(--text3);font-size:13px">
+        <div style="font-size:36px;margin-bottom:10px">📋</div>
+        Nenhum item cadastrado ainda.<br>
+        <span style="font-size:11px;font-family:var(--mono)">Clique em "+ Adicionar" para incluir o primeiro item.</span>
+      </div>
+    </div>
+    <div class="kpi-detail-footer">
+      <span id="kd-footer-info" style="font-family:var(--mono);font-size:10px;color:var(--text3)"></span>
+      <button class="btn" onclick="closeKpiDetail()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ADICIONAR/EDITAR ITEM DE DETALHE ══ -->
+<div class="modal-overlay" id="detail-item-overlay">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-title" id="di-modal-title">Adicionar item</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Título / Nome do item *</div>
+        <input class="modal-input" id="di-titulo" placeholder="Ex: Contrato nº 045/2025 — Limpeza Bloco A">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Número / Código</div>
+        <input class="modal-input" id="di-numero" placeholder="Ex: SEI 25000.001234/2025-01">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Status</div>
+        <select class="modal-input" id="di-status">
+          <option value="ativo">Ativo</option>
+          <option value="andamento">Em andamento</option>
+          <option value="concluido">Concluído</option>
+          <option value="atrasado">Atrasado</option>
+          <option value="critico">Crítico</option>
+          <option value="pendente">Pendente</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Responsável</div>
+        <input class="modal-input" id="di-responsavel" placeholder="Nome / matrícula">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Prazo</div>
+        <input class="modal-input" id="di-prazo" placeholder="Ex: 30/06/2025">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Valor / Percentual</div>
+        <input class="modal-input" id="di-valor" placeholder="Ex: R$ 250.000 ou 75%">
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Observações</div>
+        <textarea class="modal-input modal-textarea" id="di-obs"
+          placeholder="Detalhes relevantes, pontos de atenção, histórico..." style="min-height:64px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeDetailItemModal()">Cancelar</button>
+      <button class="btn btn-primary" id="di-confirm-btn" onclick="saveDetailItem()">Salvar item</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS existentes -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <div class="modal-title" id="modal-title">Modal</div>
@@ -2181,6 +2373,9 @@ function fillCoordSection(key){
       <div class="kpi-footer">
         <div class="kpi-spark">${sparkHTML(k.spark||[50,50,50,50,pc], sparkColor)}</div>
         <div style="display:flex;gap:4px;align-items:center">
+          <span class="kpi-detail-btn" onclick="openKpiDetail('${key}',${i})" title="Ver detalhes dos itens">
+            📋 ${(k.itens||[]).length?`${(k.itens||[]).length} itens`:'Detalhes'}
+          </span>
           ${edit ? `<button onclick="removeKpi('${key}',${i})" title="Excluir indicador"
             style="width:24px;height:24px;border-radius:4px;border:1px solid var(--crit-a);
             background:var(--crit-a);cursor:pointer;font-size:12px;color:var(--crit);
@@ -2573,8 +2768,223 @@ function toggleQUP(){
 }
 
 // ══════════════════════════════════════════════
-// NARRATIVA — Registro de Situação com Histórico
+// DETALHES DO KPI — itens clicáveis
 // ══════════════════════════════════════════════
+let _kdState = { coordKey:'', kpiIdx:0, editIdx:-1 };
+
+const STATUS_COLORS = {
+  ativo:     { cor:'#1B873F', bg:'rgba(27,135,63,.12)',  label:'Ativo'         },
+  concluido: { cor:'#1B873F', bg:'rgba(27,135,63,.12)',  label:'Concluído'     },
+  andamento: { cor:'#0277BD', bg:'rgba(2,119,189,.12)',  label:'Em andamento'  },
+  atrasado:  { cor:'#C05C00', bg:'rgba(192,92,0,.12)',   label:'Atrasado'      },
+  critico:   { cor:'#B71C1C', bg:'rgba(183,28,28,.12)',  label:'Crítico'       },
+  pendente:  { cor:'#C05C00', bg:'rgba(192,92,0,.12)',   label:'Pendente'      },
+};
+
+function openKpiDetail(coordKey, kpiIdx){
+  const c = DB.coords[coordKey];
+  const k = c?.kpis[kpiIdx];
+  if(!k) return;
+
+  _kdState = { coordKey, kpiIdx, editIdx:-1 };
+
+  // Garantir que o array itens existe
+  if(!k.itens) k.itens = [];
+
+  const kst = calcStatus(k.realizado, k.meta, k.inverso);
+  const cor = S(kst).color;
+
+  // Preencher header
+  document.getElementById('kd-title').textContent   = k.nome;
+  document.getElementById('kd-coord').textContent   = `${c.acro} · ${c.nome}`;
+  document.getElementById('kd-realizado').textContent = `${k.realizado} ${k.unidade}`;
+  document.getElementById('kd-realizado').style.color = cor;
+  document.getElementById('kd-meta').textContent    = `${k.meta} ${k.unidade}`;
+  document.getElementById('kd-total-items').textContent = k.itens.length;
+
+  // Botão adicionar só no modo editar
+  document.getElementById('kd-add-btn').style.display = isEdit() ? '' : 'none';
+
+  // Limpar busca e filtro
+  document.getElementById('kd-search').value = '';
+  document.getElementById('kd-filter-status').value = '';
+
+  renderDetailItems();
+
+  document.getElementById('kpi-detail-overlay').classList.add('open');
+}
+
+function closeKpiDetail(){
+  document.getElementById('kpi-detail-overlay').classList.remove('open');
+}
+
+// Fechar com ESC
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') closeKpiDetail();
+});
+
+function renderDetailItems(filter='', statusFilter=''){
+  const { coordKey, kpiIdx } = _kdState;
+  const k = DB.coords[coordKey]?.kpis[kpiIdx];
+  if(!k) return;
+
+  const itens = (k.itens||[]).filter(item=>{
+    const matchText = !filter ||
+      item.titulo?.toLowerCase().includes(filter.toLowerCase()) ||
+      item.numero?.toLowerCase().includes(filter.toLowerCase()) ||
+      item.responsavel?.toLowerCase().includes(filter.toLowerCase()) ||
+      item.obs?.toLowerCase().includes(filter.toLowerCase());
+    const matchStatus = !statusFilter || item.status===statusFilter;
+    return matchText && matchStatus;
+  });
+
+  const listEl  = document.getElementById('kd-items-list');
+  const emptyEl = document.getElementById('kd-empty');
+  const footer  = document.getElementById('kd-footer-info');
+  const total   = (k.itens||[]).length;
+
+  document.getElementById('kd-total-items').textContent = total;
+  footer.textContent = `${itens.length} de ${total} item${total!==1?'s':''} exibido${itens.length!==1?'s':''}`;
+
+  if(!itens.length){
+    listEl.innerHTML=''; emptyEl.style.display='block';
+    if(!total) emptyEl.innerHTML=`<div style="font-size:36px;margin-bottom:10px">📋</div>
+      Nenhum item cadastrado ainda.<br>
+      <span style="font-size:11px;font-family:var(--mono)">${isEdit()?'Clique em "+ Adicionar" para incluir o primeiro item.':'Acesse o modo editar para adicionar itens.'}</span>`;
+    else emptyEl.innerHTML=`<div style="font-size:28px;margin-bottom:8px">🔍</div>Nenhum resultado encontrado.`;
+    return;
+  }
+  emptyEl.style.display='none';
+
+  listEl.innerHTML = itens.map((item, idx)=>{
+    const realIdx = (k.itens||[]).findIndex(i=>i===item);
+    const st = STATUS_COLORS[item.status] || STATUS_COLORS.ativo;
+    return `
+    <div class="detail-item">
+      <div class="detail-item-dot" style="background:${st.cor}"></div>
+      <div class="detail-item-body">
+        <div class="detail-item-title">${item.titulo||'Sem título'}</div>
+        <div class="detail-item-meta">
+          ${item.numero?`<b>Nº:</b> ${item.numero} &nbsp;·&nbsp; `:''}
+          ${item.responsavel?`<b>Resp.:</b> ${item.responsavel} &nbsp;·&nbsp; `:''}
+          ${item.prazo?`<b>Prazo:</b> ${item.prazo}`:''}
+          ${item.valor?`<br><b>Valor:</b> ${item.valor}`:''}
+          ${item.obs?`<br>${item.obs}`:''}
+        </div>
+        <div class="detail-item-tags">
+          <span class="detail-tag" style="background:${st.bg};color:${st.cor}">${st.label}</span>
+          ${item.prazo && isPrazoVencido(item.prazo)?`<span class="detail-tag" style="background:var(--crit-a);color:var(--crit)">⚠ Prazo vencido</span>`:''}
+        </div>
+      </div>
+      ${isEdit()?`
+      <div class="detail-item-actions">
+        <button class="detail-btn-edit" onclick="editDetailItem(${realIdx})">✏️</button>
+        <button class="detail-btn-del" onclick="deleteDetailItem(${realIdx})">🗑</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function filterDetailItems(){
+  const search = document.getElementById('kd-search').value;
+  const status = document.getElementById('kd-filter-status').value;
+  renderDetailItems(search, status);
+}
+
+function isPrazoVencido(prazo){
+  if(!prazo) return false;
+  try {
+    const parts = prazo.split('/');
+    if(parts.length===3){
+      const d = new Date(parts[2], parts[1]-1, parts[0]);
+      return d < new Date();
+    }
+  } catch(e){}
+  return false;
+}
+
+// ── Adicionar / Editar item ──
+function showAddDetailItem(){
+  _kdState.editIdx = -1;
+  document.getElementById('di-modal-title').textContent = '➕ Adicionar item';
+  document.getElementById('di-confirm-btn').textContent = 'Salvar item';
+  ['di-titulo','di-numero','di-responsavel','di-prazo','di-valor','di-obs']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('di-status').value = 'ativo';
+  document.getElementById('detail-item-overlay').classList.add('open');
+}
+
+function editDetailItem(idx){
+  const k = DB.coords[_kdState.coordKey]?.kpis[_kdState.kpiIdx];
+  const item = k?.itens?.[idx];
+  if(!item) return;
+  _kdState.editIdx = idx;
+  document.getElementById('di-modal-title').textContent = '✏️ Editar item';
+  document.getElementById('di-confirm-btn').textContent = 'Atualizar';
+  document.getElementById('di-titulo').value      = item.titulo||'';
+  document.getElementById('di-numero').value      = item.numero||'';
+  document.getElementById('di-status').value      = item.status||'ativo';
+  document.getElementById('di-responsavel').value = item.responsavel||'';
+  document.getElementById('di-prazo').value       = item.prazo||'';
+  document.getElementById('di-valor').value       = item.valor||'';
+  document.getElementById('di-obs').value         = item.obs||'';
+  document.getElementById('detail-item-overlay').classList.add('open');
+}
+
+function saveDetailItem(){
+  const titulo = document.getElementById('di-titulo').value.trim();
+  if(!titulo){ alert('Digite o título ou nome do item.'); return; }
+
+  const item = {
+    titulo,
+    numero:      document.getElementById('di-numero').value.trim(),
+    status:      document.getElementById('di-status').value,
+    responsavel: document.getElementById('di-responsavel').value.trim(),
+    prazo:       document.getElementById('di-prazo').value.trim(),
+    valor:       document.getElementById('di-valor').value.trim(),
+    obs:         document.getElementById('di-obs').value.trim(),
+    criadoEm:   new Date().toLocaleDateString('pt-BR'),
+  };
+
+  const k = DB.coords[_kdState.coordKey]?.kpis[_kdState.kpiIdx];
+  if(!k) return;
+  if(!k.itens) k.itens = [];
+
+  if(_kdState.editIdx >= 0){
+    k.itens[_kdState.editIdx] = { ...k.itens[_kdState.editIdx], ...item };
+  } else {
+    k.itens.push(item);
+  }
+
+  autoSave();
+  closeDetailItemModal();
+  renderDetailItems(
+    document.getElementById('kd-search').value,
+    document.getElementById('kd-filter-status').value
+  );
+  // Atualizar badge no card
+  const btn = document.querySelector(`#kpi-${_kdState.coordKey}-${_kdState.kpiIdx} .kpi-detail-btn`);
+  if(btn) btn.textContent = `📋 ${k.itens.length} ${k.itens.length===1?'item':'itens'}`;
+}
+
+function deleteDetailItem(idx){
+  const k = DB.coords[_kdState.coordKey]?.kpis[_kdState.kpiIdx];
+  if(!k?.itens) return;
+  const item = k.itens[idx];
+  if(!confirm(`Remover o item "${item?.titulo||'este item'}"?`)) return;
+  k.itens.splice(idx, 1);
+  autoSave();
+  renderDetailItems(
+    document.getElementById('kd-search').value,
+    document.getElementById('kd-filter-status').value
+  );
+  const btn = document.querySelector(`#kpi-${_kdState.coordKey}-${_kdState.kpiIdx} .kpi-detail-btn`);
+  if(btn) btn.textContent = `📋 ${k.itens.length} ${k.itens.length===1?'item':'itens'}`;
+}
+
+function closeDetailItemModal(){
+  document.getElementById('detail-item-overlay').classList.remove('open');
+}
 function salvarNarrativa(key){
   const textarea = document.getElementById(`narr-${key}`);
   const autorInp = document.getElementById(`narr-autor-${key}`);
