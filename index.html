@@ -14,58 +14,66 @@
   --radius-xs: 4px;
   --trans: .16s cubic-bezier(.4,0,.2,1);
   --trans-slow: .3s cubic-bezier(.4,0,.2,1);
-  --shadow: 0 2px 12px rgba(0,40,100,.10);
-  --shadow-lg: 0 8px 32px rgba(0,40,100,.18);
+  --shadow: 0 2px 8px rgba(0,48,100,.09);
+  --shadow-lg: 0 8px 28px rgba(0,48,100,.16);
   --font: 'DM Sans', sans-serif;
   --display: 'Syne', sans-serif;
   --mono: 'DM Mono', monospace;
 
-  /* MS brand */
-  --ms-blue:    #005B9A;   /* azul primário Ministério da Saúde */
-  --ms-blue2:   #003F72;   /* azul escuro */
-  --ms-blue-a:  rgba(0,91,154,.10);
+  /* ── Paleta oficial Ministério da Saúde ──
+     Azul: Pantone 287C → #004B8D (primário MS)
+     Verde: #1B873F (identidade SUS/MS)
+     Apoio: branco, cinza institucional        */
+  --ms-blue:   #004B8D;   /* azul primário MS — Pantone 287C */
+  --ms-blue2:  #003366;   /* azul escuro MS */
+  --ms-blue3:  #0068C1;   /* azul médio MS */
+  --ms-green:  #1B873F;   /* verde MS / SUS */
+  --ms-green2: #156632;   /* verde escuro MS */
 
-  /* status semântico — tons discretos */
-  --good:   #1a8a5a;
-  --warn:   #b45309;
-  --crit:   #c0283d;
-  --nd:     #6b7280;
-  --good-a: rgba(26,138,90,.10);
-  --warn-a: rgba(180,83,9,.10);
-  --crit-a: rgba(192,40,61,.10);
+  /* ── Status semântico — tons equilibrados ── */
+  --good:   #1B873F;              /* verde MS */
+  --warn:   #C05C00;              /* laranja — atenção */
+  --crit:   #B71C1C;              /* vermelho — crítico */
+  --nd:     #6B7280;
+  --good-a: rgba(27,135,63,.11);
+  --warn-a: rgba(192,92,0,.11);
+  --crit-a: rgba(183,28,28,.11);
   --nd-a:   rgba(107,114,128,.08);
 
-  --teal:   #0e7490;
-  --purple: #5b5ea6;
+  --teal:   #0277BD;
+  --purple: #5E35B1;
 }
 
-[data-theme="dark"] {
-  --bg:       #06090f;
-  --bg2:      #090d17;
-  --surface:  #0d1221;
-  --surface2: #121930;
-  --surface3: #182240;
-  --border:   rgba(255,255,255,.05);
-  --border2:  rgba(255,255,255,.10);
-  --text:     #dce8f5;
-  --text2:    #7a96b4;
-  --text3:    #2e4260;
-  --accent:   #4a9fd4;   /* azul MS claro para dark */
-  --accent2:  #2d8bbf;
-}
+/* ── MODO CLARO — padrão MS institucional ── */
 [data-theme="light"] {
-  --bg:       #f5f7fa;
-  --bg2:      #eef2f8;
-  --surface:  #ffffff;
-  --surface2: #f0f5fb;
-  --surface3: #e4edf8;
-  --border:   rgba(0,40,100,.07);
-  --border2:  rgba(0,40,100,.14);
-  --text:     #0a1628;
-  --text2:    #3d5a78;
-  --text3:    #8aa5c0;
-  --accent:   #005B9A;   /* azul MS para light */
-  --accent2:  #003F72;
+  --bg:       #F5F7FA;
+  --bg2:      #EBF0F7;
+  --surface:  #FFFFFF;
+  --surface2: #F0F5FB;
+  --surface3: #E2EBF6;
+  --border:   rgba(0,75,141,.08);
+  --border2:  rgba(0,75,141,.15);
+  --text:     #0A1628;
+  --text2:    #1E3A5F;
+  --text3:    #7A9BB8;
+  --accent:   #004B8D;   /* azul MS primário */
+  --accent2:  #1B873F;   /* verde MS */
+}
+
+/* ── MODO ESCURO — escuro azulado suave ── */
+[data-theme="dark"] {
+  --bg:       #081525;
+  --bg2:      #0D1E33;
+  --surface:  #112240;
+  --surface2: #162B4D;
+  --surface3: #1C3560;
+  --border:   rgba(255,255,255,.06);
+  --border2:  rgba(255,255,255,.12);
+  --text:     #D8E8F8;
+  --text2:    #7AA8D4;
+  --text3:    #2A4B72;
+  --accent:   #4D9FDB;   /* azul MS claro para dark */
+  --accent2:  #34C468;   /* verde MS claro para dark */
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -772,12 +780,83 @@ body::after{ display:none }
 }
 .update-badge b{color:var(--text2)}
 
-@media(max-width:700px){
-  .sidebar{width:180px}
-  .content,.topbar{padding-left:14px;padding-right:14px}
-  .kpi-numbers{gap:5px}
-  .kpi-real{font-size:26px}
+/* ══════════════════════════════════════
+   RESPONSIVIDADE MOBILE — MS Dashboard
+══════════════════════════════════════ */
+@media(max-width:900px){
+  .sidebar{width:200px}
+  .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  .coord-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
 }
+
+@media(max-width:700px){
+  /* Sidebar vira menu hamburguer */
+  .sidebar{
+    position:fixed;left:-260px;top:0;bottom:0;z-index:500;
+    width:260px;transition:left var(--trans-slow);
+    box-shadow:var(--shadow-lg);
+  }
+  .sidebar.open{left:0}
+  .app{flex-direction:column}
+  .main{width:100%}
+
+  /* Topbar mobile */
+  .topbar{padding:10px 14px;flex-wrap:wrap;gap:8px}
+  .topbar-actions{gap:6px}
+  .topbar-title{font-size:14px}
+  .btn{padding:6px 10px;font-size:11px}
+
+  /* Conteúdo */
+  .content{padding:14px 14px 80px}
+  .sec-title{font-size:20px}
+
+  /* KPIs */
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .kpi-real{font-size:20px}
+  .kpi-numbers{gap:4px}
+  .kpi-card{padding:14px}
+
+  /* Coordenações */
+  .coord-grid{grid-template-columns:1fr 1fr}
+  .health-row{grid-template-columns:repeat(3,1fr)}
+
+  /* Gráficos */
+  .exec-bar-row{grid-template-columns:60px 1fr 32px}
+  .exec-bar-label{font-size:9px}
+
+  /* Header coordenação */
+  .detail-header{flex-direction:column}
+  .detail-name{font-size:18px}
+
+  /* Narrativa */
+  .narrativa-autor-input{width:100%}
+
+  /* Int grid */
+  .int-grid{grid-template-columns:1fr}
+
+  /* Botão hamburguer */
+  .hamburger-btn{display:flex}
+}
+
+@media(max-width:480px){
+  .kpi-grid{grid-template-columns:1fr}
+  .coord-grid{grid-template-columns:1fr}
+  .health-row{grid-template-columns:repeat(2,1fr)}
+  .topbar-actions .btn:not(.btn-primary):not(.btn-wpp){display:none}
+  .kpi-edit-row{grid-template-columns:1fr}
+}
+
+/* Botão hamburguer (hidden no desktop) */
+.hamburger-btn{
+  display:none;background:none;border:none;cursor:pointer;
+  padding:6px;color:var(--text);font-size:20px;
+}
+/* Overlay sidebar mobile */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:499;
+}
+.sidebar-overlay.open{display:block}
 </style>
 </head>
 <body>
@@ -804,6 +883,9 @@ body::after{ display:none }
     </div>
   </div>
 </div>
+
+<!-- Overlay sidebar mobile -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <!-- ════════════ APP ════════════ -->
 <div class="app">
@@ -862,11 +944,14 @@ body::after{ display:none }
   <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <div>
-        <div class="topbar-breadcrumb">MS · SAA · <span id="bc-curr">Dashboard Executivo</span></div>
-        <div class="topbar-title" id="pg-title">
-          Dashboard Executivo
-          <span class="mode-badge" id="mode-badge">—</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="hamburger-btn" onclick="toggleSidebar()" title="Menu">☰</button>
+        <div>
+          <div class="topbar-breadcrumb">MS · SAA · <span id="bc-curr">Dashboard Executivo</span></div>
+          <div class="topbar-title" id="pg-title">
+            Dashboard Executivo
+            <span class="mode-badge" id="mode-badge">—</span>
+          </div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -1418,20 +1503,25 @@ function startApp(){
     try{
       const p=JSON.parse(saved);
       if(p.coords){
-        // Preservar dados estruturais (regioes) que não ficam no localStorage
         Object.entries(p.coords).forEach(([key,c])=>{
           if(DB.coords[key]){
-            DB.coords[key].kpis = c.kpis || DB.coords[key].kpis;
-            DB.coords[key].insight = c.insight || DB.coords[key].insight;
-            // regioes: manter do DB padrão se não vier do saved
-            if(c.regioes) DB.coords[key].regioes = c.regioes;
+            // Preservar KPIs e campos editáveis
+            if(c.kpis)          DB.coords[key].kpis         = c.kpis;
+            if(c.insight)       DB.coords[key].insight       = c.insight;
+            if(c.regioes)       DB.coords[key].regioes       = c.regioes;
+            // Narrativa e controle de atualização
+            if(c.narrativa!==undefined)    DB.coords[key].narrativa    = c.narrativa;
+            if(c.atualizadoPor!==undefined) DB.coords[key].atualizadoPor = c.atualizadoPor;
+            if(c.atualizadoEm!==undefined)  DB.coords[key].atualizadoEm  = c.atualizadoEm;
+            // Histórico de registros
+            if(c.historicoNarrativa) DB.coords[key].historicoNarrativa = c.historicoNarrativa;
           }
         });
-        // Adicionar coords novas que vieram do saved
         Object.entries(p.coords).forEach(([key,c])=>{ if(!DB.coords[key]) DB.coords[key]=c; });
       }
       if(p.integrated) DB.integrated=p.integrated;
-    }catch(e){}
+      if(p.pbi)        DB.pbi=p.pbi;
+    }catch(e){ console.warn('Erro ao carregar localStorage:', e); }
   }
   renderAll();
 }
@@ -2130,24 +2220,51 @@ function fillCoordSection(key){
     <!-- ── NARRATIVA / REGISTRO DE SITUAÇÃO ── -->
     <div class="narrativa-panel">
       <div class="narrativa-label">
-        <span>📝 Registro de Situação — o que está acontecendo</span>
+        <span>📝 Registro de Situação</span>
         <div class="narrativa-update-info" id="narr-info-${key}">
           ${c.atualizadoEm ? `🕐 ${c.atualizadoEm}${c.atualizadoPor?' · '+c.atualizadoPor:''}` : 'Nenhum registro ainda'}
         </div>
       </div>
-      <textarea class="narrativa-textarea" id="narr-${key}"
-        ${!isEdit()?'readonly':''}
-        placeholder="Descreva aqui como os processos estão andando, pontos de atenção, entregas recentes, próximos passos..."
-      >${c.narrativa||''}</textarea>
-      ${isEdit()?`
-      <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap">
-        <input class="narrativa-autor-input" id="narr-autor-${key}" placeholder="Seu nome / matrícula"
-          value="${c.atualizadoPor||''}">
-        <button class="btn btn-primary" onclick="salvarNarrativa('${key}')" style="font-size:11px;padding:6px 14px">
-          💾 Salvar registro
+
+      <!-- Abas: Novo Registro | Histórico -->
+      <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid var(--border2)">
+        <button onclick="narTabSwitch('${key}','novo')"
+          id="narrtab-novo-${key}"
+          style="padding:6px 16px;border:none;background:transparent;font-family:var(--mono);
+          font-size:10px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;
+          border-bottom:2px solid var(--accent2);margin-bottom:-2px;color:var(--accent2);font-weight:600">
+          ✏️ Registrar
         </button>
-        <span id="narr-ok-${key}" style="font-family:var(--mono);font-size:10px;color:var(--good);display:none">✓ Salvo</span>
-      </div>`:''}
+        <button onclick="narTabSwitch('${key}','hist')"
+          id="narrtab-hist-${key}"
+          style="padding:6px 16px;border:none;background:transparent;font-family:var(--mono);
+          font-size:10px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;
+          border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text3)">
+          🕐 Histórico (${(c.historicoNarrativa||[]).length})
+        </button>
+      </div>
+
+      <!-- Aba: Novo Registro -->
+      <div id="narrpanel-novo-${key}">
+        <textarea class="narrativa-textarea" id="narr-${key}"
+          ${!isEdit()?'readonly':''}
+          placeholder="Descreva o que está acontecendo, pontos de atenção, entregas recentes, próximos passos, riscos identificados..."
+        >${c.narrativa||''}</textarea>
+        ${isEdit()?`
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <input class="narrativa-autor-input" id="narr-autor-${key}"
+            placeholder="Seu nome / matrícula" value="${c.atualizadoPor||''}">
+          <button class="btn btn-primary" onclick="salvarNarrativa('${key}')"
+            style="font-size:11px;padding:7px 16px">💾 Salvar registro</button>
+          <span id="narr-ok-${key}" style="font-family:var(--mono);font-size:10px;
+            color:var(--good);display:none">✓ Registro salvo!</span>
+        </div>`:''}
+      </div>
+
+      <!-- Aba: Histórico -->
+      <div id="narrpanel-hist-${key}" style="display:none">
+        <div id="narr-hist-${key}"></div>
+      </div>
     </div>
     <div class="ai-panel" style="margin-bottom:20px">
       <div class="ai-panel-head">
@@ -2164,6 +2281,9 @@ function fillCoordSection(key){
     </div>
     <div class="row-label">Indicadores de Desempenho</div>
     <div class="kpi-grid">${kpis}${addBtn}</div>`;
+
+  // Renderizar histórico após inserir HTML
+  setTimeout(()=>renderHistoricoNarrativa(key), 50);
 }
 
 // ══════════════════════════════════════════════
@@ -2453,7 +2573,7 @@ function toggleQUP(){
 }
 
 // ══════════════════════════════════════════════
-// NARRATIVA — Registro de Situação
+// NARRATIVA — Registro de Situação com Histórico
 // ══════════════════════════════════════════════
 function salvarNarrativa(key){
   const textarea = document.getElementById(`narr-${key}`);
@@ -2463,19 +2583,79 @@ function salvarNarrativa(key){
   if(!textarea) return;
 
   const texto = textarea.value.trim();
+  if(!texto){ alert('Digite algo antes de salvar.'); return; }
   const autor = autorInp?.value.trim() || 'Não identificado';
-  const agora = new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const agora = new Date().toLocaleString('pt-BR',{
+    day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'
+  });
 
-  DB.coords[key].narrativa    = texto;
+  // Salvar campos principais
+  DB.coords[key].narrativa     = texto;
   DB.coords[key].atualizadoPor = autor;
   DB.coords[key].atualizadoEm  = agora;
 
+  // Histórico: empilhar os últimos 10 registros
+  if(!DB.coords[key].historicoNarrativa) DB.coords[key].historicoNarrativa = [];
+  DB.coords[key].historicoNarrativa.unshift({ texto, autor, data: agora });
+  if(DB.coords[key].historicoNarrativa.length > 10)
+    DB.coords[key].historicoNarrativa = DB.coords[key].historicoNarrativa.slice(0,10);
+
+  // Atualizar UI
   if(infoEl) infoEl.textContent = `🕐 ${agora} · ${autor}`;
   if(okEl){ okEl.style.display='inline'; setTimeout(()=>okEl.style.display='none',2500); }
-  autoSave();
-  // Atualizar badge no coord card
+
+  // Atualizar histórico na tela
+  renderHistoricoNarrativa(key);
+
+  // Badge no overview
   const badge = document.getElementById(`update-badge-${key}`);
   if(badge) badge.innerHTML=`🕐 <b>${agora}</b> · ${autor}`;
+
+  autoSave();
+}
+
+function narTabSwitch(key, tab){
+  const novo = document.getElementById(`narrpanel-novo-${key}`);
+  const hist = document.getElementById(`narrpanel-hist-${key}`);
+  const btnNovo = document.getElementById(`narrtab-novo-${key}`);
+  const btnHist = document.getElementById(`narrtab-hist-${key}`);
+  if(!novo||!hist) return;
+  if(tab==='novo'){
+    novo.style.display=''; hist.style.display='none';
+    btnNovo.style.color='var(--accent2)'; btnNovo.style.borderBottomColor='var(--accent2)'; btnNovo.style.fontWeight='600';
+    btnHist.style.color='var(--text3)'; btnHist.style.borderBottomColor='transparent'; btnHist.style.fontWeight='400';
+  } else {
+    novo.style.display='none'; hist.style.display='';
+    btnHist.style.color='var(--accent2)'; btnHist.style.borderBottomColor='var(--accent2)'; btnHist.style.fontWeight='600';
+    btnNovo.style.color='var(--text3)'; btnNovo.style.borderBottomColor='transparent'; btnNovo.style.fontWeight='400';
+    renderHistoricoNarrativa(key);
+  }
+}
+
+function renderHistoricoNarrativa(key){
+  const el = document.getElementById(`narr-hist-${key}`);
+  if(!el) return;
+  const hist = DB.coords[key]?.historicoNarrativa || [];
+  if(!hist.length){
+    el.innerHTML = `<div style="color:var(--text3);font-size:11px;font-family:var(--mono);padding:8px 0">
+      Nenhum registro histórico ainda.</div>`;
+    return;
+  }
+  el.innerHTML = hist.map((r,i)=>`
+    <div style="border-left:3px solid ${i===0?'var(--accent2)':'var(--border2)'};
+      padding:10px 14px;margin-bottom:8px;background:${i===0?'var(--surface2)':'var(--surface)'};
+      border-radius:0 var(--radius-sm) var(--radius-sm) 0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-wrap:wrap;gap:4px">
+        <span style="font-family:var(--mono);font-size:9px;color:var(--accent2);
+          text-transform:uppercase;letter-spacing:.06em">${i===0?'✦ Mais recente':'Registro anterior'}</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">🕐 ${r.data}</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;
+            background:var(--surface3);color:var(--text2)">👤 ${r.autor}</span>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.65;white-space:pre-wrap">${r.texto}</div>
+    </div>`).join('');
 }
 function updateKpi(coordKey,idx,field,val){
   DB.coords[coordKey].kpis[idx][field] = isNaN(Number(val))?val:Number(val);
@@ -3013,9 +3193,22 @@ function goTo(key){
   document.getElementById('bc-curr').textContent=title;
   document.getElementById('pg-title').innerHTML=title+`<span class="mode-badge ${SESSION.mode==='edit'?'mb-edit':'mb-view'}">${SESSION.mode==='edit'?'✏️ Editar':'👁 Visualizar'}</span>`;
   window.scrollTo({top:0,behavior:'smooth'});
+  // Fechar sidebar no mobile após navegar
+  if(window.innerWidth<=700){
+    document.querySelector('.sidebar')?.classList.remove('open');
+    document.getElementById('sidebar-overlay')?.classList.remove('open');
+  }
   if(key==='graficos') renderGraficos();
   if(key==='coasup-regional') renderCOASUPRegionalPage();
   if(key==='importar') initImportSection();
+
+// ── Sidebar mobile ──
+function toggleSidebar(){
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb?.classList.toggle('open');
+  ov?.classList.toggle('open');
+}
 
 // renderiza chips de IA no overview
 }
