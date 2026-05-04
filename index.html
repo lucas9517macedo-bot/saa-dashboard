@@ -732,6 +732,46 @@ body::after{ display:none }
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
 
+/* ── Narrativa / Registro de Situação ── */
+.narrativa-panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-left:4px solid var(--accent2);border-radius:var(--radius);
+  padding:16px 20px;margin-bottom:16px;
+}
+.narrativa-label{
+  font-family:var(--mono);font-size:9px;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--accent2);margin-bottom:8px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;
+}
+.narrativa-update-info{
+  font-size:10px;color:var(--text3);font-family:var(--mono);
+  display:flex;align-items:center;gap:10px;
+}
+.narrativa-textarea{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:12px 14px;
+  font-family:var(--font);font-size:13px;color:var(--text);
+  outline:none;resize:vertical;min-height:80px;
+  transition:border-color var(--trans);line-height:1.65;
+}
+.narrativa-textarea:focus{border-color:var(--accent2)}
+.narrativa-textarea[readonly]{
+  background:transparent;border-color:transparent;
+  padding-left:0;cursor:default;resize:none;color:var(--text2);
+}
+.narrativa-autor-input{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:var(--radius-xs);padding:6px 10px;
+  font-family:var(--mono);font-size:11px;color:var(--text);
+  outline:none;width:160px;transition:border-color var(--trans);
+}
+.narrativa-autor-input:focus{border-color:var(--accent2)}
+.update-badge{
+  font-family:var(--mono);font-size:9px;color:var(--text3);
+  margin-top:4px;display:flex;align-items:center;gap:4px;
+}
+.update-badge b{color:var(--text2)}
+
 @media(max-width:700px){
   .sidebar{width:180px}
   .content,.topbar{padding-left:14px;padding-right:14px}
@@ -1454,6 +1494,7 @@ let DB = {
       acro:"COGAD", nome:"Coordenação de Gestão de Atos e Documentos",
       desc:"Gestão de processos SEI, demandas judiciais, ofícios e despachos. Atendimento a demandas de PGU, TCU, SIC, CGU e demais órgãos.",
       insight:"Taxa de atendimento em 98,5%. Atenção: 163 processos vencidos e 3 vencem hoje. Monitorar demandas PGU (4.036) e TCU (3.161).",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"CG1",nome:"Total de Processos SEI",realizado:12348,meta:12348,unidade:"qtd",spark:[11200,11600,11900,12100,12348]},
         {id:"CG2",nome:"Demandas Atendidas",realizado:12163,meta:12348,unidade:"qtd",spark:[11000,11300,11700,11900,12163]},
@@ -1467,6 +1508,7 @@ let DB = {
       acro:"CGLIC", nome:"Coordenação-Geral de Licitações e Contratos",
       desc:"Condução de pregões eletrônicos, dispensas e inexigibilidades do MS.",
       insight:"Tempo médio de contratação 57% acima da meta. Identificar gargalo na fase de aprovação jurídica.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"L1",nome:"Pregões concluídos no prazo",realizado:72,meta:85,unidade:"%",spark:[80,78,75,73,72]},
         {id:"L2",nome:"Pregões realizados no mês",realizado:8,meta:10,unidade:"qtd",spark:[5,6,7,8,8]},
@@ -1480,6 +1522,7 @@ let DB = {
       acro:"CGINFRA", nome:"Coordenação-Geral de Infraestrutura",
       desc:"Gestão de contratos de engenharia, manutenção predial, vigilância e infraestrutura física.",
       insight:"Indicadores dentro da meta. Acelerar manutenção preventiva do parque tecnológico.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"I1",nome:"Obras/reformas no prazo",realizado:83,meta:80,unidade:"%",spark:[75,78,80,82,83]},
         {id:"I2",nome:"Chamados resolvidos no SLA",realizado:94,meta:90,unidade:"%",spark:[88,90,91,93,94]},
@@ -1492,6 +1535,7 @@ let DB = {
       acro:"CODIPE", nome:"Coordenação de Desenvolvimento de Pessoas",
       desc:"Capacitação, avaliação de desempenho e qualidade de vida dos servidores.",
       insight:"42% dos servidores sem capacitação no ciclo. Acelerar matrículas no PDC.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"P1",nome:"Servidores capacitados (PDC)",realizado:58,meta:80,unidade:"%",spark:[30,40,48,54,58]},
         {id:"P2",nome:"Horas médias de capacitação",realizado:22,meta:40,unidade:"h/ano",spark:[10,14,18,20,22]},
@@ -1505,6 +1549,7 @@ let DB = {
       acro:"CGFISC", nome:"Coordenação-Geral de Fiscalização de Contratos",
       desc:"Fiscalização da execução contratual, medições, notificações e gestão de riscos.",
       insight:"CRÍTICO: 4 contratos com risco de descontinuidade. Prioridade máxima.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"F1",nome:"Contratos ativos fiscalizados",realizado:142,meta:142,unidade:"qtd",spark:[138,140,141,141,142]},
         {id:"F2",nome:"Contratos vencendo em 60 dias",realizado:12,meta:5,unidade:"qtd",spark:[5,6,8,10,12],inverso:true},
@@ -1518,6 +1563,7 @@ let DB = {
       acro:"CGDI", nome:"Coordenação-Geral de Gestão Documental e Informação",
       desc:"Gestão do acervo documental, protocolos SEI, digitalização e conformidade LGPD.",
       insight:"18 processos SEI com prazo vencido. Revisar fluxo de triagem urgente.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"D1",nome:"Processos SEI tramitados no prazo",realizado:84,meta:90,unidade:"%",spark:[88,87,85,84,84]},
         {id:"D2",nome:"Processos com prazo vencido",realizado:18,meta:0,unidade:"qtd",spark:[8,10,14,16,18],inverso:true},
@@ -1531,6 +1577,7 @@ let DB = {
       acro:"NPM", nome:"Núcleo de Monitoramento",
       desc:"Consolidação, monitoramento e reporte dos indicadores estratégicos da SAA.",
       insight:"Todos os indicadores dentro da meta. Foco: finalizar mapeamento de KPIs com menor maturidade.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"N1",nome:"Coordenações com painel atualizado",realizado:9,meta:9,unidade:"qtd",spark:[6,7,7,8,9]},
         {id:"N2",nome:"Relatórios gerenciais no prazo",realizado:100,meta:100,unidade:"%",spark:[90,95,100,100,100]},
@@ -1543,6 +1590,7 @@ let DB = {
       acro:"CGOF", nome:"Coordenação-Geral de Orçamento e Finanças",
       desc:"Execução orçamentária, financeira e contábil. Empenhos, liquidações e pagamentos.",
       insight:"67% executado com meta de 80% até dezembro. Antecipar liquidações.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"O1",nome:"Execução orçamentária (% do teto)",realizado:67,meta:80,unidade:"%",spark:[30,42,52,60,67]},
         {id:"O2",nome:"Empenhos liquidados sem pendência",realizado:93,meta:95,unidade:"%",spark:[89,90,91,92,93]},
@@ -1556,6 +1604,7 @@ let DB = {
       acro:"NATT", nome:"Núcleo de Apoio ao Trabalho e Trabalhadora",
       desc:"Saúde, bem-estar, condições de trabalho e qualidade de vida dos servidores.",
       insight:"Indicadores dentro da meta. Monitorar aumento gradual de demandas de apoio psicossocial.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"T1",nome:"Atendimentos de apoio realizados",realizado:38,meta:30,unidade:"qtd",spark:[28,30,33,36,38]},
         {id:"T2",nome:"Demandas de saúde atendidas",realizado:96,meta:90,unidade:"%",spark:[90,92,94,95,96]},
@@ -1567,6 +1616,7 @@ let DB = {
       acro:"Projetos", nome:"Núcleo de Projetos da Cooperação SAA",
       desc:"Projetos de cooperação técnica, acordos internacionais e entregas institucionais.",
       insight:"54% dos projetos com marcos no prazo. Revisar cronograma com CGOF urgente.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
       kpis:[
         {id:"PR1",nome:"Projetos com marcos no prazo",realizado:54,meta:80,unidade:"%",spark:[70,68,65,58,54]},
         {id:"PR2",nome:"Projetos ativos em execução",realizado:11,meta:10,unidade:"qtd",spark:[9,10,10,11,11]},
@@ -1574,6 +1624,25 @@ let DB = {
         {id:"PR4",nome:"Projetos com risco de atraso",realizado:4,meta:0,unidade:"qtd",spark:[1,2,3,3,4],inverso:true},
         {id:"PR5",nome:"Execução financeira dos projetos",realizado:61,meta:75,unidade:"%",spark:[40,48,53,57,61]},
         {id:"PR6",nome:"Relatórios de cooperação no prazo",realizado:100,meta:100,unidade:"%",spark:[90,95,100,100,100]}
+      ]
+    },
+
+    cogep:{
+      acro:"COGEP", nome:"Coordenação de Gestão de Pessoas",
+      desc:"Gestão de pessoas, vínculos, programas e acordos de cooperação no âmbito da SAA/MS.",
+      insight:"Monitorar vencimento de TEDs e contratos OPAS. PGD em fase de estruturação.",
+      narrativa:"", atualizadoPor:"", atualizadoEm:"",
+      kpis:[
+        {id:"GP1", nome:"Total de servidores ativos",          realizado:342, meta:350, unidade:"pessoas", spark:[335,337,339,340,342]},
+        {id:"GP2", nome:"Concursados (efetivos)",              realizado:198, meta:210, unidade:"pessoas", spark:[195,196,197,197,198]},
+        {id:"GP3", nome:"Comissionados/DAS",                   realizado:64,  meta:60,  unidade:"pessoas", spark:[62,63,63,64,64]},
+        {id:"GP4", nome:"Contratos OPAS ativos",               realizado:28,  meta:30,  unidade:"contratos",spark:[24,25,26,27,28]},
+        {id:"GP5", nome:"Contratos OPAS vencendo em 60 dias",  realizado:5,   meta:2,   unidade:"qtd",    spark:[3,3,4,4,5], inverso:true},
+        {id:"GP6", nome:"TEDs vigentes",                       realizado:12,  meta:15,  unidade:"TEDs",   spark:[10,10,11,11,12]},
+        {id:"GP7", nome:"TEDs vencendo em 90 dias",            realizado:3,   meta:0,   unidade:"qtd",    spark:[2,2,3,3,3], inverso:true},
+        {id:"GP8", nome:"Servidores com PGD em dia",           realizado:71,  meta:90,  unidade:"%",      spark:[50,58,63,67,71]},
+        {id:"GP9", nome:"Avaliações de desempenho realizadas", realizado:88,  meta:100, unidade:"%",      spark:[70,75,80,85,88]},
+        {id:"GP10",nome:"Afastamentos ativos",                 realizado:14,  meta:10,  unidade:"serv.",  spark:[18,17,16,15,14], inverso:true}
       ]
     }
   },
@@ -1668,7 +1737,9 @@ function renderCoordGrid(){
     const sem=crits>0?'sr':warns>0?'sw':'sg';
     return `<div class="coord-card" onclick="goTo('${key}')">
       <div class="coord-card-head">
-        <div><div class="coord-card-acro">${c.acro}</div><div class="coord-card-full">${c.nome}</div></div>
+        <div><div class="coord-card-acro">${c.acro}</div><div class="coord-card-full">${c.nome}</div>
+        ${c.atualizadoEm?`<div class="update-badge" id="update-badge-${key}">🕐 <b>${c.atualizadoEm}</b>${c.atualizadoPor?' · '+c.atualizadoPor:''}</div>`:`<div class="update-badge" id="update-badge-${key}" style="opacity:.4">Sem registro</div>`}
+        </div>
         <div class="semaph ${sem}"></div>
       </div>
       <div class="coord-card-rows">${top}</div>
@@ -2055,6 +2126,29 @@ function fillCoordSection(key){
         <div class="insight-text" ${isEdit()?`contenteditable="true" onblur="DB.coords['${key}'].insight=this.textContent.trim();autoSave()"`:''} >${c.insight}</div>
       </div>
     </div>
+
+    <!-- ── NARRATIVA / REGISTRO DE SITUAÇÃO ── -->
+    <div class="narrativa-panel">
+      <div class="narrativa-label">
+        <span>📝 Registro de Situação — o que está acontecendo</span>
+        <div class="narrativa-update-info" id="narr-info-${key}">
+          ${c.atualizadoEm ? `🕐 ${c.atualizadoEm}${c.atualizadoPor?' · '+c.atualizadoPor:''}` : 'Nenhum registro ainda'}
+        </div>
+      </div>
+      <textarea class="narrativa-textarea" id="narr-${key}"
+        ${!isEdit()?'readonly':''}
+        placeholder="Descreva aqui como os processos estão andando, pontos de atenção, entregas recentes, próximos passos..."
+      >${c.narrativa||''}</textarea>
+      ${isEdit()?`
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <input class="narrativa-autor-input" id="narr-autor-${key}" placeholder="Seu nome / matrícula"
+          value="${c.atualizadoPor||''}">
+        <button class="btn btn-primary" onclick="salvarNarrativa('${key}')" style="font-size:11px;padding:6px 14px">
+          💾 Salvar registro
+        </button>
+        <span id="narr-ok-${key}" style="font-family:var(--mono);font-size:10px;color:var(--good);display:none">✓ Salvo</span>
+      </div>`:''}
+    </div>
     <div class="ai-panel" style="margin-bottom:20px">
       <div class="ai-panel-head">
         <div class="ai-panel-title">🤖 Análise IA — ${c.acro} <span class="ai-badge">Claude</span></div>
@@ -2359,8 +2453,30 @@ function toggleQUP(){
 }
 
 // ══════════════════════════════════════════════
-// KPI EDITING
+// NARRATIVA — Registro de Situação
 // ══════════════════════════════════════════════
+function salvarNarrativa(key){
+  const textarea = document.getElementById(`narr-${key}`);
+  const autorInp = document.getElementById(`narr-autor-${key}`);
+  const infoEl   = document.getElementById(`narr-info-${key}`);
+  const okEl     = document.getElementById(`narr-ok-${key}`);
+  if(!textarea) return;
+
+  const texto = textarea.value.trim();
+  const autor = autorInp?.value.trim() || 'Não identificado';
+  const agora = new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  DB.coords[key].narrativa    = texto;
+  DB.coords[key].atualizadoPor = autor;
+  DB.coords[key].atualizadoEm  = agora;
+
+  if(infoEl) infoEl.textContent = `🕐 ${agora} · ${autor}`;
+  if(okEl){ okEl.style.display='inline'; setTimeout(()=>okEl.style.display='none',2500); }
+  autoSave();
+  // Atualizar badge no coord card
+  const badge = document.getElementById(`update-badge-${key}`);
+  if(badge) badge.innerHTML=`🕐 <b>${agora}</b> · ${autor}`;
+}
 function updateKpi(coordKey,idx,field,val){
   DB.coords[coordKey].kpis[idx][field] = isNaN(Number(val))?val:Number(val);
   const k=DB.coords[coordKey].kpis[idx];
@@ -2503,7 +2619,7 @@ Responda de forma direta, objetiva e orientada à ação. Use linguagem formal m
 
 DADOS ATUAIS DO PAINEL: ${dataCtx}`;
 
-  const GEMINI_KEY = 'AIzaSyD88cExR2r1sG8B0ovQJXv8-vQUeyB-XKQ';
+  const GEMINI_KEY = 'AIzaSyB-S8I90SroP3sZtIP65eV9n-gMdFIoNs0';
 
   try {
     const response = await fetch(
