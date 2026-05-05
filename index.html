@@ -741,7 +741,107 @@ body::after{ display:none }
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
 
 /* ══════════════════════════════════
-   MODAL DETALHES DO KPI
+   SEMÁFORO — Componente visual
+══════════════════════════════════ */
+.semaforo-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  gap:6px;padding:14px 12px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:var(--radius);
+  min-width:64px;
+}
+.semaforo-body{
+  background:#1a1a1a;border-radius:12px;padding:8px 6px;
+  display:flex;flex-direction:column;gap:6px;
+  border:2px solid #333;box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+.semaforo-luz{
+  width:20px;height:20px;border-radius:50%;
+  transition:all .4s ease;position:relative;
+}
+.semaforo-luz.off{ opacity:.15 }
+.semaforo-luz.on-red{
+  background:#EF4444;
+  box-shadow:0 0 10px #EF4444,0 0 20px rgba(239,68,68,.5);
+}
+.semaforo-luz.on-yellow{
+  background:#F59E0B;
+  box-shadow:0 0 10px #F59E0B,0 0 20px rgba(245,158,11,.5);
+}
+.semaforo-luz.on-green{
+  background:#22C55E;
+  box-shadow:0 0 10px #22C55E,0 0 20px rgba(34,197,94,.5);
+}
+.semaforo-label{
+  font-family:var(--mono);font-size:9px;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--text3);text-align:center;margin-top:2px;
+}
+.semaforo-status-text{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  text-align:center;padding:2px 6px;border-radius:3px;
+}
+
+/* ── Semáforo na barra de overview ── */
+.semaforo-overview-row{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:14px 18px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:16px;
+}
+.semaforo-coord-item{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:4px 8px;border-radius:6px;transition:background var(--trans);
+}
+.semaforo-coord-item:hover{background:var(--surface2)}
+.semaforo-mini{
+  width:12px;height:12px;border-radius:50%;flex-shrink:0;
+  transition:all .3s ease;
+}
+.semaforo-mini.verde{ background:#22C55E;box-shadow:0 0 6px #22C55E }
+.semaforo-mini.amarelo{ background:#F59E0B;box-shadow:0 0 6px #F59E0B }
+.semaforo-mini.vermelho{ background:#EF4444;box-shadow:0 0 6px #EF4444;animation:semPulse 1.5s infinite }
+@keyframes semPulse{0%,100%{box-shadow:0 0 6px #EF4444}50%{box-shadow:0 0 14px #EF4444,0 0 24px rgba(239,68,68,.4)}}
+.semaforo-coord-nome{ font-size:11px;font-weight:600;color:var(--text) }
+.semaforo-coord-count{ font-family:var(--mono);font-size:9px;color:var(--text3) }
+
+/* ── Card "Na Palma da Mão" ── */
+.palma-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px 20px;
+  display:flex;flex-direction:column;gap:4px;
+  position:relative;overflow:hidden;transition:all var(--trans);
+}
+.palma-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.palma-card-stripe{
+  position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;
+}
+.palma-card-icon{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-size:32px;opacity:.08;
+}
+.palma-card-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3)}
+.palma-card-val{font-family:var(--display);font-size:32px;font-weight:800;line-height:1.1}
+.palma-card-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.palma-card-trend{
+  display:flex;align-items:center;gap:4px;margin-top:6px;
+  font-family:var(--mono);font-size:10px;
+}
+
+/* Barra de semáforo no detalhe da coordenação */
+.coord-semaforo-bar{
+  display:flex;align-items:center;gap:16px;padding:12px 16px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);margin-bottom:14px;flex-wrap:wrap;
+}
+.coord-semaforo-bar .semaforo-body{ flex-direction:row;padding:5px 8px;gap:5px;border-radius:20px }
+.coord-semaforo-bar .semaforo-luz{ width:14px;height:14px }
+
+/* Editável inline */
+[data-editavel="true"]{
+  cursor:text;border-bottom:1px dashed var(--border2);
+  transition:border-color var(--trans);outline:none;display:inline-block;
+}
+[data-editavel="true"]:hover{ border-color:var(--accent) }
+[data-editavel="true"]:focus{ border-color:var(--accent);background:var(--surface2);
+  border-radius:3px;padding:0 4px }
 ══════════════════════════════════ */
 .kpi-detail-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.6);
@@ -867,6 +967,94 @@ body::after{ display:none }
   margin-top:4px;display:flex;align-items:center;gap:4px;
 }
 .update-badge b{color:var(--text2)}
+
+/* ══════════════════════════════════
+   IMPORTAÇÃO POR COORDENAÇÃO
+══════════════════════════════════ */
+.coord-import-banner{
+  background:linear-gradient(135deg,#004B8D,#0068C1);
+  border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.coord-import-banner h3{ font-family:var(--display);font-size:14px;font-weight:700;color:#fff;margin-bottom:3px }
+.coord-import-banner p{ font-size:11px;color:rgba(255,255,255,.75) }
+.btn-import-coord{
+  background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.35);
+  border-radius:var(--radius-sm);padding:8px 16px;
+  font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;
+  transition:all var(--trans);display:inline-flex;align-items:center;gap:6px;
+}
+.btn-import-coord:hover{ background:rgba(255,255,255,.28) }
+.coord-import-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(5px);z-index:3000;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  opacity:0;pointer-events:none;transition:opacity var(--trans);
+}
+.coord-import-overlay.open{ opacity:1;pointer-events:all }
+.coord-import-modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:14px;
+  width:100%;max-width:700px;max-height:92vh;overflow:hidden;
+  display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35);
+  transform:translateY(20px);transition:transform var(--trans-slow);
+}
+.coord-import-overlay.open .coord-import-modal{ transform:translateY(0) }
+.ci-header{
+  background:linear-gradient(135deg,#004B8D,#0068C1);
+  padding:18px 22px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+}
+.ci-header-text h2{ font-family:var(--display);font-size:15px;font-weight:800;color:#fff;margin-bottom:3px }
+.ci-header-text p{ font-size:11px;color:rgba(255,255,255,.75) }
+.ci-close{ background:rgba(255,255,255,.15);border:none;color:#fff;
+  border-radius:6px;padding:6px 10px;cursor:pointer;font-size:14px;flex-shrink:0 }
+.ci-close:hover{ background:rgba(255,255,255,.25) }
+.ci-tabs{ display:flex;border-bottom:2px solid var(--border);background:var(--surface2) }
+.ci-tab{ padding:11px 18px;border:none;background:none;cursor:pointer;
+  font-family:var(--font);font-size:12px;font-weight:600;color:var(--text3);
+  border-bottom:2px solid transparent;margin-bottom:-2px;transition:all var(--trans) }
+.ci-tab.active{ color:var(--accent);border-bottom-color:var(--accent);background:var(--surface) }
+.ci-tab-panel{ display:none }
+.ci-tab-panel.active{ display:block }
+.ci-body{ overflow-y:auto;flex:1 }
+.ci-section{ padding:18px 22px;border-bottom:1px solid var(--border) }
+.ci-section:last-child{ border-bottom:none }
+.ci-dropzone{
+  border:2px dashed var(--border2);border-radius:var(--radius);
+  padding:32px 20px;text-align:center;cursor:pointer;background:var(--surface2);
+  transition:all var(--trans);
+}
+.ci-dropzone:hover,.ci-dropzone.dragover{ border-color:var(--accent);background:rgba(27,135,63,.06) }
+.ci-dropzone-icon{ font-size:40px;margin-bottom:10px;display:block }
+.ci-dropzone h3{ font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px }
+.ci-dropzone p{ font-size:11px;color:var(--text3) }
+.ci-file-ok{ display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+  padding:5px 12px;background:var(--good-a);border:1px solid var(--good);
+  border-radius:5px;font-family:var(--mono);font-size:11px;color:var(--good) }
+.ci-mapping-grid{ display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 }
+.ci-map-label{ font-family:var(--mono);font-size:9px;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--text3);margin-bottom:4px }
+.ci-map-select{ width:100%;background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;color:var(--text);
+  outline:none;transition:border-color var(--trans) }
+.ci-map-select:focus{ border-color:var(--accent) }
+.ci-map-select.detected{ border-color:var(--good) }
+.ci-preview-wrap{ overflow-x:auto;max-height:180px;overflow-y:auto;
+  border:1px solid var(--border);border-radius:var(--radius-sm) }
+.ci-preview-wrap table{ width:100%;border-collapse:collapse;font-size:11px }
+.ci-preview-wrap th{ background:var(--surface2);padding:6px 10px;text-align:left;
+  font-family:var(--mono);font-size:9px;text-transform:uppercase;color:var(--text3);
+  border-bottom:2px solid var(--border2);white-space:nowrap }
+.ci-preview-wrap td{ padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text2);white-space:nowrap }
+.ci-result{ border-radius:var(--radius);padding:14px 18px;margin:12px 0;
+  display:flex;align-items:flex-start;gap:12px }
+.ci-result.ok{ background:var(--good-a);border:1px solid rgba(27,135,63,.25) }
+.ci-result.warn{ background:var(--warn-a);border:1px solid rgba(192,92,0,.25) }
+.ci-result-icon{ font-size:22px;flex-shrink:0 }
+.ci-result-title{ font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px }
+.ci-result-desc{ font-size:12px;color:var(--text2);line-height:1.65 }
+.ci-footer{ padding:14px 22px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  background:var(--surface2);flex-wrap:wrap }
+.ci-step-label{ font-family:var(--mono);font-size:10px;color:var(--text3) }
 
 /* ══════════════════════════════════════
    RESPONSIVIDADE MOBILE — MS Dashboard
@@ -1106,6 +1294,16 @@ body::after{ display:none }
             <div class="ai-response" id="ai-resp-overview"></div>
           </div>
         </div>
+
+        <!-- ── SEMÁFORO GERAL — Na Palma da Mão ── -->
+        <div class="semaforo-overview-row" id="semaforo-overview">
+          <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;
+            letter-spacing:.12em;color:var(--text3);flex-shrink:0">🚦 Semáforo</div>
+          <div id="semaforo-coords" style="display:flex;gap:8px;flex-wrap:wrap;flex:1"></div>
+        </div>
+
+        <!-- ── CARDS NA PALMA DA MÃO ── -->
+        <div id="palma-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:20px"></div>
 
         <div class="row-label">Saúde Geral</div>
         <div class="health-row" id="health-row"></div>
@@ -1504,6 +1702,114 @@ body::after{ display:none }
 <!-- Crédito -->
 <div class="credit-bar">
   Desenvolvido por <b>Lucas Macedo</b> · SAA/MS · Sala de Situação v5
+</div>
+
+<!-- ══ MODAL IMPORTAÇÃO POR COORDENAÇÃO ══ -->
+<div class="coord-import-overlay" id="coord-import-overlay">
+  <div class="coord-import-modal">
+    <div class="ci-header">
+      <div class="ci-header-text">
+        <h2 id="ci-modal-title">📥 Importar dados</h2>
+        <p id="ci-modal-sub">Atualize os indicadores da sua coordenação com dados do Excel</p>
+      </div>
+      <button class="ci-close" onclick="closeCoordImport()">✕</button>
+    </div>
+
+    <!-- Abas -->
+    <div class="ci-tabs">
+      <button class="ci-tab active" id="ci-tab-excel" onclick="ciSwitchTab('excel')">📊 Excel / CSV</button>
+      <button class="ci-tab" id="ci-tab-paste" onclick="ciSwitchTab('paste')">📋 Colar do Excel</button>
+      <button class="ci-tab" id="ci-tab-manual" onclick="ciSwitchTab('manual')">✏️ Preencher manual</button>
+    </div>
+
+    <div class="ci-body">
+
+      <!-- ABA: Excel/CSV -->
+      <div class="ci-tab-panel active" id="ci-panel-excel">
+        <div class="ci-section">
+          <div class="ci-dropzone" id="ci-dropzone"
+            onclick="document.getElementById('ci-file-inp').click()"
+            ondragover="event.preventDefault();this.classList.add('dragover')"
+            ondragleave="this.classList.remove('dragover')"
+            ondrop="ciHandleDrop(event)">
+            <span class="ci-dropzone-icon">📊</span>
+            <h3>Arraste seu arquivo aqui ou clique para selecionar</h3>
+            <p>Formatos aceitos: <b>.xlsx · .xls · .csv</b><br>
+            O arquivo pode ser exportado diretamente do Excel, Power BI ou Google Sheets</p>
+            <div id="ci-file-ok" style="display:none" class="ci-file-ok">✓ <span id="ci-file-name"></span></div>
+          </div>
+          <input type="file" id="ci-file-inp" accept=".xlsx,.xls,.csv" style="display:none" onchange="ciHandleFile(this)">
+          <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="btn" onclick="ciDownloadModelo()" style="font-size:11px">⬇ Baixar modelo Excel</button>
+            <span style="font-size:11px;color:var(--text3);font-family:var(--mono)">Não tem modelo? Baixe o padrão e preencha.</span>
+          </div>
+        </div>
+
+        <!-- Mapeamento de colunas (aparece após upload) -->
+        <div class="ci-section" id="ci-mapping-section" style="display:none">
+          <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;
+            letter-spacing:.1em;color:var(--accent);margin-bottom:12px;
+            display:flex;align-items:center;gap:8px">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--good)"></span>
+            Mapeamento automático de colunas — ajuste se necessário
+          </div>
+          <div class="ci-mapping-grid" id="ci-mapping-grid"></div>
+          <div style="margin-bottom:12px">
+            <div class="ci-map-label">Preview dos dados (primeiras 5 linhas)</div>
+            <div class="ci-preview-wrap" id="ci-preview-wrap"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA: Colar -->
+      <div class="ci-tab-panel" id="ci-panel-paste">
+        <div class="ci-section">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.65">
+            Abra seu Excel, selecione a tabela com os dados, copie com <b>Ctrl+C</b> e cole abaixo.<br>
+            O sistema detecta automaticamente as colunas.
+          </p>
+          <textarea id="ci-paste-area"
+            style="width:100%;min-height:160px;background:var(--surface2);
+            border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+            padding:12px;font-family:var(--mono);font-size:12px;color:var(--text);
+            outline:none;resize:vertical;transition:border-color var(--trans)"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='var(--border2)'"
+            placeholder="Indicador&#9;Realizado&#9;Meta&#9;Unidade&#10;Total de servidores&#9;342&#9;350&#9;pessoas&#10;Concursados&#9;198&#9;210&#9;pessoas&#10;..."></textarea>
+          <button class="btn btn-primary" onclick="ciProcessPaste()" style="margin-top:10px">Analisar dados colados →</button>
+        </div>
+        <div class="ci-section" id="ci-paste-preview" style="display:none">
+          <div class="ci-map-label">Preview detectado</div>
+          <div class="ci-preview-wrap" id="ci-paste-preview-table"></div>
+        </div>
+      </div>
+
+      <!-- ABA: Manual -->
+      <div class="ci-tab-panel" id="ci-panel-manual">
+        <div class="ci-section">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:14px">
+            Preencha o valor de cada indicador diretamente. Clique em salvar ao terminar.
+          </p>
+          <div id="ci-manual-fields" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px"></div>
+        </div>
+      </div>
+
+      <!-- Resultado (todas as abas) -->
+      <div class="ci-section" id="ci-result-section" style="display:none">
+        <div id="ci-result-box"></div>
+      </div>
+
+    </div><!-- /ci-body -->
+
+    <div class="ci-footer">
+      <span class="ci-step-label" id="ci-step-info">Selecione a fonte de dados acima</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="closeCoordImport()">Cancelar</button>
+        <button class="btn btn-primary" id="ci-apply-btn" onclick="ciApplyData()" disabled
+          style="min-width:120px">Aplicar dados</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ MODAL DETALHES DO KPI ══ -->
@@ -2474,7 +2780,12 @@ function fillCoordSection(key){
         <div class="ai-response" id="ai-resp-${key}"></div>
       </div>
     </div>
-    <div class="row-label">Indicadores de Desempenho</div>
+    <div class="row-label">Indicadores de Desempenho
+      <button class="btn-import-coord" onclick="openCoordImport('${key}')"
+        style="margin-left:auto;font-size:10px;padding:5px 12px">
+        📥 Importar meus dados
+      </button>
+    </div>
     <div class="kpi-grid">${kpis}${addBtn}</div>`;
 
   // Renderizar histórico após inserir HTML
@@ -2985,6 +3296,178 @@ function deleteDetailItem(idx){
 function closeDetailItemModal(){
   document.getElementById('detail-item-overlay').classList.remove('open');
 }
+function closeDetailItemModal(){
+  document.getElementById('detail-item-overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════
+// IMPORTAÇÃO POR COORDENAÇÃO
+// ══════════════════════════════════════════════
+let _ciState = { coordKey:'', rawData:[], headers:[], mapping:{}, source:'' };
+
+function openCoordImport(coordKey){
+  _ciState = { coordKey, rawData:[], headers:[], mapping:{}, source:'' };
+  const c = DB.coords[coordKey];
+  document.getElementById('ci-modal-title').textContent = `📥 Importar — ${c.acro}`;
+  document.getElementById('ci-modal-sub').textContent   = `Atualize os indicadores de ${c.nome}`;
+  document.getElementById('ci-file-ok').style.display = 'none';
+  document.getElementById('ci-mapping-section').style.display = 'none';
+  document.getElementById('ci-paste-area').value = '';
+  document.getElementById('ci-paste-preview').style.display = 'none';
+  document.getElementById('ci-result-section').style.display = 'none';
+  document.getElementById('ci-apply-btn').disabled = true;
+  document.getElementById('ci-apply-btn').textContent = 'Aplicar dados';
+  document.getElementById('ci-step-info').textContent = 'Selecione a fonte de dados';
+  ciRenderManualFields(coordKey);
+  ciSwitchTab('excel');
+  document.getElementById('coord-import-overlay').classList.add('open');
+}
+function closeCoordImport(){ document.getElementById('coord-import-overlay').classList.remove('open'); }
+
+function ciSwitchTab(tab){
+  ['excel','paste','manual'].forEach(t=>{
+    document.getElementById(`ci-tab-${t}`)?.classList.toggle('active',t===tab);
+    document.getElementById(`ci-panel-${t}`)?.classList.toggle('active',t===tab);
+  });
+  if(tab==='manual'){ document.getElementById('ci-apply-btn').disabled=false;
+    document.getElementById('ci-step-info').textContent='Preencha e clique em Aplicar'; }
+}
+
+function ciHandleDrop(e){ e.preventDefault(); e.currentTarget.classList.remove('dragover'); const f=e.dataTransfer.files[0]; if(f)ciProcessFile(f); }
+function ciHandleFile(i){ const f=i.files[0]; if(f)ciProcessFile(f); }
+
+function ciProcessFile(file){
+  _ciState.source=file.name;
+  const isCSV=file.name.toLowerCase().endsWith('.csv');
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      let data=[];
+      if(isCSV){
+        const lines=e.target.result.split('\n').filter(l=>l.trim());
+        const sep=lines[0].includes(';')?';':',';
+        const headers=lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));
+        data=lines.slice(1).map(line=>{const vals=line.split(sep).map(v=>v.trim().replace(/^"|"$/g,''));const obj={};headers.forEach((h,i2)=>obj[h]=vals[i2]||'');return obj;}).filter(r=>Object.values(r).some(v=>v));
+        _ciState.headers=headers;
+      }else{
+        const wb=XLSX.read(e.target.result,{type:'binary'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        data=XLSX.utils.sheet_to_json(ws,{defval:''});
+        _ciState.headers=data.length?Object.keys(data[0]):[];
+      }
+      _ciState.rawData=data; ciAutoDetect(); ciRenderMapping(); ciRenderPreview();
+      document.getElementById('ci-file-ok').style.display='inline-flex';
+      document.getElementById('ci-file-name').textContent=`${file.name} — ${data.length} linhas`;
+      document.getElementById('ci-mapping-section').style.display='block';
+      document.getElementById('ci-apply-btn').disabled=false;
+      document.getElementById('ci-step-info').textContent=`✓ ${data.length} linhas — revise o mapeamento`;
+    }catch(err){alert('Erro ao ler: '+err.message);}
+  };
+  isCSV?reader.readAsText(file,'utf-8'):reader.readAsBinaryString(file);
+}
+
+function ciProcessPaste(){
+  const raw=document.getElementById('ci-paste-area').value.trim();
+  if(!raw){alert('Cole os dados primeiro.');return;}
+  const lines=raw.split('\n').filter(l=>l.trim());
+  const sep=lines[0].includes('\t')?'\t':lines[0].includes(';')?';':',';
+  const headers=lines[0].split(sep).map(h=>h.trim());
+  const data=lines.slice(1).map(line=>{const vals=line.split(sep).map(v=>v.trim());const obj={};headers.forEach((h,i)=>obj[h]=vals[i]||'');return obj;}).filter(r=>Object.values(r).some(v=>v));
+  _ciState.rawData=data;_ciState.headers=headers;_ciState.source='Colado';ciAutoDetect();
+  document.getElementById('ci-paste-preview-table').innerHTML=ciBuildPreviewHTML(data.slice(0,5),headers);
+  document.getElementById('ci-paste-preview').style.display='block';
+  document.getElementById('ci-apply-btn').disabled=false;
+  document.getElementById('ci-step-info').textContent=`✓ ${data.length} linhas`;
+}
+
+const CI_ALIASES={
+  indicador:['indicador','kpi','nome','indicator','descricao','item','metrica'],
+  realizado:['realizado','valor','result','atual','executado','quantidade','qtd','total'],
+  meta:['meta','target','objetivo','goal','planejado','previsto'],
+  unidade:['unidade','unit','tipo','medida'],status:['status','situacao'],
+};
+function ciAutoDetect(){
+  const mapping={};
+  _ciState.headers.forEach(h=>{
+    const hn=h.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+    for(const [field,aliases] of Object.entries(CI_ALIASES)){if(!mapping[field]&&aliases.some(a=>hn.includes(a))){mapping[field]=h;break;}}
+  });
+  _ciState.mapping=mapping;
+}
+function ciRenderMapping(){
+  const el=document.getElementById('ci-mapping-grid');if(!el)return;
+  const labels={indicador:'Nome do Indicador',realizado:'Valor Realizado',meta:'Meta',unidade:'Unidade',status:'Status'};
+  el.innerHTML=Object.entries(labels).map(([field,label])=>`
+    <div><div class="ci-map-label">${label}</div>
+    <select class="ci-map-select ${_ciState.mapping[field]?'detected':''}" id="ci-map-${field}" onchange="_ciState.mapping['${field}']=this.value">
+      <option value="">— não mapeado —</option>
+      ${_ciState.headers.map(h=>`<option value="${h}" ${_ciState.mapping[field]===h?'selected':''}>${h}</option>`).join('')}
+    </select></div>`).join('');
+}
+function ciRenderPreview(){const el=document.getElementById('ci-preview-wrap');if(!el)return;el.innerHTML=ciBuildPreviewHTML(_ciState.rawData.slice(0,5),_ciState.headers);}
+function ciBuildPreviewHTML(rows,headers){return `<table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${headers.map(h=>`<td>${r[h]??''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;}
+
+function ciRenderManualFields(coordKey){
+  const el=document.getElementById('ci-manual-fields');if(!el)return;
+  const c=DB.coords[coordKey];
+  el.innerHTML=c.kpis.map((k,i)=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px">
+      <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.35">${k.nome}</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="ci-man-${i}" type="number" value="${k.realizado}"
+          style="flex:1;background:var(--surface);border:1.5px solid var(--border2);border-radius:4px;
+          padding:7px 8px;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);outline:none">
+        <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${k.unidade}<br>meta ${k.meta}</span>
+      </div>
+    </div>`).join('');
+}
+
+function ciApplyData(){
+  const{coordKey}=_ciState;const c=DB.coords[coordKey];
+  const activeTab=document.querySelector('.ci-tab.active')?.id?.replace('ci-tab-','');
+  let applied=0,novas=0,erros=[];
+  if(activeTab==='manual'){
+    c.kpis.forEach((k,i)=>{const inp=document.getElementById(`ci-man-${i}`);if(!inp)return;const n=parseFloat(inp.value);if(!isNaN(n)){k.spark=[...(k.spark||[0,0,0,0,k.realizado]).slice(1),n];k.realizado=n;applied++;}});
+  }else{
+    Object.keys(CI_ALIASES).forEach(field=>{const sel=document.getElementById(`ci-map-${field}`);if(sel)_ciState.mapping[field]=sel.value;});
+    const m=_ciState.mapping;const data=_ciState.rawData;
+    data.forEach(row=>{
+      const nome=m.indicador?String(row[m.indicador]||'').trim():'';
+      const val=m.realizado?parseFloat(String(row[m.realizado]||'').replace(/[^\d.,\-]/g,'').replace(',','.')):NaN;
+      const meta=m.meta?parseFloat(String(row[m.meta]||'').replace(/[^\d.,\-]/g,'').replace(',','.')):NaN;
+      const unid=m.unidade?String(row[m.unidade]||'').trim():'';
+      if(!nome||isNaN(val)){if(nome)erros.push(nome);return;}
+      const existing=c.kpis.find(k=>k.nome.toLowerCase().trim()===nome.toLowerCase().trim()||nome.toLowerCase().includes(k.nome.toLowerCase().substring(0,8)));
+      if(existing){existing.spark=[...(existing.spark||[0,0,0,0,existing.realizado]).slice(1),val];existing.realizado=val;if(!isNaN(meta)&&meta>0)existing.meta=meta;if(unid)existing.unidade=unid;applied++;}
+      else if(nome){c.kpis.push({id:'CI'+Date.now()+'_'+Math.random().toString(36).slice(2,5),nome,realizado:val,meta:!isNaN(meta)&&meta>0?meta:val,unidade:unid||'qtd',spark:[0,0,0,0,val]});novas++;}
+    });
+  }
+  const agora=new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  c.atualizadoEm=agora;c.atualizadoPor=`Import (${_ciState.source||'manual'})`;
+  if(!c.historicoNarrativa)c.historicoNarrativa=[];
+  c.historicoNarrativa.unshift({texto:`Importação: ${applied} atualizados${novas>0?`, ${novas} criados`:''}`,autor:'Sistema',data:agora});
+  renderAll();autoSave();fillCoordSection(coordKey);
+  document.getElementById('ci-result-box').innerHTML=`<div class="ci-result ${applied>0?'ok':'warn'}">
+    <div class="ci-result-icon">${applied>0?'✅':'⚠️'}</div>
+    <div><div class="ci-result-title">${applied>0?`${applied} indicador${applied!==1?'es':''} atualizado${applied!==1?'s':''}!`:'Nenhum atualizado'}</div>
+    <div class="ci-result-desc">${novas>0?`<b>${novas}</b> novos criados.<br>`:''}${erros.length?`<b>${erros.length}</b> linha${erros.length!==1?'s':''} ignorada${erros.length!==1?'s':''}.<br>`:''}
+    <b>${c.acro}</b> · ${agora}</div></div></div>`;
+  document.getElementById('ci-result-section').style.display='block';
+  document.getElementById('ci-step-info').textContent=applied>0?'✓ Dados aplicados!':'⚠ Verifique o mapeamento';
+  document.getElementById('ci-apply-btn').textContent='✓ Aplicado';document.getElementById('ci-apply-btn').disabled=true;
+  setTimeout(()=>{document.getElementById('ci-apply-btn').textContent='Aplicar dados';document.getElementById('ci-apply-btn').disabled=false;},3000);
+}
+
+function ciDownloadModelo(){
+  const c=DB.coords[_ciState.coordKey];const bom='\uFEFF';
+  let csv=bom+'Indicador;Realizado;Meta;Unidade;Observacao\n';
+  c.kpis.forEach(k=>{csv+=`"${k.nome}";${k.realizado};${k.meta};"${k.unidade}";""\n`;});
+  csv+=`\n"INSTRUCOES";"Como usar:";"";"";""\n"1. Preencha a coluna Realizado com os valores atuais";"";"";"";"";\n"2. Nao altere os nomes dos indicadores";"";"";"";"";\n`;
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`modelo_${c.acro}_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
 function salvarNarrativa(key){
   const textarea = document.getElementById(`narr-${key}`);
   const autorInp = document.getElementById(`narr-autor-${key}`);
