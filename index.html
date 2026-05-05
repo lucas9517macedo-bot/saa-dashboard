@@ -1191,36 +1191,53 @@ body::after{ display:none }
       <div class="brand-week">Sem <b id="wk-n">—</b> · <b id="wk-r">—</b></div>
     </div>
 
+
     <div class="nav-section">
-      <div class="nav-label">Visão Geral</div>
+      <div class="nav-label">🖐 Na Palma da Mão</div>
       <button class="nav-item active" onclick="goTo('overview')" data-sec="overview">
         <span class="nav-dot"></span>Dashboard Executivo
       </button>
       <button class="nav-item" onclick="goTo('graficos')" data-sec="graficos">
-        <span class="nav-dot"></span>Gráficos & Análise
+        <span class="nav-dot"></span>📊 Gráficos & Análise
       </button>
       <button class="nav-item" onclick="goTo('alertas')" data-sec="alertas">
-        <span class="nav-dot"></span>Alertas e Riscos
+        <span class="nav-dot"></span>🚦 Alertas e Riscos
         <span class="nav-badge nb-r" id="alert-pip">—</span>
-      </button>
-      <button class="nav-item" onclick="goTo('coasup-regional')" data-sec="coasup-regional">
-        <span class="nav-dot"></span>COASUP · Regional
-        <span class="nav-badge nb-g">5 regiões</span>
       </button>
     </div>
 
     <div class="nav-section">
-      <div class="nav-label">Coordenações</div>
+      <div class="nav-label">🏛 Governança SAA</div>
+      <button class="nav-item" onclick="goTo('governanca')" data-sec="governanca">
+        <span class="nav-dot"></span>🎯 Painel de Governança
+      </button>
+      <button class="nav-item" onclick="goTo('briefing')" data-sec="briefing">
+        <span class="nav-dot"></span>📋 Briefing Semanal
+      </button>
+      <button class="nav-item" onclick="goTo('memoria')" data-sec="memoria">
+        <span class="nav-dot"></span>📁 Memória & Arquivos
+      </button>
+      <button class="nav-item" onclick="goTo('agenda')" data-sec="agenda">
+        <span class="nav-dot"></span>📅 Agenda & Reuniões
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">📍 Coordenações</div>
+      <button class="nav-item" onclick="goTo('coasup-regional')" data-sec="coasup-regional">
+        <span class="nav-dot"></span>🗺 COASUP · Regional
+        <span class="nav-badge nb-g">5</span>
+      </button>
       <div id="coord-nav"></div>
     </div>
 
     <div class="nav-section">
-      <div class="nav-label">Config.</div>
+      <div class="nav-label">⚙ Sistema</div>
       <button class="nav-item" onclick="goTo('importar')" data-sec="importar">
         <span class="nav-dot"></span>⬆ Importar Dados
       </button>
       <button class="nav-item" onclick="goTo('integracao')" data-sec="integracao">
-        <span class="nav-dot"></span>Integração & Arquitetura
+        <span class="nav-dot"></span>🔗 Integração
       </button>
     </div>
 
@@ -1537,7 +1554,167 @@ body::after{ display:none }
         <div id="cr-region-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:24px"></div>
       </div>
 
-      <!-- ── IMPORTAR DADOS ── -->
+      <!-- ══ GOVERNANÇA SAA ══ -->
+      <div id="sec-governanca" class="section">
+        <div class="sec-head">
+          <div class="sec-title">🎯 Painel de <em>Governança</em></div>
+          <div class="sec-sub">SAA na Palma da Mão · Visão estratégica integrada · Subsecretaria de Assuntos Administrativos</div>
+        </div>
+
+        <!-- Premissas -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+          <div style="background:linear-gradient(135deg,#004B8D,#0068C1);border-radius:var(--radius);
+            padding:18px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">🏛</div>
+            <div style="font-family:var(--display);font-size:12px;font-weight:700;color:#fff;margin-bottom:4px">Responsabilidade</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.75);line-height:1.5">Cada área é responsável pela alimentação, manutenção e gestão das suas informações</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#1B873F,#2EA85A);border-radius:var(--radius);
+            padding:18px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">🔐</div>
+            <div style="font-family:var(--display);font-size:12px;font-weight:700;color:#fff;margin-bottom:4px">Acesso Autorizado</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.75);line-height:1.5">Informações utilizadas apenas por pessoas autorizadas pelo GAB/SAA</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#C05C00,#D97706);border-radius:var(--radius);
+            padding:18px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">🔄</div>
+            <div style="font-family:var(--display);font-size:12px;font-weight:700;color:#fff;margin-bottom:4px">Interprogramático</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.75);line-height:1.5">Ações conjuntas registradas pelas áreas responsáveis pela demanda</div>
+          </div>
+        </div>
+
+        <!-- Status de governança por coordenação -->
+        <div class="row-label" style="margin-bottom:10px">Status de Governança por Coordenação</div>
+        <div id="gov-status-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px"></div>
+
+        <!-- Indicadores estratégicos da SAA -->
+        <div class="row-label" style="margin-bottom:10px">Indicadores Estratégicos da SAA</div>
+        <div id="gov-kpi-summary" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px"></div>
+
+        <!-- Fluxo de dados -->
+        <div class="chart-wrap">
+          <div class="chart-title">Fluxo de Dados — SAA na Palma da Mão</div>
+          <div class="chart-sub">Ferramentas → Painéis → Informação → Conhecimento → Decisão</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-top:16px;flex-wrap:wrap;gap:4px">
+            ${['📊 Ferramentas<br><small>Excel · Power BI</small>','📋 Painéis<br><small>Consolidação</small>','💡 Informação<br><small>Dashboards</small>','🧠 Conhecimento<br><small>Análise IA</small>','⚡ Decisão<br><small>Gestão</small>'].map((t,i)=>`
+              <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);
+                padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:var(--text);
+                min-width:100px;flex:1;max-width:160px">${t}</div>
+              ${i<4?`<div style="color:var(--accent2);font-size:20px;font-weight:700">→</div>`:''}
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ BRIEFING SEMANAL ══ -->
+      <div id="sec-briefing" class="section">
+        <div class="sec-head">
+          <div class="sec-title">📋 Briefing <em>Semanal</em></div>
+          <div class="sec-sub">Padrão executivo · Atualizado semanalmente pelas coordenações · SAA/MS</div>
+        </div>
+
+        <!-- Semana atual -->
+        <div style="background:linear-gradient(135deg,#004B8D,#1B873F);border-radius:var(--radius);
+          padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-family:var(--display);font-size:18px;font-weight:800;color:#fff" id="briefing-semana-titulo">Semana 18 · 05 a 09/05/2026</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:4px">Briefing Executivo SAA — atualização automática ao salvar registros</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-import-coord" onclick="gerarBriefing()" style="font-size:11px">🤖 Gerar com IA</button>
+            <button class="btn-import-coord" onclick="exportarBriefing()" style="font-size:11px">📄 Exportar PDF</button>
+          </div>
+        </div>
+
+        <!-- Resumo por coordenação -->
+        <div class="row-label">Situação por Coordenação esta semana</div>
+        <div id="briefing-coords" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+        <!-- Campo de pauta -->
+        <div class="narrativa-panel" style="border-left-color:var(--accent)">
+          <div class="narrativa-label">
+            <span>📌 Pauta da Semana / Destaques</span>
+            <span id="briefing-ts" style="font-family:var(--mono);font-size:9px;color:var(--text3)"></span>
+          </div>
+          <textarea class="narrativa-textarea" id="briefing-pauta"
+            placeholder="Registre os principais temas da semana, decisões tomadas, encaminhamentos, próximos passos e prioridades da SAA..."
+            style="min-height:120px"></textarea>
+          ${`<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <input class="narrativa-autor-input" id="briefing-autor" placeholder="Responsável pelo briefing">
+            <button class="btn btn-primary" onclick="salvarBriefing()" style="font-size:11px">💾 Salvar briefing</button>
+          </div>`}
+        </div>
+
+        <!-- Histórico de briefings -->
+        <div class="row-label" style="margin-top:20px">Histórico de Briefings</div>
+        <div id="briefing-historico" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- ══ MEMÓRIA & ARQUIVOS ══ -->
+      <div id="sec-memoria" class="section">
+        <div class="sec-head">
+          <div class="sec-title">📁 Memória & <em>Arquivos</em></div>
+          <div class="sec-sub">Repositório de memórias de reunião, documentos, decisões e referências da SAA</div>
+        </div>
+
+        <!-- Barra de ferramentas -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <input id="mem-busca" class="narrativa-textarea" style="min-height:unset;flex:1;padding:8px 12px;resize:none"
+            placeholder="🔍 Buscar por título, data, tipo, coordenação..."
+            oninput="renderMemoria()">
+          <select id="mem-filtro-tipo" class="ci-map-select" style="width:130px" onchange="renderMemoria()">
+            <option value="">Todos os tipos</option>
+            <option value="memoria">📝 Memória de reunião</option>
+            <option value="decisao">⚖️ Decisão</option>
+            <option value="documento">📄 Documento</option>
+            <option value="ata">📋 Ata</option>
+            <option value="referencia">🔗 Referência</option>
+            <option value="outro">📎 Outro</option>
+          </select>
+          <select id="mem-filtro-coord" class="ci-map-select" style="width:120px" onchange="renderMemoria()">
+            <option value="">Todas as áreas</option>
+          </select>
+          <button class="btn btn-primary locked" onclick="showAddMemoria()" style="font-size:11px;padding:8px 14px">
+            + Adicionar
+          </button>
+        </div>
+
+        <!-- Grid de arquivos -->
+        <div id="memoria-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
+        <div id="memoria-vazio" style="display:none;text-align:center;padding:48px;color:var(--text3)">
+          <div style="font-size:48px;margin-bottom:12px">📁</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">Nenhum arquivo ainda</div>
+          <div style="font-size:12px">Clique em "+ Adicionar" para registrar memórias de reunião, decisões e documentos</div>
+        </div>
+      </div>
+
+      <!-- ══ AGENDA & REUNIÕES ══ -->
+      <div id="sec-agenda" class="section">
+        <div class="sec-head">
+          <div class="sec-title">📅 Agenda & <em>Reuniões</em></div>
+          <div class="sec-sub">Controle de reuniões, compromissos e encaminhamentos da SAA</div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+          <select id="agenda-filtro" class="ci-map-select" style="width:140px" onchange="renderAgenda()">
+            <option value="todas">Todas</option>
+            <option value="proximas">Próximas</option>
+            <option value="hoje">Hoje</option>
+            <option value="passadas">Realizadas</option>
+          </select>
+          <button class="btn btn-primary locked" onclick="showAddReuniao()" style="font-size:11px;padding:8px 14px">
+            + Nova Reunião
+          </button>
+        </div>
+
+        <div id="agenda-lista" style="display:flex;flex-direction:column;gap:10px"></div>
+        <div id="agenda-vazio" style="display:none;text-align:center;padding:48px;color:var(--text3)">
+          <div style="font-size:48px;margin-bottom:12px">📅</div>
+          <div style="font-size:14px;font-weight:600">Nenhuma reunião registrada</div>
+        </div>
+      </div>
+
+      <!-- ══ IMPORTAR DADOS ══ -->
       <div id="sec-importar" class="section">
         <div class="sec-head">
           <div class="sec-title">⬆ Importar <em>Dados</em></div>
@@ -1752,7 +1929,114 @@ body::after{ display:none }
   Desenvolvido por <b>Lucas Macedo</b> · SAA/MS · Sala de Situação v5
 </div>
 
-<!-- ══ MODAL IMPORTAÇÃO POR COORDENAÇÃO ══ -->
+<!-- ══ MODAL MEMÓRIA/ARQUIVO ══ -->
+<div class="modal-overlay" id="memoria-overlay">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-title" id="mem-modal-title">📁 Adicionar Arquivo / Memória</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Título *</div>
+        <input class="modal-input" id="mem-titulo" placeholder="Ex: Memória de reunião CGLIC — 03/05/2026">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Tipo</div>
+        <select class="modal-input" id="mem-tipo">
+          <option value="memoria">📝 Memória de reunião</option>
+          <option value="decisao">⚖️ Decisão</option>
+          <option value="documento">📄 Documento</option>
+          <option value="ata">📋 Ata</option>
+          <option value="referencia">🔗 Referência</option>
+          <option value="outro">📎 Outro</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Coordenação</div>
+        <select class="modal-input" id="mem-coord">
+          <option value="geral">🏛 SAA · Geral</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Data</div>
+        <input class="modal-input" id="mem-data" type="date">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Responsável</div>
+        <input class="modal-input" id="mem-responsavel" placeholder="Nome / matrícula">
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Conteúdo / Descrição</div>
+        <textarea class="modal-input modal-textarea" id="mem-conteudo" style="min-height:100px"
+          placeholder="Resumo da reunião, principais decisões, encaminhamentos, pontos de atenção..."></textarea>
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Link do arquivo (Google Drive, SEI, etc.)</div>
+        <input class="modal-input" id="mem-link" placeholder="https://...">
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Tags (separadas por vírgula)</div>
+        <input class="modal-input" id="mem-tags" placeholder="Ex: contrato, urgente, CGLIC, aprovado">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('memoria-overlay').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMemoria()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL REUNIÃO ══ -->
+<div class="modal-overlay" id="reuniao-overlay">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title">📅 Registrar Reunião</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Título da reunião *</div>
+        <input class="modal-input" id="reu-titulo" placeholder="Ex: Reunião de governança SAA — semana 18">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Data</div>
+        <input class="modal-input" id="reu-data" type="date">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Horário</div>
+        <input class="modal-input" id="reu-hora" placeholder="Ex: 14h00 às 15h30">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Local / Link</div>
+        <input class="modal-input" id="reu-local" placeholder="Sala X / Teams / https://...">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Coordenação / Área</div>
+        <select class="modal-input" id="reu-coord">
+          <option value="geral">🏛 SAA · Geral</option>
+        </select>
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Pauta</div>
+        <textarea class="modal-input modal-textarea" id="reu-pauta" style="min-height:80px"
+          placeholder="Tópicos que serão discutidos..."></textarea>
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Participantes</div>
+        <input class="modal-input" id="reu-participantes" placeholder="Ex: Coordenadores, GAB/SAA, NPM...">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Status</div>
+        <select class="modal-input" id="reu-status">
+          <option value="agendada">🔵 Agendada</option>
+          <option value="realizada">✅ Realizada</option>
+          <option value="cancelada">❌ Cancelada</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('reuniao-overlay').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveReuniao()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL MEMÓRIA/ARQUIVO ══ (existentes antes) -->
 <div class="coord-import-overlay" id="coord-import-overlay">
   <div class="coord-import-modal">
     <div class="ci-header">
@@ -3436,8 +3720,403 @@ function closeDetailItemModal(){
 }
 
 // ══════════════════════════════════════════════
-// IMPORTAÇÃO POR COORDENAÇÃO
+// GOVERNANÇA SAA — Engine completo
 // ══════════════════════════════════════════════
+
+// Garantir estrutura de dados de governança no DB
+function initGov(){
+  if(!DB.governanca) DB.governanca = {
+    briefings: [], memorias: [], reunioes: [], pauta_atual: '', briefing_autor: ''
+  };
+}
+
+// ── Painel de Governança ──
+function renderGovernanca(){
+  initGov();
+  renderGovStatus();
+  renderGovKPIs();
+}
+
+function renderGovStatus(){
+  const el = document.getElementById('gov-status-grid'); if(!el) return;
+  el.innerHTML = Object.entries(DB.coords).map(([key,c])=>{
+    const kpis = c.kpis || [];
+    const crits = kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+    const warns = kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+    const temNarrativa = !!(c.narrativa || (c.historicoNarrativa||[]).length);
+    const temAtualizacao = !!c.atualizadoEm;
+    const cor = crits>0?'#B71C1C':warns>0?'#C05C00':'#1B873F';
+    const ico = crits>0?'🔴':warns>0?'🟡':'🟢';
+    return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+      padding:14px 16px;cursor:pointer;transition:all var(--trans)" onclick="goTo('${key}')"
+      onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow)'"
+      onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--text)">${c.acro}</div>
+        <span style="font-size:14px">${ico}</span>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px">${kpis.length} indicadores</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;
+          background:${temNarrativa?'var(--good-a)':'var(--surface3)'};
+          color:${temNarrativa?'var(--good)':'var(--text3)'}">
+          ${temNarrativa?'✓ Registro':'Sem registro'}
+        </span>
+        <span style="font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;
+          background:${temAtualizacao?'var(--good-a)':'var(--surface3)'};
+          color:${temAtualizacao?'var(--good)':'var(--text3)'}">
+          ${temAtualizacao?'✓ '+c.atualizadoEm.slice(0,5):'Não atualizado'}
+        </span>
+        ${crits>0?`<span style="font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;background:var(--crit-a);color:var(--crit)">⚠ ${crits} críticos</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderGovKPIs(){
+  const el = document.getElementById('gov-kpi-summary'); if(!el) return;
+  const all = Object.values(DB.coords).flatMap(c=>c.kpis);
+  const total = all.length;
+  const g = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='good').length;
+  const w = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+  const r = all.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+  const cards = [
+    {ico:'📊',lbl:'Total KPIs',val:total,col:'var(--accent)'},
+    {ico:'✅',lbl:'Atingindo Meta',val:g,col:'#1B873F',sub:`${total?Math.round(g/total*100):0}%`},
+    {ico:'⚠️',lbl:'Em Atenção',val:w,col:'#C05C00'},
+    {ico:'🔴',lbl:'Críticos',val:r,col:'#B71C1C'},
+    {ico:'🏛',lbl:'Coordenações',val:Object.keys(DB.coords).length,col:'var(--accent2)'},
+    {ico:'📝',lbl:'Com Registro',val:Object.values(DB.coords).filter(c=>c.narrativa||(c.historicoNarrativa||[]).length).length,col:'var(--teal)'},
+  ];
+  el.innerHTML = cards.map(c=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid ${c.col};
+      border-radius:var(--radius);padding:14px 16px">
+      <div style="font-size:20px;margin-bottom:6px">${c.ico}</div>
+      <div style="font-family:var(--display);font-size:28px;font-weight:800;color:${c.col};line-height:1">${c.val}</div>
+      ${c.sub?`<div style="font-family:var(--mono);font-size:9px;color:${c.col}">${c.sub}</div>`:''}
+      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:4px">${c.lbl}</div>
+    </div>`).join('');
+}
+
+// ── Briefing Semanal ──
+function renderBriefing(){
+  initGov();
+  const pautaEl = document.getElementById('briefing-pauta');
+  const autorEl = document.getElementById('briefing-autor');
+  if(pautaEl) pautaEl.value = DB.governanca.pauta_atual || '';
+  if(autorEl) autorEl.value = DB.governanca.briefing_autor || '';
+
+  // Resumo por coordenação
+  const el = document.getElementById('briefing-coords'); if(!el) return;
+  el.innerHTML = Object.entries(DB.coords).map(([key,c])=>{
+    const kpis = c.kpis||[];
+    const crits = kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+    const warns = kpis.filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='warn').length;
+    const cor = crits>0?'#B71C1C':warns>0?'#C05C00':'#1B873F';
+    const ico = crits>0?'🔴':warns>0?'🟡':'🟢';
+    return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+      padding:14px 18px;display:flex;align-items:flex-start;gap:14px;border-left:4px solid ${cor}">
+      <span style="font-size:18px;flex-shrink:0">${ico}</span>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span style="font-weight:700;color:var(--text);font-size:13px">${c.acro}</span>
+          <span style="font-size:10px;color:var(--text3)">${c.nome}</span>
+          ${crits>0?`<span style="font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;background:var(--crit-a);color:var(--crit)">⚠ ${crits} críticos</span>`:''}
+        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.55">
+          ${c.narrativa ? `"${c.narrativa.slice(0,120)}${c.narrativa.length>120?'...':''}"` : '<em style="color:var(--text3)">Sem registro de situação esta semana</em>'}
+        </div>
+        ${c.atualizadoEm?`<div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px">🕐 ${c.atualizadoEm} · ${c.atualizadoPor||''}</div>`:''}
+      </div>
+      <button class="btn" onclick="goTo('${key}')" style="font-size:10px;padding:5px 10px;flex-shrink:0">Ver →</button>
+    </div>`;
+  }).join('');
+
+  // Histórico de briefings
+  const histEl = document.getElementById('briefing-historico'); if(!histEl) return;
+  const hist = DB.governanca.briefings || [];
+  if(!hist.length){
+    histEl.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:12px 0">Nenhum briefing salvo ainda.</div>`;
+    return;
+  }
+  histEl.innerHTML = hist.slice(0,8).map((b,i)=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);
+      padding:12px 16px;display:flex;align-items:flex-start;gap:12px">
+      <div style="flex-shrink:0;font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;
+        background:var(--surface3);padding:4px 8px;border-radius:4px;min-width:60px">
+        ${b.data||'—'}
+      </div>
+      <div style="flex:1">
+        <div style="font-size:12px;color:var(--text2);line-height:1.55;white-space:pre-wrap">${b.pauta.slice(0,200)}${b.pauta.length>200?'...':''}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px">👤 ${b.autor}</div>
+      </div>
+    </div>`).join('');
+}
+
+function salvarBriefing(){
+  initGov();
+  const pauta = document.getElementById('briefing-pauta')?.value.trim();
+  const autor = document.getElementById('briefing-autor')?.value.trim() || 'Não identificado';
+  if(!pauta){ alert('Digite o conteúdo do briefing antes de salvar.'); return; }
+  const agora = new Date().toLocaleDateString('pt-BR');
+  DB.governanca.pauta_atual = pauta;
+  DB.governanca.briefing_autor = autor;
+  DB.governanca.briefings.unshift({ pauta, autor, data: agora });
+  if(DB.governanca.briefings.length>20) DB.governanca.briefings = DB.governanca.briefings.slice(0,20);
+  document.getElementById('briefing-ts').textContent = `Salvo em ${agora} · ${autor}`;
+  autoSave();
+  renderBriefing();
+}
+
+async function gerarBriefing(){
+  const key = Object.keys(DB.coords)[0];
+  if(key) await askAI(key, 'Gere um briefing executivo semanal resumindo o status de todas as coordenações da SAA.');
+}
+
+function exportarBriefing(){
+  const pauta = document.getElementById('briefing-pauta')?.value || '';
+  const semana = document.getElementById('briefing-semana-titulo')?.textContent || '';
+  let txt = `BRIEFING EXECUTIVO SAA\n${semana}\n${'='.repeat(50)}\n\n`;
+  txt += `PAUTA / DESTAQUES:\n${pauta}\n\n${'='.repeat(50)}\n\n`;
+  txt += `STATUS DAS COORDENAÇÕES:\n\n`;
+  Object.values(DB.coords).forEach(c=>{
+    const crits = (c.kpis||[]).filter(k=>calcStatus(k.realizado,k.meta,k.inverso)==='crit').length;
+    txt += `${c.acro} — ${crits>0?'⚠ '+crits+' críticos':'OK'}\n`;
+    if(c.narrativa) txt += `  → ${c.narrativa.slice(0,150)}\n`;
+    txt += '\n';
+  });
+  txt += `\nGerado em: ${new Date().toLocaleString('pt-BR')} | SAA na Palma da Mão`;
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Briefing_SAA_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+
+// ── Memória & Arquivos ──
+const MEM_TIPOS = {
+  memoria:    {ico:'📝', label:'Memória de reunião', cor:'#004B8D'},
+  decisao:    {ico:'⚖️', label:'Decisão',            cor:'#B71C1C'},
+  documento:  {ico:'📄', label:'Documento',           cor:'#1B873F'},
+  ata:        {ico:'📋', label:'Ata',                 cor:'#C05C00'},
+  referencia: {ico:'🔗', label:'Referência',          cor:'#5E35B1'},
+  outro:      {ico:'📎', label:'Outro',               cor:'#6B7280'},
+};
+
+function showAddMemoria(){
+  initGov();
+  document.getElementById('mem-titulo').value = '';
+  document.getElementById('mem-tipo').value = 'memoria';
+  document.getElementById('mem-data').value = new Date().toISOString().slice(0,10);
+  document.getElementById('mem-responsavel').value = '';
+  document.getElementById('mem-conteudo').value = '';
+  document.getElementById('mem-link').value = '';
+  document.getElementById('mem-tags').value = '';
+  // Popular select de coordenações
+  const sel = document.getElementById('mem-coord');
+  if(sel && sel.options.length<=1){
+    Object.entries(DB.coords).forEach(([k,c])=>{
+      const o=document.createElement('option'); o.value=k; o.textContent=c.acro+' — '+c.nome; sel.appendChild(o);
+    });
+  }
+  document.getElementById('memoria-overlay').classList.add('open');
+}
+
+function saveMemoria(){
+  const titulo = document.getElementById('mem-titulo').value.trim();
+  if(!titulo){ alert('Digite o título.'); return; }
+  initGov();
+  const mem = {
+    id: 'MEM'+Date.now(),
+    titulo,
+    tipo:        document.getElementById('mem-tipo').value,
+    coord:       document.getElementById('mem-coord').value,
+    data:        document.getElementById('mem-data').value,
+    responsavel: document.getElementById('mem-responsavel').value.trim(),
+    conteudo:    document.getElementById('mem-conteudo').value.trim(),
+    link:        document.getElementById('mem-link').value.trim(),
+    tags:        document.getElementById('mem-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    criadoEm:   new Date().toLocaleString('pt-BR'),
+  };
+  DB.governanca.memorias.unshift(mem);
+  autoSave();
+  document.getElementById('memoria-overlay').classList.remove('open');
+  renderMemoria();
+}
+
+function renderMemoria(){
+  initGov();
+  const busca = document.getElementById('mem-busca')?.value.toLowerCase()||'';
+  const filtTipo = document.getElementById('mem-filtro-tipo')?.value||'';
+  const filtCoord = document.getElementById('mem-filtro-coord')?.value||'';
+
+  // Popular filtro de coord
+  const selCoord = document.getElementById('mem-filtro-coord');
+  if(selCoord && selCoord.options.length<=1){
+    Object.entries(DB.coords).forEach(([k,c])=>{
+      const o=document.createElement('option'); o.value=k; o.textContent=c.acro; selCoord.appendChild(o);
+    });
+  }
+
+  const mems = (DB.governanca.memorias||[]).filter(m=>{
+    const matchBusca = !busca || m.titulo?.toLowerCase().includes(busca) ||
+      m.conteudo?.toLowerCase().includes(busca) || m.tags?.some(t=>t.toLowerCase().includes(busca));
+    const matchTipo = !filtTipo || m.tipo===filtTipo;
+    const matchCoord = !filtCoord || m.coord===filtCoord;
+    return matchBusca && matchTipo && matchCoord;
+  });
+
+  const el = document.getElementById('memoria-grid'); if(!el) return;
+  const vazio = document.getElementById('memoria-vazio');
+
+  if(!mems.length){ el.innerHTML=''; if(vazio) vazio.style.display='block'; return; }
+  if(vazio) vazio.style.display='none';
+
+  el.innerHTML = mems.map(m=>{
+    const tp = MEM_TIPOS[m.tipo]||MEM_TIPOS.outro;
+    const coordNome = m.coord&&DB.coords[m.coord]?DB.coords[m.coord].acro:'SAA';
+    return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+      overflow:hidden;transition:all var(--trans)"
+      onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow)'"
+      onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <div style="background:${tp.cor};padding:12px 16px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">${tp.ico}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.titulo}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.75);font-family:var(--mono)">${tp.label} · ${coordNome}</div>
+        </div>
+        ${isEdit()?`<button onclick="deleteMemoria('${m.id}')" style="background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;border-radius:4px;padding:3px 6px;font-size:11px">🗑</button>`:''}
+      </div>
+      <div style="padding:14px 16px">
+        ${m.data?`<div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:8px">📅 ${new Date(m.data+'T00:00').toLocaleDateString('pt-BR')} · ${m.responsavel||'—'}</div>`:''}
+        ${m.conteudo?`<div style="font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:8px">${m.conteudo.slice(0,180)}${m.conteudo.length>180?'...':''}</div>`:''}
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+          ${(m.tags||[]).map(t=>`<span style="font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;background:var(--surface3);color:var(--text2)">${t}</span>`).join('')}
+        </div>
+        ${m.link?`<a href="${m.link}" target="_blank" style="font-family:var(--mono);font-size:9px;color:var(--accent);text-decoration:none">🔗 Abrir arquivo →</a>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteMemoria(id){
+  if(!confirm('Remover este arquivo/memória?')) return;
+  DB.governanca.memorias = (DB.governanca.memorias||[]).filter(m=>m.id!==id);
+  autoSave(); renderMemoria();
+}
+
+// ── Agenda & Reuniões ──
+function showAddReuniao(){
+  initGov();
+  document.getElementById('reu-titulo').value = '';
+  document.getElementById('reu-data').value = new Date().toISOString().slice(0,10);
+  document.getElementById('reu-hora').value = '';
+  document.getElementById('reu-local').value = '';
+  document.getElementById('reu-pauta').value = '';
+  document.getElementById('reu-participantes').value = '';
+  document.getElementById('reu-status').value = 'agendada';
+  const sel = document.getElementById('reu-coord');
+  if(sel && sel.options.length<=1){
+    Object.entries(DB.coords).forEach(([k,c])=>{
+      const o=document.createElement('option'); o.value=k; o.textContent=c.acro; sel.appendChild(o);
+    });
+  }
+  document.getElementById('reuniao-overlay').classList.add('open');
+}
+
+function saveReuniao(){
+  const titulo = document.getElementById('reu-titulo').value.trim();
+  if(!titulo){ alert('Digite o título.'); return; }
+  initGov();
+  const reu = {
+    id: 'REU'+Date.now(),
+    titulo,
+    data:          document.getElementById('reu-data').value,
+    hora:          document.getElementById('reu-hora').value.trim(),
+    local:         document.getElementById('reu-local').value.trim(),
+    coord:         document.getElementById('reu-coord').value,
+    pauta:         document.getElementById('reu-pauta').value.trim(),
+    participantes: document.getElementById('reu-participantes').value.trim(),
+    status:        document.getElementById('reu-status').value,
+    criadoEm:     new Date().toLocaleString('pt-BR'),
+  };
+  DB.governanca.reunioes.unshift(reu);
+  autoSave();
+  document.getElementById('reuniao-overlay').classList.remove('open');
+  renderAgenda();
+}
+
+function renderAgenda(){
+  initGov();
+  const filtro = document.getElementById('agenda-filtro')?.value||'todas';
+  const hoje = new Date().toISOString().slice(0,10);
+
+  let reunioes = [...(DB.governanca.reunioes||[])];
+  if(filtro==='proximas') reunioes = reunioes.filter(r=>r.data>=hoje&&r.status==='agendada');
+  else if(filtro==='hoje')   reunioes = reunioes.filter(r=>r.data===hoje);
+  else if(filtro==='passadas') reunioes = reunioes.filter(r=>r.status==='realizada'||r.data<hoje);
+
+  reunioes.sort((a,b)=>a.data<b.data?1:-1);
+
+  const el = document.getElementById('agenda-lista'); if(!el) return;
+  const vazio = document.getElementById('agenda-vazio');
+
+  if(!reunioes.length){ el.innerHTML=''; if(vazio) vazio.style.display='block'; return; }
+  if(vazio) vazio.style.display='none';
+
+  const STATUS_REU = { agendada:{cor:'#0277BD',ico:'🔵'}, realizada:{cor:'#1B873F',ico:'✅'}, cancelada:{cor:'#B71C1C',ico:'❌'} };
+  el.innerHTML = reunioes.map(r=>{
+    const st = STATUS_REU[r.status]||STATUS_REU.agendada;
+    const coordNome = r.coord&&DB.coords[r.coord]?DB.coords[r.coord].acro:'SAA';
+    const dataFmt = r.data?new Date(r.data+'T00:00').toLocaleDateString('pt-BR'):'—';
+    return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+      padding:16px 18px;display:flex;align-items:flex-start;gap:14px;border-left:4px solid ${st.cor}">
+      <div style="flex-shrink:0;text-align:center;min-width:56px">
+        <div style="font-family:var(--display);font-size:18px;font-weight:800;color:${st.cor}">${dataFmt.slice(0,5)}</div>
+        <div style="font-family:var(--mono);font-size:8px;color:var(--text3)">${r.hora||'—'}</div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
+          <span style="font-size:13px;font-weight:700;color:var(--text)">${r.titulo}</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;
+            background:${st.cor}18;color:${st.cor}">${st.ico} ${r.status}</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${coordNome}</span>
+        </div>
+        ${r.local?`<div style="font-size:11px;color:var(--text2);margin-bottom:4px">📍 ${r.local}</div>`:''}
+        ${r.pauta?`<div style="font-size:11px;color:var(--text2);line-height:1.5">${r.pauta.slice(0,120)}${r.pauta.length>120?'...':''}</div>`:''}
+        ${r.participantes?`<div style="font-size:10px;color:var(--text3);margin-top:4px">👥 ${r.participantes}</div>`:''}
+      </div>
+      ${isEdit()?`
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <select onchange="updateReuniaoStatus('${r.id}',this.value)"
+          style="font-size:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:4px">
+          <option value="agendada" ${r.status==='agendada'?'selected':''}>Agendada</option>
+          <option value="realizada" ${r.status==='realizada'?'selected':''}>Realizada</option>
+          <option value="cancelada" ${r.status==='cancelada'?'selected':''}>Cancelada</option>
+        </select>
+        <button onclick="deleteReuniao('${r.id}')" style="background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--text3);font-size:11px">🗑</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function updateReuniaoStatus(id, status){
+  const r = (DB.governanca.reunioes||[]).find(r=>r.id===id); if(!r) return;
+  r.status=status; autoSave(); renderAgenda();
+}
+function deleteReuniao(id){
+  if(!confirm('Remover esta reunião?')) return;
+  DB.governanca.reunioes = (DB.governanca.reunioes||[]).filter(r=>r.id!==id);
+  autoSave(); renderAgenda();
+}
+
+// Chamar no startApp para garantir inicialização
+const _origStartApp = startApp;
+
 let _ciState = { coordKey:'', rawData:[], headers:[], mapping:{}, source:'' };
 
 function openCoordImport(coordKey){
@@ -4043,6 +4722,10 @@ const TITLES={
   overview:'Dashboard Executivo',
   graficos:'Gráficos & Análise',
   alertas:'Alertas e Riscos',
+  governanca:'Painel de Governança',
+  briefing:'Briefing Semanal',
+  memoria:'Memória & Arquivos',
+  agenda:'Agenda & Reuniões',
   'coasup-regional':'COASUP · Painel Regional',
   importar:'Importar Dados',
   integracao:'Integração & Arquitetura'
@@ -4317,6 +5000,10 @@ function goTo(key){
   if(key==='graficos') renderGraficos();
   if(key==='coasup-regional') renderCOASUPRegionalPage();
   if(key==='importar') initImportSection();
+  if(key==='governanca') renderGovernanca();
+  if(key==='briefing') renderBriefing();
+  if(key==='memoria') renderMemoria();
+  if(key==='agenda') renderAgenda();
 
 // ── Sidebar mobile ──
 function toggleSidebar(){
