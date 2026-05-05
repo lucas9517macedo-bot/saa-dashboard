@@ -916,6 +916,23 @@ body::after{ display:none }
   transition:all var(--trans);
 }
 .detail-btn-del:hover{border-color:var(--crit);color:var(--crit)}
+
+/* ── Inputs inline nos detail items ── */
+.detail-inline-input{
+  width:100%;background:var(--surface);border:1.5px solid var(--border2);
+  border-radius:var(--radius-xs);padding:7px 10px;
+  font-family:var(--font);font-size:12px;color:var(--text);
+  outline:none;transition:border-color var(--trans);
+}
+.detail-inline-input:hover{border-color:var(--accent)}
+.detail-inline-input:focus{border-color:var(--accent);background:var(--surface2)}
+.detail-inline-select{
+  width:100%;background:var(--surface);border:1.5px solid var(--border2);
+  border-radius:var(--radius-xs);padding:7px 10px;
+  font-size:12px;color:var(--text);outline:none;
+  transition:border-color var(--trans);cursor:pointer;
+}
+.detail-inline-select:focus{border-color:var(--accent)}
 .kpi-detail-footer{
   padding:14px 22px;border-top:1px solid var(--border);
   display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;
@@ -3170,29 +3187,95 @@ function renderDetailItems(filter='', statusFilter=''){
   listEl.innerHTML = itens.map((item, idx)=>{
     const realIdx = (k.itens||[]).findIndex(i=>i===item);
     const st = STATUS_COLORS[item.status] || STATUS_COLORS.ativo;
-    return `
-    <div class="detail-item">
-      <div class="detail-item-dot" style="background:${st.cor}"></div>
-      <div class="detail-item-body">
-        <div class="detail-item-title">${item.titulo||'Sem título'}</div>
-        <div class="detail-item-meta">
-          ${item.numero?`<b>Nº:</b> ${item.numero} &nbsp;·&nbsp; `:''}
-          ${item.responsavel?`<b>Resp.:</b> ${item.responsavel} &nbsp;·&nbsp; `:''}
-          ${item.prazo?`<b>Prazo:</b> ${item.prazo}`:''}
-          ${item.valor?`<br><b>Valor:</b> ${item.valor}`:''}
-          ${item.obs?`<br>${item.obs}`:''}
+    const edit = isEdit();
+
+    if(edit){
+      // ── MODO EDITAR: campos inline editáveis ──
+      return `
+      <div class="detail-item" id="detail-item-card-${realIdx}" style="flex-direction:column;gap:10px;align-items:stretch">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <div class="detail-item-dot" style="background:${st.cor};flex-shrink:0"></div>
+            <input class="detail-inline-input" style="flex:1;font-weight:600;font-size:13px"
+              value="${escHtml(item.titulo||'')}"
+              placeholder="Título / Nome do item"
+              onchange="updateDetailField(${realIdx},'titulo',this.value)"
+              title="Título / Nome do item">
+          </div>
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <button class="detail-btn-del" onclick="deleteDetailItem(${realIdx})" title="Remover item">🗑</button>
+          </div>
         </div>
-        <div class="detail-item-tags">
-          <span class="detail-tag" style="background:${st.bg};color:${st.cor}">${st.label}</span>
-          ${item.prazo && isPrazoVencido(item.prazo)?`<span class="detail-tag" style="background:var(--crit-a);color:var(--crit)">⚠ Prazo vencido</span>`:''}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div style="font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px">Número / Código SEI</div>
+            <input class="detail-inline-input"
+              value="${escHtml(item.numero||'')}"
+              placeholder="Ex: SEI 25000.001234/2025-01"
+              onchange="updateDetailField(${realIdx},'numero',this.value)">
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px">Status</div>
+            <select class="detail-inline-select"
+              onchange="updateDetailField(${realIdx},'status',this.value)">
+              ${Object.entries(STATUS_COLORS).map(([k2,v])=>`<option value="${k2}" ${item.status===k2?'selected':''}>${v.label}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px">Responsável</div>
+            <input class="detail-inline-input"
+              value="${escHtml(item.responsavel||'')}"
+              placeholder="Nome / matrícula"
+              onchange="updateDetailField(${realIdx},'responsavel',this.value)">
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px">Prazo</div>
+            <input class="detail-inline-input"
+              value="${escHtml(item.prazo||'')}"
+              placeholder="Ex: 30/06/2025"
+              onchange="updateDetailField(${realIdx},'prazo',this.value)">
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px">Valor / Percentual</div>
+            <input class="detail-inline-input"
+              value="${escHtml(item.valor||'')}"
+              placeholder="Ex: R$ 250.000 ou 75%"
+              onchange="updateDetailField(${realIdx},'valor',this.value)">
+          </div>
+          <div style="grid-column:1/-1">
+            <div style="font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px">Observações</div>
+            <textarea class="detail-inline-input" rows="2"
+              style="resize:vertical"
+              placeholder="Detalhes, pontos de atenção, histórico..."
+              onchange="updateDetailField(${realIdx},'obs',this.value)">${escHtml(item.obs||'')}</textarea>
+          </div>
         </div>
-      </div>
-      ${isEdit()?`
-      <div class="detail-item-actions">
-        <button class="detail-btn-edit" onclick="editDetailItem(${realIdx})">✏️</button>
-        <button class="detail-btn-del" onclick="deleteDetailItem(${realIdx})">🗑</button>
-      </div>`:''}
-    </div>`;
+        ${item.prazo && isPrazoVencido(item.prazo)?`
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="detail-tag" style="background:var(--crit-a);color:var(--crit)">⚠ Prazo vencido</span>
+        </div>`:''}
+      </div>`;
+    } else {
+      // ── MODO VISUALIZAR: leitura compacta ──
+      return `
+      <div class="detail-item">
+        <div class="detail-item-dot" style="background:${st.cor}"></div>
+        <div class="detail-item-body">
+          <div class="detail-item-title">${escHtml(item.titulo||'Sem título')}</div>
+          <div class="detail-item-meta">
+            ${item.numero?`<b>Nº:</b> ${escHtml(item.numero)} &nbsp;·&nbsp; `:''}
+            ${item.responsavel?`<b>Resp.:</b> ${escHtml(item.responsavel)} &nbsp;·&nbsp; `:''}
+            ${item.prazo?`<b>Prazo:</b> ${escHtml(item.prazo)}`:''}
+            ${item.valor?`<br><b>Valor:</b> ${escHtml(item.valor)}`:''}
+            ${item.obs?`<br>${escHtml(item.obs)}`:''}
+          </div>
+          <div class="detail-item-tags">
+            <span class="detail-tag" style="background:${st.bg};color:${st.cor}">${st.label}</span>
+            ${item.prazo && isPrazoVencido(item.prazo)?`<span class="detail-tag" style="background:var(--crit-a);color:var(--crit)">⚠ Prazo vencido</span>`:''}
+          </div>
+        </div>
+      </div>`;
+    }
   }).join('');
 }
 
@@ -3200,6 +3283,25 @@ function filterDetailItems(){
   const search = document.getElementById('kd-search').value;
   const status = document.getElementById('kd-filter-status').value;
   renderDetailItems(search, status);
+}
+
+// Salva campo editado inline no item
+function updateDetailField(realIdx, campo, valor){
+  const { coordKey, kpiIdx } = _kdState;
+  const k = DB.coords[coordKey]?.kpis[kpiIdx];
+  if(!k?.itens?.[realIdx]) return;
+  k.itens[realIdx][campo] = valor;
+  autoSave();
+  // Atualizar badge do botão no KPI card sem re-render total
+  const btn = document.querySelector(`#kpi-${coordKey}-${kpiIdx} .kpi-detail-btn`);
+  if(btn) btn.textContent = `📋 ${k.itens.length} ${k.itens.length===1?'item':'itens'}`;
+}
+
+// Escapar HTML para segurança
+function escHtml(str){
+  return String(str||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 function isPrazoVencido(prazo){
