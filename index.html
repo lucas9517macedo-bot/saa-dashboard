@@ -1312,7 +1312,38 @@ body::after{ display:none }
           </div>
         </div>
 
-        <!-- ── SEMÁFORO GERAL — Na Palma da Mão ── -->
+        <!-- ── BANNER SAA NA PALMA DA MÃO ── -->
+        <div style="background:linear-gradient(135deg,#004B8D 0%,#1B6B3A 100%);
+          border-radius:var(--radius);padding:14px 20px;margin-bottom:20px;
+          display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="font-size:32px">🖐</div>
+            <div>
+              <div style="font-family:var(--display);font-size:16px;font-weight:800;color:#fff;line-height:1.2">
+                SAA <span style="color:#F5C518">na Palma da</span> Mão
+              </div>
+              <div style="font-size:10px;color:rgba(255,255,255,.75);font-family:var(--mono);margin-top:2px">
+                Painel Estratégico de Governança · SAA/MS · Informação estratégica para tomada de decisão
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="background:rgba(255,255,255,.12);color:#fff;font-family:var(--mono);
+              font-size:9px;padding:4px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2)">
+              📊 Consolidar dados
+            </span>
+            <span style="background:rgba(255,255,255,.12);color:#fff;font-family:var(--mono);
+              font-size:9px;padding:4px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2)">
+              🎯 Apoiar governança
+            </span>
+            <span style="background:rgba(255,255,255,.12);color:#fff;font-family:var(--mono);
+              font-size:9px;padding:4px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2)">
+              ⚡ Tomada de decisão
+            </span>
+          </div>
+        </div>
+
+        <!-- ── SEMÁFORO GERAL ── -->
         <div class="semaforo-overview-row" id="semaforo-overview">
           <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;
             letter-spacing:.12em;color:var(--text3);flex-shrink:0">🚦 Semáforo</div>
@@ -2098,15 +2129,17 @@ let DB = {
     cogad:{
       acro:"COGAD", nome:"Coordenação de Gestão de Atos e Documentos",
       desc:"Gestão de processos SEI, demandas judiciais, ofícios e despachos. Atendimento a demandas de PGU, TCU, SIC, CGU e demais órgãos.",
-      insight:"Taxa de atendimento em 98,5%. Atenção: 163 processos vencidos e 3 vencem hoje. Monitorar demandas PGU (4.036) e TCU (3.161).",
-      narrativa:"", atualizadoPor:"", atualizadoEm:"",
+      insight:"Dados atualizados via Excel Power BI. Total histórico: 5.238 processos · 95,3% de atendimento. Em 2026: 409 processos, 171 ainda em andamento (abr: 90, mar: 49). Monitorar volume crescente em abril.",
+      narrativa:"", atualizadoPor:"Importação Excel Power BI", atualizadoEm:"05/05/2026",
       kpis:[
-        {id:"CG1",nome:"Total de Processos SEI",realizado:12348,meta:12348,unidade:"qtd",spark:[11200,11600,11900,12100,12348]},
-        {id:"CG2",nome:"Demandas Atendidas",realizado:12163,meta:12348,unidade:"qtd",spark:[11000,11300,11700,11900,12163]},
-        {id:"CG3",nome:"Taxa de Atendimento",realizado:98.5,meta:95,unidade:"%",spark:[96,97,97.5,98,98.5]},
-        {id:"CG4",nome:"Processos Vencidos",realizado:163,meta:0,unidade:"qtd",spark:[180,175,170,165,163],inverso:true},
-        {id:"CG5",nome:"Vencem Hoje",realizado:3,meta:0,unidade:"qtd",spark:[5,4,4,3,3],inverso:true},
-        {id:"CG6",nome:"No Prazo (ativos)",realizado:16,meta:20,unidade:"qtd",spark:[10,12,14,15,16]}
+        {id:"CG1",nome:"Total de Processos (histórico)",realizado:5238, meta:5238,unidade:"qtd",  spark:[4800,4950,5050,5150,5238]},
+        {id:"CG2",nome:"Processos Concluídos",          realizado:4991, meta:5238,unidade:"qtd",  spark:[4600,4720,4830,4920,4991]},
+        {id:"CG3",nome:"Taxa de Atendimento (geral)",   realizado:95.3, meta:95,  unidade:"%",    spark:[94.1,94.5,94.8,95.1,95.3]},
+        {id:"CG4",nome:"Em Andamento (atual)",          realizado:247,  meta:100, unidade:"qtd",  spark:[280,270,265,255,247],inverso:true},
+        {id:"CG5",nome:"Total 2026",                    realizado:409,  meta:500, unidade:"qtd",  spark:[55,141,280,409,409]},
+        {id:"CG6",nome:"Concluídos 2026",               realizado:238,  meta:409, unidade:"qtd",  spark:[47,110,173,238,238]},
+        {id:"CG7",nome:"Em andamento 2026",             realizado:171,  meta:50,  unidade:"qtd",  spark:[8,31,80,162,171],inverso:true},
+        {id:"CG8",nome:"Taxa atendimento 2026",         realizado:58.2, meta:90,  unidade:"%",    spark:[85.5,77.9,61.8,58.2,58.2]}
       ]
     },
     cglic:{
@@ -3444,28 +3477,97 @@ function ciProcessFile(file){
   const reader=new FileReader();
   reader.onload=e=>{
     try{
-      let data=[];
+      let data=[], headers=[];
       if(isCSV){
         const lines=e.target.result.split('\n').filter(l=>l.trim());
         const sep=lines[0].includes(';')?';':',';
-        const headers=lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));
+        headers=lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));
         data=lines.slice(1).map(line=>{const vals=line.split(sep).map(v=>v.trim().replace(/^"|"$/g,''));const obj={};headers.forEach((h,i2)=>obj[h]=vals[i2]||'');return obj;}).filter(r=>Object.values(r).some(v=>v));
-        _ciState.headers=headers;
       }else{
         const wb=XLSX.read(e.target.result,{type:'binary'});
         const ws=wb.Sheets[wb.SheetNames[0]];
-        data=XLSX.utils.sheet_to_json(ws,{defval:''});
-        _ciState.headers=data.length?Object.keys(data[0]):[];
+        // Detectar se é formato Power BI (cabeçalho na linha 2)
+        const rawAll = XLSX.utils.sheet_to_json(ws,{defval:'',header:1});
+        const isPBI = rawAll[0] && String(rawAll[0][0]||'').toLowerCase().includes('filtro');
+        if(isPBI){
+          // Formato Power BI: linha 0=filtros, linha 1=cabeçalhos, linhas 2+=dados
+          headers = rawAll[1]?.map(h=>String(h||'').trim()).filter(h=>h) || [];
+          data = rawAll.slice(2).map(row=>{
+            const obj={};
+            headers.forEach((h,i2)=>obj[h]=row[i2]??'');
+            return obj;
+          }).filter(r=>headers.some(h=>r[h]!==''&&r[h]!==undefined));
+          _ciState.pbiFormat = true;
+        } else {
+          data=XLSX.utils.sheet_to_json(ws,{defval:''});
+          headers=data.length?Object.keys(data[0]):[];
+        }
       }
-      _ciState.rawData=data; ciAutoDetect(); ciRenderMapping(); ciRenderPreview();
+      _ciState.rawData=data; _ciState.headers=headers; ciAutoDetect();
+
+      // Para formato Power BI, sugerir mapeamento automático de totalizador mensal
+      if(_ciState.pbiFormat){
+        ciShowPBIMapping(data, headers);
+      } else {
+        ciRenderMapping(); ciRenderPreview();
+      }
+
       document.getElementById('ci-file-ok').style.display='inline-flex';
-      document.getElementById('ci-file-name').textContent=`${file.name} — ${data.length} linhas`;
+      document.getElementById('ci-file-name').textContent=`${file.name} — ${data.length} linhas${_ciState.pbiFormat?' (formato Power BI detectado)':''}`;
       document.getElementById('ci-mapping-section').style.display='block';
       document.getElementById('ci-apply-btn').disabled=false;
-      document.getElementById('ci-step-info').textContent=`✓ ${data.length} linhas — revise o mapeamento`;
+      document.getElementById('ci-step-info').textContent=`✓ ${data.length} linhas${_ciState.pbiFormat?' · formato Power BI':''}`;
     }catch(err){alert('Erro ao ler: '+err.message);}
   };
   isCSV?reader.readAsText(file,'utf-8'):reader.readAsBinaryString(file);
+}
+
+function ciShowPBIMapping(data, headers){
+  const el=document.getElementById('ci-mapping-grid');
+  if(!el) return;
+
+  // Para o totalizador mensal da COGAD, calcular totais automáticos
+  const totalCol = headers.find(h=>h.toLowerCase()==='total')||headers[2];
+  const concCol  = headers.find(h=>h.toLowerCase().includes('conclu'))||headers[3];
+  const andCol   = headers.find(h=>h.toLowerCase().includes('andamento'))||headers[4];
+  const anoCol   = headers[0];
+  const mesCol   = headers[1];
+
+  const total = data.reduce((a,r)=>a+(parseInt(r[totalCol])||0),0);
+  const conc  = data.reduce((a,r)=>a+(parseInt(r[concCol])||0),0);
+  const and_  = data.reduce((a,r)=>a+(parseInt(r[andCol])||0),0);
+  const taxa  = total>0?Math.round((conc/total)*1000)/10:0;
+
+  // Filtrar 2026
+  const d26   = data.filter(r=>String(r[anoCol])===String(new Date().getFullYear()));
+  const t26   = d26.reduce((a,r)=>a+(parseInt(r[totalCol])||0),0);
+  const c26   = d26.reduce((a,r)=>a+(parseInt(r[concCol])||0),0);
+  const a26   = d26.reduce((a,r)=>a+(parseInt(r[andCol])||0),0);
+
+  el.innerHTML=`
+    <div style="grid-column:1/-1;background:var(--good-a);border:1px solid rgba(27,135,63,.2);
+      border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px">
+      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;
+        letter-spacing:.1em;color:var(--good);margin-bottom:8px">
+        ✓ Formato Power BI detectado — totais calculados automaticamente
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:11px">
+        <div><b style="color:var(--text)">Total histórico:</b><br><span style="font-family:var(--mono);color:var(--accent)">${total.toLocaleString('pt-BR')}</span></div>
+        <div><b style="color:var(--text)">Concluídos:</b><br><span style="font-family:var(--mono);color:var(--good)">${conc.toLocaleString('pt-BR')}</span></div>
+        <div><b style="color:var(--text)">Em andamento:</b><br><span style="font-family:var(--mono);color:var(--warn)">${and_.toLocaleString('pt-BR')}</span></div>
+        <div><b style="color:var(--text)">Taxa geral:</b><br><span style="font-family:var(--mono);color:var(--accent)">${taxa}%</span></div>
+      </div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(27,135,63,.15);
+        display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px">
+        <div><b style="color:var(--text)">Total ${new Date().getFullYear()}:</b><br><span style="font-family:var(--mono)">${t26}</span></div>
+        <div><b style="color:var(--text)">Concluídos ${new Date().getFullYear()}:</b><br><span style="font-family:var(--mono);color:var(--good)">${c26}</span></div>
+        <div><b style="color:var(--text)">Em andamento ${new Date().getFullYear()}:</b><br><span style="font-family:var(--mono);color:var(--warn)">${a26}</span></div>
+      </div>
+    </div>`;
+
+  // Guardar os totais para aplicar
+  _ciState.pbiTotals={total,conc,and_,taxa,t26,c26,a26};
+  ciRenderPreview();
 }
 
 function ciProcessPaste(){
@@ -3530,6 +3632,25 @@ function ciApplyData(){
   let applied=0,novas=0,erros=[];
   if(activeTab==='manual'){
     c.kpis.forEach((k,i)=>{const inp=document.getElementById(`ci-man-${i}`);if(!inp)return;const n=parseFloat(inp.value);if(!isNaN(n)){k.spark=[...(k.spark||[0,0,0,0,k.realizado]).slice(1),n];k.realizado=n;applied++;}});
+  } else if(_ciState.pbiFormat && _ciState.pbiTotals){
+    // Formato Power BI com totais pré-calculados
+    const t = _ciState.pbiTotals;
+    const anoAtual = new Date().getFullYear();
+    const mapeamentoPBI = [
+      {nome:'Total de Processos (histórico)', val:t.total},
+      {nome:'Processos Concluídos',           val:t.conc},
+      {nome:`Taxa de Atendimento (geral)`,    val:t.taxa},
+      {nome:`Em Andamento (atual)`,           val:t.and_},
+      {nome:`Total ${anoAtual}`,              val:t.t26},
+      {nome:`Concluídos ${anoAtual}`,         val:t.c26},
+      {nome:`Em andamento ${anoAtual}`,       val:t.a26},
+      {nome:`Taxa atendimento ${anoAtual}`,   val:t.t26>0?Math.round((t.c26/t.t26)*1000)/10:0},
+    ];
+    mapeamentoPBI.forEach(({nome,val})=>{
+      const existing=c.kpis.find(k=>k.nome.toLowerCase().trim()===nome.toLowerCase().trim()||nome.toLowerCase().includes(k.nome.toLowerCase().substring(0,10)));
+      if(existing){existing.spark=[...(existing.spark||[]).slice(1),val];existing.realizado=val;applied++;}
+      else{c.kpis.push({id:'PBI'+Date.now()+'_'+Math.random().toString(36).slice(2,5),nome,realizado:val,meta:val,unidade:nome.includes('Taxa')||nome.includes('%')?'%':'qtd',spark:[0,0,0,0,val]});novas++;}
+    });
   }else{
     Object.keys(CI_ALIASES).forEach(field=>{const sel=document.getElementById(`ci-map-${field}`);if(sel)_ciState.mapping[field]=sel.value;});
     const m=_ciState.mapping;const data=_ciState.rawData;
