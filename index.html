@@ -1931,7 +1931,7 @@ body::after{ display:none }
 
 <!-- ══ MODAL MEMÓRIA/ARQUIVO ══ -->
 <div class="modal-overlay" id="memoria-overlay">
-  <div class="modal" style="max-width:580px">
+  <div class="modal" style="max-width:600px">
     <div class="modal-title" id="mem-modal-title">📁 Adicionar Arquivo / Memória</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="modal-field" style="grid-column:1/-1">
@@ -1965,21 +1965,58 @@ body::after{ display:none }
       </div>
       <div class="modal-field" style="grid-column:1/-1">
         <div class="modal-label">Conteúdo / Descrição</div>
-        <textarea class="modal-input modal-textarea" id="mem-conteudo" style="min-height:100px"
-          placeholder="Resumo da reunião, principais decisões, encaminhamentos, pontos de atenção..."></textarea>
+        <textarea class="modal-input modal-textarea" id="mem-conteudo" style="min-height:90px"
+          placeholder="Resumo, principais decisões, encaminhamentos, pontos de atenção..."></textarea>
       </div>
+
+      <!-- ── ANEXAR ARQUIVO LOCAL ── -->
       <div class="modal-field" style="grid-column:1/-1">
-        <div class="modal-label">Link do arquivo (Google Drive, SEI, etc.)</div>
-        <input class="modal-input" id="mem-link" placeholder="https://...">
+        <div class="modal-label">📎 Anexar arquivo do computador</div>
+        <div id="mem-upload-zone"
+          style="border:2px dashed var(--border2);border-radius:var(--radius-sm);
+          padding:18px;text-align:center;cursor:pointer;background:var(--surface2);
+          transition:all var(--trans);position:relative"
+          onclick="document.getElementById('mem-file-inp').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='var(--good-a)'"
+          ondragleave="this.style.borderColor='var(--border2)';this.style.background='var(--surface2)'"
+          ondrop="memHandleDrop(event)">
+          <div id="mem-upload-empty">
+            <div style="font-size:28px;margin-bottom:6px">📂</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px">Clique ou arraste o arquivo aqui</div>
+            <div style="font-size:10px;color:var(--text3)">Word, PDF, Excel, PowerPoint, imagens — qualquer formato</div>
+          </div>
+          <div id="mem-upload-preview" style="display:none">
+            <div style="display:flex;align-items:center;gap:10px;justify-content:center">
+              <span id="mem-file-ico" style="font-size:28px">📄</span>
+              <div style="text-align:left">
+                <div id="mem-file-nome" style="font-size:12px;font-weight:600;color:var(--text)"></div>
+                <div id="mem-file-size" style="font-size:10px;color:var(--text3)"></div>
+              </div>
+              <button onclick="event.stopPropagation();memClearFile()"
+                style="background:var(--crit-a);border:1px solid var(--crit);color:var(--crit);
+                border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer">✕ Remover</button>
+            </div>
+          </div>
+          <input type="file" id="mem-file-inp" style="display:none"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.zip"
+            onchange="memHandleFile(this)">
+        </div>
       </div>
+
+      <!-- ── OU LINK EXTERNO ── -->
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">🔗 Ou cole um link externo (Google Drive, SEI, OneDrive...)</div>
+        <input class="modal-input" id="mem-link" placeholder="https://drive.google.com/... ou https://sei.saude.gov.br/...">
+      </div>
+
       <div class="modal-field" style="grid-column:1/-1">
         <div class="modal-label">Tags (separadas por vírgula)</div>
         <input class="modal-input" id="mem-tags" placeholder="Ex: contrato, urgente, CGLIC, aprovado">
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="document.getElementById('memoria-overlay').classList.remove('open')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveMemoria()">Salvar</button>
+      <button class="btn" onclick="closeMemoriaModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMemoria()">💾 Salvar</button>
     </div>
   </div>
 </div>
@@ -3905,8 +3942,68 @@ const MEM_TIPOS = {
   outro:      {ico:'📎', label:'Outro',               cor:'#6B7280'},
 };
 
+// ══════════════════════════════════════════════
+// MEMÓRIA & ARQUIVOS — edição + upload local
+// ══════════════════════════════════════════════
+let _memEditId  = null;   // ID do item em edição (null = novo)
+let _memFileData = null;  // arquivo carregado {nome, ext, tipo, tamanho, base64}
+
+const FILE_ICOS = {
+  pdf:'📕', doc:'📘', docx:'📘', xls:'📗', xlsx:'📗',
+  ppt:'📙', pptx:'📙', txt:'📄', png:'🖼', jpg:'🖼',
+  jpeg:'🖼', gif:'🖼', zip:'🗜', rar:'🗜', default:'📎'
+};
+function fileIco(ext){ return FILE_ICOS[ext?.toLowerCase()]||FILE_ICOS.default; }
+function fmtSize(bytes){
+  if(bytes<1024) return bytes+'B';
+  if(bytes<1024*1024) return (bytes/1024).toFixed(1)+'KB';
+  return (bytes/1024/1024).toFixed(1)+'MB';
+}
+
+function memHandleDrop(e){
+  e.preventDefault();
+  document.getElementById('mem-upload-zone').style.borderColor='var(--border2)';
+  document.getElementById('mem-upload-zone').style.background='var(--surface2)';
+  const f = e.dataTransfer.files[0]; if(f) _memReadFile(f);
+}
+function memHandleFile(input){ const f=input.files[0]; if(f) _memReadFile(f); }
+
+function _memReadFile(file){
+  // Limite de 5MB
+  if(file.size > 5*1024*1024){
+    alert('Arquivo muito grande. Limite: 5MB.\nPara arquivos maiores, use o link do Google Drive.');
+    return;
+  }
+  const ext = file.name.split('.').pop()||'';
+  const reader = new FileReader();
+  reader.onload = e=>{
+    _memFileData = { nome:file.name, ext, tipo:file.type, tamanho:file.size, base64:e.target.result };
+    // Atualizar preview
+    document.getElementById('mem-upload-empty').style.display='none';
+    document.getElementById('mem-upload-preview').style.display='block';
+    document.getElementById('mem-file-ico').textContent = fileIco(ext);
+    document.getElementById('mem-file-nome').textContent = file.name;
+    document.getElementById('mem-file-size').textContent = fmtSize(file.size);
+  };
+  reader.readAsDataURL(file);
+}
+
+function memClearFile(){
+  _memFileData = null;
+  document.getElementById('mem-file-inp').value = '';
+  document.getElementById('mem-upload-empty').style.display='block';
+  document.getElementById('mem-upload-preview').style.display='none';
+}
+
+function closeMemoriaModal(){
+  document.getElementById('memoria-overlay').classList.remove('open');
+  _memEditId = null; _memFileData = null;
+}
+
 function showAddMemoria(){
   initGov();
+  _memEditId = null; _memFileData = null;
+  document.getElementById('mem-modal-title').textContent = '📁 Adicionar Arquivo / Memória';
   document.getElementById('mem-titulo').value = '';
   document.getElementById('mem-tipo').value = 'memoria';
   document.getElementById('mem-data').value = new Date().toISOString().slice(0,10);
@@ -3914,7 +4011,8 @@ function showAddMemoria(){
   document.getElementById('mem-conteudo').value = '';
   document.getElementById('mem-link').value = '';
   document.getElementById('mem-tags').value = '';
-  // Popular select de coordenações
+  memClearFile();
+  // Popular coordenações
   const sel = document.getElementById('mem-coord');
   if(sel && sel.options.length<=1){
     Object.entries(DB.coords).forEach(([k,c])=>{
@@ -3924,12 +4022,51 @@ function showAddMemoria(){
   document.getElementById('memoria-overlay').classList.add('open');
 }
 
+function editMemoria(id){
+  initGov();
+  const m = (DB.governanca.memorias||[]).find(m=>m.id===id);
+  if(!m) return;
+  _memEditId = id; _memFileData = null;
+
+  document.getElementById('mem-modal-title').textContent = '✏️ Editar Arquivo / Memória';
+  document.getElementById('mem-titulo').value     = m.titulo||'';
+  document.getElementById('mem-tipo').value       = m.tipo||'memoria';
+  document.getElementById('mem-data').value       = m.data||'';
+  document.getElementById('mem-responsavel').value= m.responsavel||'';
+  document.getElementById('mem-conteudo').value   = m.conteudo||'';
+  document.getElementById('mem-link').value       = m.link||'';
+  document.getElementById('mem-tags').value       = (m.tags||[]).join(', ');
+
+  // Mostrar arquivo já anexado se existir
+  if(m.arquivo){
+    _memFileData = m.arquivo;
+    document.getElementById('mem-upload-empty').style.display='none';
+    document.getElementById('mem-upload-preview').style.display='block';
+    document.getElementById('mem-file-ico').textContent = fileIco(m.arquivo.ext);
+    document.getElementById('mem-file-nome').textContent = m.arquivo.nome;
+    document.getElementById('mem-file-size').textContent = fmtSize(m.arquivo.tamanho);
+  } else {
+    memClearFile();
+  }
+
+  // Popular coordenações
+  const sel = document.getElementById('mem-coord');
+  if(sel && sel.options.length<=1){
+    Object.entries(DB.coords).forEach(([k,c])=>{
+      const o=document.createElement('option'); o.value=k; o.textContent=c.acro+' — '+c.nome; sel.appendChild(o);
+    });
+  }
+  if(sel) sel.value = m.coord||'geral';
+
+  document.getElementById('memoria-overlay').classList.add('open');
+}
+
 function saveMemoria(){
   const titulo = document.getElementById('mem-titulo').value.trim();
   if(!titulo){ alert('Digite o título.'); return; }
   initGov();
-  const mem = {
-    id: 'MEM'+Date.now(),
+
+  const dados = {
     titulo,
     tipo:        document.getElementById('mem-tipo').value,
     coord:       document.getElementById('mem-coord').value,
@@ -3938,21 +4075,38 @@ function saveMemoria(){
     conteudo:    document.getElementById('mem-conteudo').value.trim(),
     link:        document.getElementById('mem-link').value.trim(),
     tags:        document.getElementById('mem-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
-    criadoEm:   new Date().toLocaleString('pt-BR'),
+    arquivo:     _memFileData || null,
   };
-  DB.governanca.memorias.unshift(mem);
+
+  if(_memEditId){
+    // Editar existente
+    const idx = DB.governanca.memorias.findIndex(m=>m.id===_memEditId);
+    if(idx>=0) DB.governanca.memorias[idx] = { ...DB.governanca.memorias[idx], ...dados };
+  } else {
+    // Novo
+    DB.governanca.memorias.unshift({ id:'MEM'+Date.now(), criadoEm:new Date().toLocaleString('pt-BR'), ...dados });
+  }
+
   autoSave();
-  document.getElementById('memoria-overlay').classList.remove('open');
+  closeMemoriaModal();
   renderMemoria();
+}
+
+function downloadMemoria(id){
+  const m = (DB.governanca.memorias||[]).find(m=>m.id===id);
+  if(!m?.arquivo?.base64){ alert('Nenhum arquivo anexado.'); return; }
+  const a = document.createElement('a');
+  a.href = m.arquivo.base64;
+  a.download = m.arquivo.nome;
+  a.click();
 }
 
 function renderMemoria(){
   initGov();
-  const busca = document.getElementById('mem-busca')?.value.toLowerCase()||'';
-  const filtTipo = document.getElementById('mem-filtro-tipo')?.value||'';
+  const busca     = document.getElementById('mem-busca')?.value.toLowerCase()||'';
+  const filtTipo  = document.getElementById('mem-filtro-tipo')?.value||'';
   const filtCoord = document.getElementById('mem-filtro-coord')?.value||'';
 
-  // Popular filtro de coord
   const selCoord = document.getElementById('mem-filtro-coord');
   if(selCoord && selCoord.options.length<=1){
     Object.entries(DB.coords).forEach(([k,c])=>{
@@ -3961,50 +4115,104 @@ function renderMemoria(){
   }
 
   const mems = (DB.governanca.memorias||[]).filter(m=>{
-    const matchBusca = !busca || m.titulo?.toLowerCase().includes(busca) ||
-      m.conteudo?.toLowerCase().includes(busca) || m.tags?.some(t=>t.toLowerCase().includes(busca));
-    const matchTipo = !filtTipo || m.tipo===filtTipo;
+    const matchBusca = !busca ||
+      m.titulo?.toLowerCase().includes(busca) ||
+      m.conteudo?.toLowerCase().includes(busca) ||
+      m.tags?.some(t=>t.toLowerCase().includes(busca)) ||
+      m.responsavel?.toLowerCase().includes(busca);
+    const matchTipo  = !filtTipo  || m.tipo===filtTipo;
     const matchCoord = !filtCoord || m.coord===filtCoord;
     return matchBusca && matchTipo && matchCoord;
   });
 
-  const el = document.getElementById('memoria-grid'); if(!el) return;
+  const el    = document.getElementById('memoria-grid'); if(!el) return;
   const vazio = document.getElementById('memoria-vazio');
 
   if(!mems.length){ el.innerHTML=''; if(vazio) vazio.style.display='block'; return; }
   if(vazio) vazio.style.display='none';
 
   el.innerHTML = mems.map(m=>{
-    const tp = MEM_TIPOS[m.tipo]||MEM_TIPOS.outro;
+    const tp        = MEM_TIPOS[m.tipo]||MEM_TIPOS.outro;
     const coordNome = m.coord&&DB.coords[m.coord]?DB.coords[m.coord].acro:'SAA';
+    const temArq    = !!m.arquivo;
+    const temLink   = !!m.link;
+    const dataFmt   = m.data ? new Date(m.data+'T00:00').toLocaleDateString('pt-BR') : '—';
+
     return `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-      overflow:hidden;transition:all var(--trans)"
+      overflow:hidden;display:flex;flex-direction:column;
+      transition:transform var(--trans),box-shadow var(--trans)"
       onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow)'"
       onmouseout="this.style.transform='';this.style.boxShadow=''">
+
+      <!-- Cabeçalho colorido -->
       <div style="background:${tp.cor};padding:12px 16px;display:flex;align-items:center;gap:10px">
-        <span style="font-size:20px">${tp.ico}</span>
+        <span style="font-size:22px">${temArq?fileIco(m.arquivo.ext):tp.ico}</span>
         <div style="flex:1;min-width:0">
-          <div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.titulo}</div>
+          <div style="font-size:11px;font-weight:700;color:#fff;
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escHtml(m.titulo)}">${escHtml(m.titulo)}</div>
           <div style="font-size:9px;color:rgba(255,255,255,.75);font-family:var(--mono)">${tp.label} · ${coordNome}</div>
         </div>
-        ${isEdit()?`<button onclick="deleteMemoria('${m.id}')" style="background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;border-radius:4px;padding:3px 6px;font-size:11px">🗑</button>`:''}
-      </div>
-      <div style="padding:14px 16px">
-        ${m.data?`<div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:8px">📅 ${new Date(m.data+'T00:00').toLocaleDateString('pt-BR')} · ${m.responsavel||'—'}</div>`:''}
-        ${m.conteudo?`<div style="font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:8px">${m.conteudo.slice(0,180)}${m.conteudo.length>180?'...':''}</div>`:''}
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
-          ${(m.tags||[]).map(t=>`<span style="font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;background:var(--surface3);color:var(--text2)">${t}</span>`).join('')}
+        <!-- Ações -->
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          ${isEdit()?`
+          <button onclick="editMemoria('${m.id}')"
+            style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+            color:#fff;cursor:pointer;border-radius:4px;padding:3px 8px;font-size:10px"
+            title="Editar">✏️</button>
+          <button onclick="deleteMemoria('${m.id}')"
+            style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+            color:#fff;cursor:pointer;border-radius:4px;padding:3px 8px;font-size:10px"
+            title="Remover">🗑</button>`:''}
         </div>
-        ${m.link?`<a href="${m.link}" target="_blank" style="font-family:var(--mono);font-size:9px;color:var(--accent);text-decoration:none">🔗 Abrir arquivo →</a>`:''}
+      </div>
+
+      <!-- Corpo -->
+      <div style="padding:14px 16px;flex:1;display:flex;flex-direction:column;gap:6px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">
+          📅 ${dataFmt} &nbsp;·&nbsp; 👤 ${escHtml(m.responsavel||'—')}
+        </div>
+        ${m.conteudo?`
+        <div style="font-size:12px;color:var(--text2);line-height:1.6;flex:1">
+          ${escHtml(m.conteudo.slice(0,200))}${m.conteudo.length>200?'…':''}
+        </div>`:''}
+        ${(m.tags||[]).length?`
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${m.tags.map(t=>`<span style="font-family:var(--mono);font-size:8px;padding:2px 6px;
+            border-radius:3px;background:var(--surface3);color:var(--text2)">${escHtml(t)}</span>`).join('')}
+        </div>`:''}
+      </div>
+
+      <!-- Rodapé com botões de arquivo/link -->
+      <div style="padding:10px 16px;border-top:1px solid var(--border);
+        display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--surface2)">
+        ${temArq?`
+        <button onclick="downloadMemoria('${m.id}')"
+          style="display:flex;align-items:center;gap:5px;background:var(--accent);color:#fff;
+          border:none;border-radius:5px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;
+          transition:opacity var(--trans)" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          ⬇ Baixar ${escHtml(m.arquivo.nome.slice(0,20))}${m.arquivo.nome.length>20?'...':''}
+          <span style="font-family:var(--mono);font-size:9px;opacity:.75">(${fmtSize(m.arquivo.tamanho)})</span>
+        </button>`:''}
+        ${temLink?`
+        <a href="${escHtml(m.link)}" target="_blank"
+          style="display:flex;align-items:center;gap:5px;background:var(--surface);
+          border:1px solid var(--border2);border-radius:5px;padding:6px 12px;
+          font-size:11px;font-weight:600;color:var(--accent);text-decoration:none;
+          transition:border-color var(--trans)" onmouseover="this.style.borderColor='var(--accent)'"
+          onmouseout="this.style.borderColor='var(--border2)'">
+          🔗 Abrir link externo
+        </a>`:''}
+        ${!temArq&&!temLink?`<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Sem arquivo anexado</span>`:''}
       </div>
     </div>`;
   }).join('');
 }
 
 function deleteMemoria(id){
-  if(!confirm('Remover este arquivo/memória?')) return;
-  DB.governanca.memorias = (DB.governanca.memorias||[]).filter(m=>m.id!==id);
+  const m = (DB.governanca.memorias||[]).find(m=>m.id===id);
+  if(!confirm(`Remover "${m?.titulo||'este item'}"?`)) return;
+  DB.governanca.memorias = DB.governanca.memorias.filter(m=>m.id!==id);
   autoSave(); renderMemoria();
 }
 
