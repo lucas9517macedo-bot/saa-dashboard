@@ -4225,21 +4225,30 @@ function memHandleDrop(e){
 function memHandleFile(input){ const f=input.files[0]; if(f) _memReadFile(f); }
 
 function _memReadFile(file){
-  // Limite de 5MB
-  if(file.size > 5*1024*1024){
-    alert('Arquivo muito grande. Limite: 5MB.\nPara arquivos maiores, use o link do Google Drive.');
-    return;
+  // LocalStorage suporta ~4-5MB total. Base64 é 33% maior que o arquivo.
+  // Limite seguro: 1MB por arquivo
+  if(file.size > 1*1024*1024){
+    const mb = (file.size/1024/1024).toFixed(1);
+    const continuar = confirm(
+      `⚠️ Arquivo grande: ${mb}MB\n\n` +
+      `Arquivos maiores que 1MB podem não ser salvos corretamente no navegador.\n\n` +
+      `Recomendamos:\n` +
+      `• Usar o campo "Link externo" com Google Drive ou OneDrive\n` +
+      `• Continuar mesmo assim (pode não persistir após atualizar a página)\n\n` +
+      `Deseja continuar mesmo assim?`
+    );
+    if(!continuar) return;
   }
   const ext = file.name.split('.').pop()||'';
   const reader = new FileReader();
   reader.onload = e=>{
     _memFileData = { nome:file.name, ext, tipo:file.type, tamanho:file.size, base64:e.target.result };
-    // Atualizar preview
     document.getElementById('mem-upload-empty').style.display='none';
     document.getElementById('mem-upload-preview').style.display='block';
     document.getElementById('mem-file-ico').textContent = fileIco(ext);
     document.getElementById('mem-file-nome').textContent = file.name;
-    document.getElementById('mem-file-size').textContent = fmtSize(file.size);
+    document.getElementById('mem-file-size').textContent = fmtSize(file.size)+
+      (file.size > 500*1024 ? ' ⚠ arquivo grande' : '');
   };
   reader.readAsDataURL(file);
 }
@@ -4496,7 +4505,13 @@ function reuHandleDrop(e){
 }
 function reuHandleFile(input){ const f=input.files[0]; if(f) _reuReadFile(f); }
 function _reuReadFile(file){
-  if(file.size > 5*1024*1024){ alert('Arquivo muito grande. Limite: 5MB.'); return; }
+  if(file.size > 1*1024*1024){
+    const mb = (file.size/1024/1024).toFixed(1);
+    const continuar = confirm(
+      `⚠️ Arquivo grande: ${mb}MB\n\nArquivos maiores que 1MB podem não persistir após atualizar a página.\n\nDeseja continuar mesmo assim?`
+    );
+    if(!continuar) return;
+  }
   const ext = file.name.split('.').pop()||'';
   const reader = new FileReader();
   reader.onload = e=>{
@@ -5480,8 +5495,61 @@ function exportData(){
 }
 
 function autoSave(){
-  localStorage.setItem('saa-db-v5',JSON.stringify(DB));
-  document.getElementById('ts-date').textContent=new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  try {
+    const json = JSON.stringify(DB);
+    localStorage.setItem('saa-db-v5', json);
+    const kb = Math.round(json.length / 1024);
+    document.getElementById('ts-date').textContent =
+      new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) +
+      ` · ${kb}KB`;
+  } catch(e) {
+    // localStorage cheio — tentar salvar sem arquivos base64
+    console.warn('localStorage cheio, salvando sem arquivos:', e);
+    try {
+      const dbSemArquivos = JSON.parse(JSON.stringify(DB));
+      // Remover base64 das memórias (manter metadados)
+      if(dbSemArquivos.governanca?.memorias){
+        dbSemArquivos.governanca.memorias = dbSemArquivos.governanca.memorias.map(m=>({
+          ...m, arquivo: m.arquivo ? {
+            nome: m.arquivo.nome, ext: m.arquivo.ext,
+            tipo: m.arquivo.tipo, tamanho: m.arquivo.tamanho,
+            base64: null, _truncated: true
+          } : null
+        }));
+      }
+      if(dbSemArquivos.governanca?.reunioes){
+        dbSemArquivos.governanca.reunioes = dbSemArquivos.governanca.reunioes.map(r=>({
+          ...r, arquivo: r.arquivo ? {
+            nome: r.arquivo.nome, ext: r.arquivo.ext,
+            tipo: r.arquivo.tipo, tamanho: r.arquivo.tamanho,
+            base64: null, _truncated: true
+          } : null
+        }));
+      }
+      localStorage.setItem('saa-db-v5', JSON.stringify(dbSemArquivos));
+      _showSaveWarning('⚠️ Armazenamento quase cheio. Arquivos grandes foram removidos do cache. Use links do Google Drive para arquivos acima de 1MB.');
+    } catch(e2) {
+      _showSaveWarning('❌ Não foi possível salvar. localStorage cheio. Exporte um backup JSON agora.');
+    }
+  }
+  document.getElementById('ts-date').textContent =
+    new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+
+function _showSaveWarning(msg){
+  let el = document.getElementById('save-warning-bar');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'save-warning-bar';
+    el.style.cssText = `position:fixed;bottom:60px;left:50%;transform:translateX(-50%);
+      background:#B71C1C;color:#fff;padding:10px 20px;border-radius:8px;
+      font-size:12px;z-index:9999;max-width:90%;text-align:center;
+      box-shadow:0 4px 20px rgba(0,0,0,.3)`;
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(()=>{ if(el) el.style.display='none'; }, 6000);
 }
 
 function saveAll(){
