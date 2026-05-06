@@ -1214,6 +1214,12 @@ body::after{ display:none }
       <button class="nav-item" onclick="goTo('briefing')" data-sec="briefing">
         <span class="nav-dot"></span>📋 Briefing Semanal
       </button>
+      <button class="nav-item" onclick="goTo('demandas')" data-sec="demandas">
+        <span class="nav-dot"></span>🗂 Mapa de Demandas
+      </button>
+      <button class="nav-item" onclick="goTo('decisoes')" data-sec="decisoes">
+        <span class="nav-dot"></span>⚖️ Quadro de Decisões
+      </button>
       <button class="nav-item" onclick="goTo('memoria')" data-sec="memoria">
         <span class="nav-dot"></span>📁 Memória & Arquivos
       </button>
@@ -1558,52 +1564,174 @@ body::after{ display:none }
       <div id="sec-governanca" class="section">
         <div class="sec-head">
           <div class="sec-title">🎯 Painel de <em>Governança</em></div>
-          <div class="sec-sub">SAA na Palma da Mão · Visão estratégica integrada · Subsecretaria de Assuntos Administrativos</div>
+          <div class="sec-sub">SAA na Palma da Mão · Modelo de Governança do Gabinete SAA · Coordenação Executiva: Dra. Máira Rocha</div>
         </div>
 
         <!-- Premissas -->
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
-          <div style="background:linear-gradient(135deg,#004B8D,#0068C1);border-radius:var(--radius);
-            padding:18px;text-align:center">
+          <div style="background:linear-gradient(135deg,#004B8D,#0068C1);border-radius:var(--radius);padding:18px;text-align:center">
             <div style="font-size:28px;margin-bottom:8px">🏛</div>
             <div style="font-family:var(--display);font-size:12px;font-weight:700;color:#fff;margin-bottom:4px">Responsabilidade</div>
             <div style="font-size:10px;color:rgba(255,255,255,.75);line-height:1.5">Cada área é responsável pela alimentação, manutenção e gestão das suas informações</div>
           </div>
-          <div style="background:linear-gradient(135deg,#1B873F,#2EA85A);border-radius:var(--radius);
-            padding:18px;text-align:center">
+          <div style="background:linear-gradient(135deg,#1B873F,#2EA85A);border-radius:var(--radius);padding:18px;text-align:center">
             <div style="font-size:28px;margin-bottom:8px">🔐</div>
             <div style="font-family:var(--display);font-size:12px;font-weight:700;color:#fff;margin-bottom:4px">Acesso Autorizado</div>
             <div style="font-size:10px;color:rgba(255,255,255,.75);line-height:1.5">Informações utilizadas apenas por pessoas autorizadas pelo GAB/SAA</div>
           </div>
-          <div style="background:linear-gradient(135deg,#C05C00,#D97706);border-radius:var(--radius);
-            padding:18px;text-align:center">
+          <div style="background:linear-gradient(135deg,#C05C00,#D97706);border-radius:var(--radius);padding:18px;text-align:center">
             <div style="font-size:28px;margin-bottom:8px">🔄</div>
             <div style="font-family:var(--display);font-size:12px;font-weight:700;color:#fff;margin-bottom:4px">Interprogramático</div>
             <div style="font-size:10px;color:rgba(255,255,255,.75);line-height:1.5">Ações conjuntas registradas pelas áreas responsáveis pela demanda</div>
           </div>
         </div>
 
-        <!-- Status de governança por coordenação -->
-        <div class="row-label" style="margin-bottom:10px">Status de Governança por Coordenação</div>
-        <div id="gov-status-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px"></div>
+        <!-- ── NÚCLEOS DO GABINETE ── -->
+        <div class="row-label" style="margin-bottom:12px">Estrutura Funcional do Gabinete SAA</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px">
 
-        <!-- Indicadores estratégicos da SAA -->
-        <div class="row-label" style="margin-bottom:10px">Indicadores Estratégicos da SAA</div>
-        <div id="gov-kpi-summary" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px"></div>
+          <!-- Coordenação Executiva -->
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+            <div style="background:#004B8D;padding:14px 18px">
+              <div style="font-family:var(--display);font-size:13px;font-weight:800;color:#fff">Coordenação Executiva</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:2px">Dra. Máira Rocha</div>
+            </div>
+            <div style="padding:14px 18px;font-size:11px;color:var(--text2);line-height:1.7">
+              <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">Produtos obrigatórios</div>
+              <div>📋 Pauta executiva semanal</div>
+              <div>🎯 Validação das prioridades</div>
+              <div>📤 Definição do que sobe ao SAA</div>
+              <div>📊 Relatório executivo semanal</div>
+              <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--text3)">Periodicidade: Sexta-feira</div>
+            </div>
+          </div>
 
-        <!-- Fluxo de dados -->
-        <div class="chart-wrap">
-          <div class="chart-title">Fluxo de Dados — SAA na Palma da Mão</div>
-          <div class="chart-sub">Ferramentas → Painéis → Informação → Conhecimento → Decisão</div>
-          <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-top:16px;flex-wrap:wrap;gap:4px">
-            ${['📊 Ferramentas<br><small>Excel · Power BI</small>','📋 Painéis<br><small>Consolidação</small>','💡 Informação<br><small>Dashboards</small>','🧠 Conhecimento<br><small>Análise IA</small>','⚡ Decisão<br><small>Gestão</small>'].map((t,i)=>`
-              <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);
-                padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:var(--text);
-                min-width:100px;flex:1;max-width:160px">${t}</div>
-              ${i<4?`<div style="color:var(--accent2);font-size:20px;font-weight:700">→</div>`:''}
-            `).join('')}
+          <!-- Núcleo de Agenda -->
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+            <div style="background:#1B873F;padding:14px 18px">
+              <div style="font-family:var(--display);font-size:13px;font-weight:800;color:#fff">Agenda e Articulação Institucional</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:2px">Gláucia Viviane · Barbara · Célia</div>
+            </div>
+            <div style="padding:14px 18px;font-size:11px;color:var(--text2);line-height:1.7">
+              <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">Produtos obrigatórios</div>
+              <div>📅 Agenda qualificada da semana</div>
+              <div>📝 Briefings de agenda e notas preparatórias</div>
+              <div>🔁 Registro de encaminhamentos pós-reunião</div>
+              <div>👥 Confirmação de participantes</div>
+              <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--text3)">Prazo: 24h antes dos compromissos · Quarta-feira</div>
+            </div>
+          </div>
+
+          <!-- Núcleo de Governança e Monitoramento -->
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+            <div style="background:#5E35B1;padding:14px 18px">
+              <div style="font-family:var(--display);font-size:13px;font-weight:800;color:#fff">Governança e Monitoramento</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:2px">Sabrina · Rayane</div>
+            </div>
+            <div style="padding:14px 18px;font-size:11px;color:var(--text2);line-height:1.7">
+              <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">Produtos obrigatórios</div>
+              <div>📊 Painel semanal das frentes</div>
+              <div>📋 Briefing executivo para o SAA</div>
+              <div>⚖️ Quadro de decisões e encaminhamentos</div>
+              <div>📰 Informe para Sala de Situação</div>
+              <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--text3)">Terça-feira 15h · Quinta-feira 15h · Sexta-feira</div>
+            </div>
+          </div>
+
+          <!-- Núcleo de Demandas -->
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+            <div style="background:#C05C00;padding:14px 18px">
+              <div style="font-family:var(--display);font-size:13px;font-weight:800;color:#fff">Demandas, Respostas e Expedientes</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:2px">Hilda · Manu · Giseli · Vitor · Cláudia</div>
+            </div>
+            <div style="padding:14px 18px;font-size:11px;color:var(--text2);line-height:1.7">
+              <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">Produtos obrigatórios</div>
+              <div>🗂 Mapa de demandas do Gabinete</div>
+              <div>📨 Respostas e expedientes qualificados</div>
+              <div>⏰ Controle de pendências e retornos</div>
+              <div>📌 Registro formal de encaminhamentos</div>
+              <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--text3)">Triagem diária 9h · Atualização contínua</div>
+            </div>
           </div>
         </div>
+
+        <!-- ── CALENDÁRIO SEMANAL ── -->
+        <div class="row-label" style="margin-bottom:12px">📅 Calendário Semanal de Governança</div>
+        <div style="overflow-x:auto;margin-bottom:24px">
+          <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:600px">
+            <thead>
+              <tr style="background:var(--accent)">
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">Dia</th>
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em">Horário</th>
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em">Rito</th>
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em">Responsável</th>
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em">Produto</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                {dia:'Diariamente',hora:'9h00',rito:'Triagem diária do Gabinete',resp:'Hilda | Demandas',produto:'Mapa de demandas atualizado; responsável e prazo',cor:''},
+                {dia:'Segunda',hora:'10h00',rito:'Reunião de alinhamento do Gabinete',resp:'Dra. Máira Rocha',produto:'Pauta executiva da semana; definição do que sobe ao SAA',cor:'#004B8D'},
+                {dia:'Terça',hora:'15h00',rito:'Consolidação de monitoramento',resp:'Rayane / Sabrina',produto:'Painel semanal das frentes; minuta do briefing executivo',cor:'#5E35B1'},
+                {dia:'Quarta',hora:'12h00',rito:'Preparação das interlocuções institucionais',resp:'Gláucia',produto:'Briefings de agenda; materiais preparatórios',cor:'#1B873F'},
+                {dia:'Quinta',hora:'15h00',rito:'Acompanhamento de retornos e informe executivo',resp:'Sabrina / Rayane / Hilda',produto:'Quadro de pendências; informe para Sala de Situação',cor:'#C05C00'},
+                {dia:'Sexta',hora:'11h00',rito:'Fechamento executivo da semana',resp:'Dra. Máira Rocha / Sabrina / Hilda / Gláucia',produto:'Relatório executivo semanal; quadro de decisões',cor:'#B71C1C'},
+              ].map((r,i)=>`
+              <tr style="background:${i%2===0?'var(--surface)':'var(--surface2)'};border-bottom:1px solid var(--border)">
+                <td style="padding:10px 12px;font-weight:700;color:${r.cor||'var(--accent)'};white-space:nowrap;font-family:var(--mono);font-size:10px">${r.dia}</td>
+                <td style="padding:10px 12px;font-family:var(--mono);color:var(--text2);white-space:nowrap">${r.hora}</td>
+                <td style="padding:10px 12px;font-weight:600;color:var(--text)">${r.rito}</td>
+                <td style="padding:10px 12px;color:var(--text2);font-size:10px">${r.resp}</td>
+                <td style="padding:10px 12px;color:var(--text3);font-size:10px">${r.produto}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── ALÇADAS DE DECISÃO ── -->
+        <div class="row-label" style="margin-bottom:12px">⚖️ Alçadas de Decisão</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+          <div style="background:var(--good-a);border:1px solid rgba(27,135,63,.2);border-radius:var(--radius);padding:16px">
+            <div style="font-family:var(--display);font-size:12px;font-weight:700;color:#1B873F;margin-bottom:10px">🟢 Resolve no Gabinete</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.7">
+              <div>· Ajustes ordinários de agenda</div>
+              <div>· Respostas de rotina</div>
+              <div>· Distribuição de demandas</div>
+              <div>· Cobrança de retornos</div>
+              <div>· Consolidação de informações operacionais</div>
+              <div>· Triagem de prioridade operacional</div>
+            </div>
+          </div>
+          <div style="background:var(--warn-a);border:1px solid rgba(192,92,0,.2);border-radius:var(--radius);padding:16px">
+            <div style="font-family:var(--display);font-size:12px;font-weight:700;color:#C05C00;margin-bottom:10px">🟡 Sobe para ciência do SAA</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.7">
+              <div>· Andamento das frentes prioritárias</div>
+              <div>· Riscos relevantes sob controle</div>
+              <div>· Agendas com repercussão institucional</div>
+              <div>· Pendências sensíveis em acompanhamento</div>
+              <div>· Interlocuções com SE, GM e secretarias</div>
+            </div>
+          </div>
+          <div style="background:var(--crit-a);border:1px solid rgba(183,28,28,.2);border-radius:var(--radius);padding:16px">
+            <div style="font-family:var(--display);font-size:12px;font-weight:700;color:#B71C1C;margin-bottom:10px">🔴 Sobe para decisão do SAA</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.7">
+              <div>· Conflito entre agendas concorrentes</div>
+              <div>· Impasse entre áreas</div>
+              <div>· Mudança de orientação estratégica</div>
+              <div>· Compromisso público</div>
+              <div>· Tema sensível com repercussão institucional</div>
+              <div>· Risco alto de prazo, exposição ou entrega</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status de governança por coordenação -->
+        <div class="row-label" style="margin-bottom:10px">Status de Governança por Coordenação</div>
+        <div id="gov-status-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px"></div>
+
+        <!-- Indicadores estratégicos -->
+        <div class="row-label" style="margin-bottom:10px">Indicadores Estratégicos da SAA</div>
+        <div id="gov-kpi-summary" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:20px"></div>
       </div>
 
       <!-- ══ BRIEFING SEMANAL ══ -->
@@ -1648,6 +1776,90 @@ body::after{ display:none }
         <!-- Histórico de briefings -->
         <div class="row-label" style="margin-top:20px">Histórico de Briefings</div>
         <div id="briefing-historico" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- ══ MAPA DE DEMANDAS ══ -->
+      <div id="sec-demandas" class="section">
+        <div class="sec-head">
+          <div class="sec-title">🗂 Mapa de <em>Demandas</em></div>
+          <div class="sec-sub">Controle de demandas do Gabinete SAA · Responsável: Hilda | Atualização diária 9h</div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+          <input id="dem-busca" class="narrativa-textarea"
+            style="min-height:unset;flex:1;padding:8px 12px;resize:none"
+            placeholder="🔍 Buscar por demanda, origem, responsável..."
+            oninput="renderDemandas()">
+          <select id="dem-filtro-status" class="ci-map-select" style="width:130px" onchange="renderDemandas()">
+            <option value="">Todos os status</option>
+            <option value="aberta">🔵 Aberta</option>
+            <option value="andamento">🟡 Em andamento</option>
+            <option value="concluida">✅ Concluída</option>
+            <option value="critica">🔴 Crítica</option>
+            <option value="cancelada">❌ Cancelada</option>
+          </select>
+          <select id="dem-filtro-esc" class="ci-map-select" style="width:140px" onchange="renderDemandas()">
+            <option value="">Todo escalonamento</option>
+            <option value="gabinete">Resolve no Gabinete</option>
+            <option value="ciencia">Ciência do SAA</option>
+            <option value="decisao">Decisão do SAA</option>
+          </select>
+          <button class="btn btn-primary locked" onclick="showAddDemanda()" style="font-size:11px;padding:8px 14px">+ Nova Demanda</button>
+        </div>
+
+        <!-- Cards resumo -->
+        <div id="dem-resumo" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:16px"></div>
+
+        <div id="demandas-lista" style="display:flex;flex-direction:column;gap:8px"></div>
+        <div id="demandas-vazio" style="display:none;text-align:center;padding:48px;color:var(--text3)">
+          <div style="font-size:40px;margin-bottom:10px">🗂</div>
+          <div style="font-size:14px;font-weight:600">Nenhuma demanda registrada</div>
+          <div style="font-size:12px;margin-top:4px">Clique em "+ Nova Demanda" para começar</div>
+        </div>
+      </div>
+
+      <!-- ══ QUADRO DE DECISÕES ══ -->
+      <div id="sec-decisoes" class="section">
+        <div class="sec-head">
+          <div class="sec-title">⚖️ Quadro de <em>Decisões</em></div>
+          <div class="sec-sub">Registro de decisões e encaminhamentos · Responsável: Sabrina | Consolidação: sexta-feira</div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+          <input id="dec-busca" class="narrativa-textarea"
+            style="min-height:unset;flex:1;padding:8px 12px;resize:none"
+            placeholder="🔍 Buscar por decisão, responsável, data..."
+            oninput="renderDecisoes()">
+          <select id="dec-filtro-status" class="ci-map-select" style="width:130px" onchange="renderDecisoes()">
+            <option value="">Todos</option>
+            <option value="pendente">⏳ Pendente</option>
+            <option value="andamento">🔄 Em andamento</option>
+            <option value="concluido">✅ Concluído</option>
+            <option value="cancelado">❌ Cancelado</option>
+          </select>
+          <button class="btn btn-primary locked" onclick="showAddDecisao()" style="font-size:11px;padding:8px 14px">+ Nova Decisão</button>
+        </div>
+
+        <div id="decisoes-lista" style="overflow-x:auto">
+          <table id="decisoes-table" style="width:100%;border-collapse:collapse;font-size:11px;min-width:700px">
+            <thead>
+              <tr style="background:var(--accent)">
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em">Decisão / Encaminhamento</th>
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase">Data</th>
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase">Responsável</th>
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase">Prazo</th>
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase">Status</th>
+                <th style="padding:10px 12px;text-align:left;color:#fff;font-family:var(--mono);font-size:9px;text-transform:uppercase">Obs.</th>
+                ${`<th style="padding:10px 12px;color:#fff;font-size:9px" class="locked">⚙</th>`}
+              </tr>
+            </thead>
+            <tbody id="decisoes-tbody"></tbody>
+          </table>
+          <div id="decisoes-vazio" style="display:none;text-align:center;padding:48px;color:var(--text3)">
+            <div style="font-size:40px;margin-bottom:10px">⚖️</div>
+            <div style="font-size:14px;font-weight:600">Nenhuma decisão registrada</div>
+          </div>
+        </div>
       </div>
 
       <!-- ══ MEMÓRIA & ARQUIVOS ══ -->
@@ -1932,7 +2144,10 @@ body::after{ display:none }
 <!-- ══ MODAL MEMÓRIA/ARQUIVO ══ -->
 <div class="modal-overlay" id="memoria-overlay">
   <div class="modal" style="max-width:600px">
-    <div class="modal-title" id="mem-modal-title">📁 Adicionar Arquivo / Memória</div>
+    <div class="modal-title" style="display:flex;align-items:center;justify-content:space-between">
+      <span id="mem-modal-title">📁 Adicionar Arquivo / Memória</span>
+      <button onclick="closeMemoriaModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);padding:0 4px;line-height:1" title="Fechar">✕</button>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="modal-field" style="grid-column:1/-1">
         <div class="modal-label">Título *</div>
@@ -2023,8 +2238,11 @@ body::after{ display:none }
 
 <!-- ══ MODAL REUNIÃO ══ -->
 <div class="modal-overlay" id="reuniao-overlay">
-  <div class="modal" style="max-width:560px">
-    <div class="modal-title">📅 Registrar Reunião</div>
+  <div class="modal" style="max-width:600px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="modal-title" style="margin:0" id="reu-modal-title">📅 Registrar Reunião</div>
+      <button onclick="closeReuniaoModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);padding:0 4px" title="Fechar">✕</button>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="modal-field" style="grid-column:1/-1">
         <div class="modal-label">Título da reunião *</div>
@@ -2048,14 +2266,19 @@ body::after{ display:none }
           <option value="geral">🏛 SAA · Geral</option>
         </select>
       </div>
-      <div class="modal-field" style="grid-column:1/-1">
-        <div class="modal-label">Pauta</div>
-        <textarea class="modal-input modal-textarea" id="reu-pauta" style="min-height:80px"
-          placeholder="Tópicos que serão discutidos..."></textarea>
-      </div>
-      <div class="modal-field" style="grid-column:1/-1">
+      <div class="modal-field">
         <div class="modal-label">Participantes</div>
         <input class="modal-input" id="reu-participantes" placeholder="Ex: Coordenadores, GAB/SAA, NPM...">
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Pauta / Objetivo</div>
+        <textarea class="modal-input modal-textarea" id="reu-pauta" style="min-height:70px"
+          placeholder="Tópicos, objetivos, contexto e encaminhamentos esperados..."></textarea>
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Encaminhamentos / Resultados</div>
+        <textarea class="modal-input modal-textarea" id="reu-encaminhamentos" style="min-height:60px"
+          placeholder="Decisões tomadas, responsáveis, prazos, próximos passos..."></textarea>
       </div>
       <div class="modal-field">
         <div class="modal-label">Status</div>
@@ -2065,10 +2288,43 @@ body::after{ display:none }
           <option value="cancelada">❌ Cancelada</option>
         </select>
       </div>
+      <div class="modal-field">
+        <div class="modal-label">Responsável pelo pós-reunião</div>
+        <input class="modal-input" id="reu-responsavel-pos" placeholder="Nome / matrícula">
+      </div>
+
+      <!-- Upload de arquivo -->
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">📎 Anexar arquivo (ata, briefing, material...)</div>
+        <div id="reu-upload-zone"
+          style="border:2px dashed var(--border2);border-radius:var(--radius-sm);
+          padding:14px;text-align:center;cursor:pointer;background:var(--surface2);transition:all var(--trans)"
+          onclick="document.getElementById('reu-file-inp').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+          ondragleave="this.style.borderColor='var(--border2)'"
+          ondrop="reuHandleDrop(event)">
+          <div id="reu-upload-empty">
+            <span style="font-size:20px">📂</span>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">Clique ou arraste o arquivo · PDF, Word, Excel, etc.</div>
+          </div>
+          <div id="reu-upload-preview" style="display:none;align-items:center;gap:10px;justify-content:center">
+            <span id="reu-file-ico" style="font-size:22px">📄</span>
+            <div style="text-align:left">
+              <div id="reu-file-nome" style="font-size:12px;font-weight:600;color:var(--text)"></div>
+              <div id="reu-file-size" style="font-size:10px;color:var(--text3)"></div>
+            </div>
+            <button onclick="event.stopPropagation();reuClearFile()"
+              style="background:var(--crit-a);border:1px solid var(--crit);color:var(--crit);border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer">✕</button>
+          </div>
+          <input type="file" id="reu-file-inp" style="display:none"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg"
+            onchange="reuHandleFile(this)">
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="document.getElementById('reuniao-overlay').classList.remove('open')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveReuniao()">Salvar</button>
+      <button class="btn" onclick="closeReuniaoModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveReuniao()">💾 Salvar</button>
     </div>
   </div>
 </div>
@@ -4066,6 +4322,9 @@ function saveMemoria(){
   if(!titulo){ alert('Digite o título.'); return; }
   initGov();
 
+  // Capturar arquivo ANTES de qualquer reset
+  const arquivoFinal = _memFileData;
+
   const dados = {
     titulo,
     tipo:        document.getElementById('mem-tipo').value,
@@ -4075,20 +4334,26 @@ function saveMemoria(){
     conteudo:    document.getElementById('mem-conteudo').value.trim(),
     link:        document.getElementById('mem-link').value.trim(),
     tags:        document.getElementById('mem-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
-    arquivo:     _memFileData || null,
+    arquivo:     arquivoFinal || null,
   };
 
   if(_memEditId){
-    // Editar existente
     const idx = DB.governanca.memorias.findIndex(m=>m.id===_memEditId);
-    if(idx>=0) DB.governanca.memorias[idx] = { ...DB.governanca.memorias[idx], ...dados };
+    if(idx>=0){
+      // Se não anexou novo arquivo, preservar o antigo
+      if(!arquivoFinal && DB.governanca.memorias[idx].arquivo)
+        dados.arquivo = DB.governanca.memorias[idx].arquivo;
+      DB.governanca.memorias[idx] = { ...DB.governanca.memorias[idx], ...dados };
+    }
   } else {
-    // Novo
     DB.governanca.memorias.unshift({ id:'MEM'+Date.now(), criadoEm:new Date().toLocaleString('pt-BR'), ...dados });
   }
 
   autoSave();
-  closeMemoriaModal();
+  // Fechar DEPOIS de salvar
+  document.getElementById('memoria-overlay').classList.remove('open');
+  _memEditId = null;
+  _memFileData = null;
   renderMemoria();
 }
 
@@ -4216,17 +4481,54 @@ function deleteMemoria(id){
   autoSave(); renderMemoria();
 }
 
-// ── Agenda & Reuniões ──
+// ── Agenda & Reuniões com upload ──
+let _reuEditId = null;
+let _reuFileData = null;
+
+function closeReuniaoModal(){
+  document.getElementById('reuniao-overlay').classList.remove('open');
+  _reuEditId = null; _reuFileData = null;
+}
+
+function reuHandleDrop(e){
+  e.preventDefault();
+  const f = e.dataTransfer.files[0]; if(f) _reuReadFile(f);
+}
+function reuHandleFile(input){ const f=input.files[0]; if(f) _reuReadFile(f); }
+function _reuReadFile(file){
+  if(file.size > 5*1024*1024){ alert('Arquivo muito grande. Limite: 5MB.'); return; }
+  const ext = file.name.split('.').pop()||'';
+  const reader = new FileReader();
+  reader.onload = e=>{
+    _reuFileData = { nome:file.name, ext, tipo:file.type, tamanho:file.size, base64:e.target.result };
+    document.getElementById('reu-upload-empty').style.display='none';
+    const prev = document.getElementById('reu-upload-preview');
+    prev.style.display='flex';
+    document.getElementById('reu-file-ico').textContent = fileIco(ext);
+    document.getElementById('reu-file-nome').textContent = file.name;
+    document.getElementById('reu-file-size').textContent = fmtSize(file.size);
+  };
+  reader.readAsDataURL(file);
+}
+function reuClearFile(){
+  _reuFileData = null;
+  document.getElementById('reu-file-inp').value='';
+  document.getElementById('reu-upload-empty').style.display='block';
+  document.getElementById('reu-upload-preview').style.display='none';
+}
+
 function showAddReuniao(){
   initGov();
-  document.getElementById('reu-titulo').value = '';
+  _reuEditId=null; _reuFileData=null;
+  document.getElementById('reu-modal-title').textContent='📅 Registrar Reunião';
+  ['reu-titulo','reu-hora','reu-local','reu-participantes','reu-pauta','reu-encaminhamentos','reu-responsavel-pos'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
   document.getElementById('reu-data').value = new Date().toISOString().slice(0,10);
-  document.getElementById('reu-hora').value = '';
-  document.getElementById('reu-local').value = '';
-  document.getElementById('reu-pauta').value = '';
-  document.getElementById('reu-participantes').value = '';
   document.getElementById('reu-status').value = 'agendada';
-  const sel = document.getElementById('reu-coord');
+  reuClearFile();
+  // Popular coordenações
+  const sel=document.getElementById('reu-coord');
   if(sel && sel.options.length<=1){
     Object.entries(DB.coords).forEach(([k,c])=>{
       const o=document.createElement('option'); o.value=k; o.textContent=c.acro; sel.appendChild(o);
@@ -4235,78 +4537,143 @@ function showAddReuniao(){
   document.getElementById('reuniao-overlay').classList.add('open');
 }
 
+function editReuniao(id){
+  initGov();
+  const r=(DB.governanca.reunioes||[]).find(r=>r.id===id); if(!r) return;
+  _reuEditId=id; _reuFileData=null;
+  document.getElementById('reu-modal-title').textContent='✏️ Editar Reunião';
+  document.getElementById('reu-titulo').value        = r.titulo||'';
+  document.getElementById('reu-data').value          = r.data||'';
+  document.getElementById('reu-hora').value          = r.hora||'';
+  document.getElementById('reu-local').value         = r.local||'';
+  document.getElementById('reu-participantes').value = r.participantes||'';
+  document.getElementById('reu-pauta').value         = r.pauta||'';
+  document.getElementById('reu-status').value        = r.status||'agendada';
+  document.getElementById('reu-encaminhamentos').value    = r.encaminhamentos||'';
+  document.getElementById('reu-responsavel-pos').value    = r.responsavelPos||'';
+  // Arquivo existente
+  if(r.arquivo){
+    _reuFileData=r.arquivo;
+    document.getElementById('reu-upload-empty').style.display='none';
+    const prev=document.getElementById('reu-upload-preview'); prev.style.display='flex';
+    document.getElementById('reu-file-ico').textContent=fileIco(r.arquivo.ext);
+    document.getElementById('reu-file-nome').textContent=r.arquivo.nome;
+    document.getElementById('reu-file-size').textContent=fmtSize(r.arquivo.tamanho);
+  } else { reuClearFile(); }
+  // Coord
+  const sel=document.getElementById('reu-coord');
+  if(sel && sel.options.length<=1){
+    Object.entries(DB.coords).forEach(([k,c])=>{
+      const o=document.createElement('option'); o.value=k; o.textContent=c.acro; sel.appendChild(o);
+    });
+  }
+  if(sel) sel.value=r.coord||'geral';
+  document.getElementById('reuniao-overlay').classList.add('open');
+}
+
 function saveReuniao(){
-  const titulo = document.getElementById('reu-titulo').value.trim();
+  const titulo=document.getElementById('reu-titulo').value.trim();
   if(!titulo){ alert('Digite o título.'); return; }
   initGov();
+  const arquivoFinal = _reuFileData;
   const reu = {
-    id: 'REU'+Date.now(),
     titulo,
-    data:          document.getElementById('reu-data').value,
-    hora:          document.getElementById('reu-hora').value.trim(),
-    local:         document.getElementById('reu-local').value.trim(),
-    coord:         document.getElementById('reu-coord').value,
-    pauta:         document.getElementById('reu-pauta').value.trim(),
-    participantes: document.getElementById('reu-participantes').value.trim(),
-    status:        document.getElementById('reu-status').value,
-    criadoEm:     new Date().toLocaleString('pt-BR'),
+    data:           document.getElementById('reu-data').value,
+    hora:           document.getElementById('reu-hora').value.trim(),
+    local:          document.getElementById('reu-local').value.trim(),
+    coord:          document.getElementById('reu-coord').value,
+    pauta:          document.getElementById('reu-pauta').value.trim(),
+    participantes:  document.getElementById('reu-participantes').value.trim(),
+    status:         document.getElementById('reu-status').value,
+    encaminhamentos:document.getElementById('reu-encaminhamentos').value.trim(),
+    responsavelPos: document.getElementById('reu-responsavel-pos').value.trim(),
+    arquivo:        arquivoFinal||null,
   };
-  DB.governanca.reunioes.unshift(reu);
-  autoSave();
-  document.getElementById('reuniao-overlay').classList.remove('open');
-  renderAgenda();
+  if(_reuEditId){
+    const idx=DB.governanca.reunioes.findIndex(r=>r.id===_reuEditId);
+    if(idx>=0){
+      if(!arquivoFinal && DB.governanca.reunioes[idx].arquivo) reu.arquivo=DB.governanca.reunioes[idx].arquivo;
+      DB.governanca.reunioes[idx]={...DB.governanca.reunioes[idx],...reu};
+    }
+  } else {
+    DB.governanca.reunioes.unshift({id:'REU'+Date.now(),criadoEm:new Date().toLocaleString('pt-BR'),...reu});
+  }
+  autoSave(); closeReuniaoModal(); renderAgenda();
+}
+
+function downloadReuniao(id){
+  const r=(DB.governanca.reunioes||[]).find(r=>r.id===id);
+  if(!r?.arquivo?.base64){ alert('Nenhum arquivo anexado.'); return; }
+  const a=document.createElement('a'); a.href=r.arquivo.base64; a.download=r.arquivo.nome; a.click();
 }
 
 function renderAgenda(){
   initGov();
-  const filtro = document.getElementById('agenda-filtro')?.value||'todas';
-  const hoje = new Date().toISOString().slice(0,10);
-
-  let reunioes = [...(DB.governanca.reunioes||[])];
-  if(filtro==='proximas') reunioes = reunioes.filter(r=>r.data>=hoje&&r.status==='agendada');
-  else if(filtro==='hoje')   reunioes = reunioes.filter(r=>r.data===hoje);
-  else if(filtro==='passadas') reunioes = reunioes.filter(r=>r.status==='realizada'||r.data<hoje);
-
+  const filtro=document.getElementById('agenda-filtro')?.value||'todas';
+  const hoje=new Date().toISOString().slice(0,10);
+  let reunioes=[...(DB.governanca.reunioes||[])];
+  if(filtro==='proximas') reunioes=reunioes.filter(r=>r.data>=hoje&&r.status==='agendada');
+  else if(filtro==='hoje') reunioes=reunioes.filter(r=>r.data===hoje);
+  else if(filtro==='passadas') reunioes=reunioes.filter(r=>r.status==='realizada'||r.data<hoje);
   reunioes.sort((a,b)=>a.data<b.data?1:-1);
 
-  const el = document.getElementById('agenda-lista'); if(!el) return;
-  const vazio = document.getElementById('agenda-vazio');
-
+  const el=document.getElementById('agenda-lista'); if(!el) return;
+  const vazio=document.getElementById('agenda-vazio');
   if(!reunioes.length){ el.innerHTML=''; if(vazio) vazio.style.display='block'; return; }
   if(vazio) vazio.style.display='none';
 
-  const STATUS_REU = { agendada:{cor:'#0277BD',ico:'🔵'}, realizada:{cor:'#1B873F',ico:'✅'}, cancelada:{cor:'#B71C1C',ico:'❌'} };
-  el.innerHTML = reunioes.map(r=>{
-    const st = STATUS_REU[r.status]||STATUS_REU.agendada;
-    const coordNome = r.coord&&DB.coords[r.coord]?DB.coords[r.coord].acro:'SAA';
-    const dataFmt = r.data?new Date(r.data+'T00:00').toLocaleDateString('pt-BR'):'—';
+  const ST={agendada:{cor:'#0277BD',ico:'🔵'},realizada:{cor:'#1B873F',ico:'✅'},cancelada:{cor:'#B71C1C',ico:'❌'}};
+  el.innerHTML=reunioes.map(r=>{
+    const st=ST[r.status]||ST.agendada;
+    const coordNome=r.coord&&DB.coords[r.coord]?DB.coords[r.coord].acro:'SAA';
+    const dataFmt=r.data?new Date(r.data+'T00:00').toLocaleDateString('pt-BR'):'—';
+    const temArq=!!r.arquivo;
     return `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-      padding:16px 18px;display:flex;align-items:flex-start;gap:14px;border-left:4px solid ${st.cor}">
-      <div style="flex-shrink:0;text-align:center;min-width:56px">
-        <div style="font-family:var(--display);font-size:18px;font-weight:800;color:${st.cor}">${dataFmt.slice(0,5)}</div>
-        <div style="font-family:var(--mono);font-size:8px;color:var(--text3)">${r.hora||'—'}</div>
-      </div>
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
-          <span style="font-size:13px;font-weight:700;color:var(--text)">${r.titulo}</span>
-          <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;
-            background:${st.cor}18;color:${st.cor}">${st.ico} ${r.status}</span>
-          <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${coordNome}</span>
+      overflow:hidden;border-left:4px solid ${st.cor}">
+      <!-- Cabeçalho da reunião -->
+      <div style="padding:14px 18px;display:flex;align-items:flex-start;gap:14px">
+        <div style="flex-shrink:0;text-align:center;min-width:56px">
+          <div style="font-family:var(--display);font-size:18px;font-weight:800;color:${st.cor}">${dataFmt.slice(0,5)}</div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text3)">${r.hora||'—'}</div>
         </div>
-        ${r.local?`<div style="font-size:11px;color:var(--text2);margin-bottom:4px">📍 ${r.local}</div>`:''}
-        ${r.pauta?`<div style="font-size:11px;color:var(--text2);line-height:1.5">${r.pauta.slice(0,120)}${r.pauta.length>120?'...':''}</div>`:''}
-        ${r.participantes?`<div style="font-size:10px;color:var(--text3);margin-top:4px">👥 ${r.participantes}</div>`:''}
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
+            <span style="font-size:13px;font-weight:700;color:var(--text)">${escHtml(r.titulo)}</span>
+            <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;background:${st.cor}18;color:${st.cor}">${st.ico} ${r.status}</span>
+            <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${coordNome}</span>
+          </div>
+          ${r.local?`<div style="font-size:11px;color:var(--text2);margin-bottom:4px">📍 ${escHtml(r.local)}</div>`:''}
+          ${r.participantes?`<div style="font-size:11px;color:var(--text2);margin-bottom:4px">👥 ${escHtml(r.participantes)}</div>`:''}
+          ${r.pauta?`<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:4px"><b>Pauta:</b> ${escHtml(r.pauta.slice(0,120))}${r.pauta.length>120?'...':''}</div>`:''}
+          ${r.encaminhamentos?`<div style="font-size:11px;color:var(--accent2);line-height:1.5;margin-top:6px;padding:6px 10px;background:var(--good-a);border-radius:4px"><b>Encaminhamentos:</b> ${escHtml(r.encaminhamentos.slice(0,150))}${r.encaminhamentos.length>150?'...':''}</div>`:''}
+          ${r.responsavelPos?`<div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px">📌 Responsável pós-reunião: ${escHtml(r.responsavelPos)}</div>`:''}
+        </div>
+        <!-- Ações -->
+        <div style="display:flex;gap:4px;flex-shrink:0;flex-direction:column">
+          ${isEdit()?`
+          <button onclick="editReuniao('${r.id}')"
+            style="background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 8px;
+            cursor:pointer;color:var(--text3);font-size:11px" title="Editar">✏️</button>
+          <select onchange="updateReuniaoStatus('${r.id}',this.value)"
+            style="font-size:9px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:3px">
+            <option value="agendada" ${r.status==='agendada'?'selected':''}>🔵 Agendada</option>
+            <option value="realizada" ${r.status==='realizada'?'selected':''}>✅ Realizada</option>
+            <option value="cancelada" ${r.status==='cancelada'?'selected':''}>❌ Cancelada</option>
+          </select>
+          <button onclick="deleteReuniao('${r.id}')"
+            style="background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 8px;
+            cursor:pointer;color:var(--text3);font-size:11px" title="Remover">🗑</button>`:''}
+        </div>
       </div>
-      ${isEdit()?`
-      <div style="display:flex;gap:4px;flex-shrink:0">
-        <select onchange="updateReuniaoStatus('${r.id}',this.value)"
-          style="font-size:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:4px">
-          <option value="agendada" ${r.status==='agendada'?'selected':''}>Agendada</option>
-          <option value="realizada" ${r.status==='realizada'?'selected':''}>Realizada</option>
-          <option value="cancelada" ${r.status==='cancelada'?'selected':''}>Cancelada</option>
-        </select>
-        <button onclick="deleteReuniao('${r.id}')" style="background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--text3);font-size:11px">🗑</button>
+      <!-- Rodapé com download -->
+      ${temArq?`
+      <div style="padding:8px 18px;border-top:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:8px">
+        <span style="font-size:14px">${fileIco(r.arquivo.ext)}</span>
+        <span style="font-size:11px;color:var(--text2);flex:1">${escHtml(r.arquivo.nome)} <span style="color:var(--text3);font-family:var(--mono)">(${fmtSize(r.arquivo.tamanho)})</span></span>
+        <button onclick="downloadReuniao('${r.id}')"
+          style="background:var(--accent);color:#fff;border:none;border-radius:5px;padding:5px 12px;
+          font-size:11px;font-weight:600;cursor:pointer">⬇ Baixar</button>
       </div>`:''}
     </div>`;
   }).join('');
@@ -4324,6 +4691,209 @@ function deleteReuniao(id){
 
 // Chamar no startApp para garantir inicialização
 const _origStartApp = startApp;
+
+// ══════════════════════════════════════════════
+// MAPA DE DEMANDAS
+// ══════════════════════════════════════════════
+const DEM_STATUS={
+  aberta:   {cor:'#0277BD',bg:'rgba(2,119,189,.12)',  ico:'🔵',label:'Aberta'},
+  andamento:{cor:'#C05C00',bg:'rgba(192,92,0,.12)',   ico:'🟡',label:'Em andamento'},
+  concluida:{cor:'#1B873F',bg:'rgba(27,135,63,.12)',  ico:'✅',label:'Concluída'},
+  critica:  {cor:'#B71C1C',bg:'rgba(183,28,28,.12)',  ico:'🔴',label:'Crítica'},
+  cancelada:{cor:'#6B7280',bg:'rgba(107,114,128,.1)', ico:'❌',label:'Cancelada'},
+};
+const DEM_ESC={
+  gabinete:{label:'Resolve no Gabinete',cor:'#1B873F'},
+  ciencia: {label:'Ciência do SAA',    cor:'#C05C00'},
+  decisao: {label:'Decisão do SAA',    cor:'#B71C1C'},
+};
+
+function showAddDemanda(){ _openDemModal(null); }
+
+function _openDemModal(id){
+  initGov();
+  if(!DB.governanca.demandas) DB.governanca.demandas=[];
+  const d=id?(DB.governanca.demandas.find(d=>d.id===id)||null):null;
+  document.getElementById('modal-title').textContent=id?'✏️ Editar Demanda':'🗂 Nova Demanda';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Demanda recebida *</div>
+        <textarea class="modal-input modal-textarea" id="dem-titulo" style="min-height:60px"
+          placeholder="Descreva a demanda...">${d?.titulo||''}</textarea>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Origem</div>
+        <input class="modal-input" id="dem-origem" placeholder="Ex: Ofício, Gabinete/SE, telefone..." value="${d?.origem||''}">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Responsável principal</div>
+        <input class="modal-input" id="dem-resp" placeholder="Nome / matrícula" value="${d?.resp||''}">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Área de apoio</div>
+        <input class="modal-input" id="dem-apoio" placeholder="Ex: Governança e Monitoramento" value="${d?.apoio||''}">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Prazo</div>
+        <input class="modal-input" id="dem-prazo" placeholder="Ex: 15/05/2026" value="${d?.prazo||''}">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Status</div>
+        <select class="modal-input" id="dem-status">
+          ${Object.entries(DEM_STATUS).map(([k,v])=>`<option value="${k}" ${d?.status===k?'selected':''}>${v.ico} ${v.label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Escalonamento</div>
+        <select class="modal-input" id="dem-esc">
+          ${Object.entries(DEM_ESC).map(([k,v])=>`<option value="${k}" ${d?.escalonamento===k?'selected':''}>${v.label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Observações</div>
+        <input class="modal-input" id="dem-obs" placeholder="Contexto, situação atual..." value="${d?.obs||''}">
+      </div>
+    </div>`;
+  _pa=()=>{
+    const titulo=document.getElementById('dem-titulo').value.trim();
+    if(!titulo){ alert('Descreva a demanda.'); return; }
+    const obj={titulo,origem:document.getElementById('dem-origem').value.trim(),
+      resp:document.getElementById('dem-resp').value.trim(),apoio:document.getElementById('dem-apoio').value.trim(),
+      prazo:document.getElementById('dem-prazo').value.trim(),obs:document.getElementById('dem-obs').value.trim(),
+      status:document.getElementById('dem-status').value,escalonamento:document.getElementById('dem-esc').value};
+    if(id){ const idx=DB.governanca.demandas.findIndex(d=>d.id===id);
+      if(idx>=0) DB.governanca.demandas[idx]={...DB.governanca.demandas[idx],...obj};
+    } else { DB.governanca.demandas.unshift({id:'DEM'+Date.now(),criadoEm:new Date().toLocaleString('pt-BR'),...obj}); }
+    autoSave(); closeModal(); renderDemandas();
+  };
+  openModal();
+}
+
+function renderDemandas(){
+  initGov();
+  if(!DB.governanca.demandas) DB.governanca.demandas=[];
+  const busca=document.getElementById('dem-busca')?.value.toLowerCase()||'';
+  const fS=document.getElementById('dem-filtro-status')?.value||'';
+  const fE=document.getElementById('dem-filtro-esc')?.value||'';
+  const lista=(DB.governanca.demandas||[]).filter(d=>{
+    return (!busca||(d.titulo+d.origem+d.resp+d.obs).toLowerCase().includes(busca))&&(!fS||d.status===fS)&&(!fE||d.escalonamento===fE);
+  });
+  const res=document.getElementById('dem-resumo');
+  if(res){
+    const all=DB.governanca.demandas||[];
+    const cards=[{lbl:'Total',val:all.length,col:'var(--accent)'},{lbl:'Abertas',val:all.filter(d=>d.status==='aberta').length,col:'#0277BD'},
+      {lbl:'Concluídas',val:all.filter(d=>d.status==='concluida').length,col:'#1B873F'},{lbl:'Críticas',val:all.filter(d=>d.status==='critica').length,col:'#B71C1C'}];
+    res.innerHTML=cards.map(c=>`<div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid ${c.col};border-radius:var(--radius);padding:12px;text-align:center">
+      <div style="font-family:var(--display);font-size:22px;font-weight:800;color:${c.col}">${c.val}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase">${c.lbl}</div></div>`).join('');
+  }
+  const el=document.getElementById('demandas-lista'); if(!el) return;
+  const vazio=document.getElementById('demandas-vazio');
+  if(!lista.length){ el.innerHTML=''; if(vazio) vazio.style.display='block'; return; }
+  if(vazio) vazio.style.display='none';
+  el.innerHTML=lista.map(d=>{
+    const st=DEM_STATUS[d.status]||DEM_STATUS.aberta;
+    const esc=DEM_ESC[d.escalonamento]||DEM_ESC.gabinete;
+    const vencido=d.prazo&&isPrazoVencido(d.prazo)&&d.status!=='concluida';
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+      padding:14px 18px;display:flex;align-items:flex-start;gap:12px;border-left:4px solid ${st.cor}">
+      <span style="font-size:18px;flex-shrink:0">${st.ico}</span>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;margin-bottom:5px">
+          <span style="font-size:12px;font-weight:700;color:var(--text)">${escHtml(d.titulo)}</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;background:${st.bg};color:${st.cor}">${st.label}</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;background:${esc.cor}18;color:${esc.cor}">${esc.label}</span>
+          ${vencido?`<span style="font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;background:var(--crit-a);color:var(--crit)">⚠ Prazo vencido</span>`:''}
+        </div>
+        <div style="font-size:11px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap">
+          ${d.origem?`<span>🔵 ${escHtml(d.origem)}</span>`:''}
+          ${d.resp?`<span>👤 <b>${escHtml(d.resp)}</b></span>`:''}
+          ${d.apoio?`<span>🤝 ${escHtml(d.apoio)}</span>`:''}
+          ${d.prazo?`<span>📅 <b style="color:${vencido?'var(--crit)':'inherit'}">${escHtml(d.prazo)}</b></span>`:''}
+          ${d.obs?`<span style="color:var(--text3)">${escHtml(d.obs.slice(0,80))}${d.obs.length>80?'...':''}</span>`:''}
+        </div>
+      </div>
+      ${isEdit()?`<div style="display:flex;gap:4px;flex-shrink:0">
+        <button onclick="_openDemModal('${d.id}')" style="background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--text3);font-size:11px">✏️</button>
+        <button onclick="deleteDemanda('${d.id}')" style="background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--text3);font-size:11px">🗑</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+function deleteDemanda(id){ if(!confirm('Remover?')) return; DB.governanca.demandas=(DB.governanca.demandas||[]).filter(d=>d.id!==id); autoSave(); renderDemandas(); }
+
+// ══════════════════════════════════════════════
+// QUADRO DE DECISÕES
+// ══════════════════════════════════════════════
+const DEC_STATUS={pendente:{cor:'#C05C00',ico:'⏳'},andamento:{cor:'#0277BD',ico:'🔄'},concluido:{cor:'#1B873F',ico:'✅'},cancelado:{cor:'#6B7280',ico:'❌'}};
+
+function showAddDecisao(){ _openDecModal(null); }
+function _openDecModal(id){
+  initGov(); if(!DB.governanca.decisoes) DB.governanca.decisoes=[];
+  const d=id?(DB.governanca.decisoes.find(d=>d.id===id)||null):null;
+  document.getElementById('modal-title').textContent=id?'✏️ Editar Decisão':'⚖️ Nova Decisão / Encaminhamento';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field" style="grid-column:1/-1">
+        <div class="modal-label">Decisão / Encaminhamento *</div>
+        <textarea class="modal-input modal-textarea" id="dec-texto" style="min-height:80px"
+          placeholder="Descreva a decisão ou encaminhamento...">${d?.texto||''}</textarea>
+      </div>
+      <div class="modal-field"><div class="modal-label">Data</div>
+        <input class="modal-input" id="dec-data" type="date" value="${d?.data||new Date().toISOString().slice(0,10)}"></div>
+      <div class="modal-field"><div class="modal-label">Responsável</div>
+        <input class="modal-input" id="dec-resp" placeholder="Nome / matrícula" value="${d?.resp||''}"></div>
+      <div class="modal-field"><div class="modal-label">Prazo</div>
+        <input class="modal-input" id="dec-prazo" placeholder="Ex: 30/05/2026" value="${d?.prazo||''}"></div>
+      <div class="modal-field"><div class="modal-label">Status</div>
+        <select class="modal-input" id="dec-status">
+          ${Object.entries(DEC_STATUS).map(([k,v])=>`<option value="${k}" ${d?.status===k?'selected':''}>${v.ico} ${k.charAt(0).toUpperCase()+k.slice(1)}</option>`).join('')}
+        </select></div>
+      <div class="modal-field" style="grid-column:1/-1"><div class="modal-label">Observações</div>
+        <input class="modal-input" id="dec-obs" placeholder="Contexto, origem..." value="${d?.obs||''}"></div>
+    </div>`;
+  _pa=()=>{
+    const texto=document.getElementById('dec-texto').value.trim(); if(!texto){ alert('Descreva a decisão.'); return; }
+    const obj={texto,data:document.getElementById('dec-data').value,resp:document.getElementById('dec-resp').value.trim(),
+      prazo:document.getElementById('dec-prazo').value.trim(),status:document.getElementById('dec-status').value,
+      obs:document.getElementById('dec-obs').value.trim()};
+    if(id){ const idx=DB.governanca.decisoes.findIndex(d=>d.id===id); if(idx>=0) DB.governanca.decisoes[idx]={...DB.governanca.decisoes[idx],...obj}; }
+    else { DB.governanca.decisoes.unshift({id:'DEC'+Date.now(),criadoEm:new Date().toLocaleString('pt-BR'),...obj}); }
+    autoSave(); closeModal(); renderDecisoes();
+  };
+  openModal();
+}
+
+function renderDecisoes(){
+  initGov(); if(!DB.governanca.decisoes) DB.governanca.decisoes=[];
+  const busca=document.getElementById('dec-busca')?.value.toLowerCase()||'';
+  const fS=document.getElementById('dec-filtro-status')?.value||'';
+  const lista=(DB.governanca.decisoes||[]).filter(d=>(!busca||(d.texto+d.resp+d.obs).toLowerCase().includes(busca))&&(!fS||d.status===fS));
+  const tbody=document.getElementById('decisoes-tbody'); if(!tbody) return;
+  const vazio=document.getElementById('decisoes-vazio');
+  if(!lista.length){ tbody.innerHTML=''; if(vazio) vazio.style.display='block'; return; }
+  if(vazio) vazio.style.display='none';
+  tbody.innerHTML=lista.map((d,i)=>{
+    const st=DEC_STATUS[d.status]||DEC_STATUS.pendente;
+    const dataFmt=d.data?new Date(d.data+'T00:00').toLocaleDateString('pt-BR'):'—';
+    const vencido=d.prazo&&isPrazoVencido(d.prazo)&&d.status!=='concluido';
+    return `<tr style="background:${i%2===0?'var(--surface)':'var(--surface2)'};border-bottom:1px solid var(--border)">
+      <td style="padding:10px 12px;color:var(--text);font-size:11px;max-width:280px">${escHtml(d.texto)}</td>
+      <td style="padding:10px 12px;font-family:var(--mono);color:var(--text2);white-space:nowrap;font-size:10px">${dataFmt}</td>
+      <td style="padding:10px 12px;color:var(--text2);font-size:11px">${escHtml(d.resp||'—')}</td>
+      <td style="padding:10px 12px;font-family:var(--mono);font-size:10px;color:${vencido?'var(--crit)':'var(--text2)'}">
+        ${d.prazo?escHtml(d.prazo):'—'}${vencido?' ⚠':''}</td>
+      <td style="padding:10px 12px"><span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;background:${st.cor}18;color:${st.cor}">${st.ico} ${d.status}</span></td>
+      <td style="padding:10px 12px;color:var(--text3);font-size:10px">${escHtml(d.obs||'—')}</td>
+      ${isEdit()?`<td style="padding:6px 8px;white-space:nowrap">
+        <button onclick="_openDecModal('${d.id}')" style="background:none;border:1px solid var(--border2);border-radius:3px;padding:3px 6px;cursor:pointer;color:var(--text3);font-size:10px">✏️</button>
+        <button onclick="deleteDecisao('${d.id}')" style="background:none;border:1px solid var(--border2);border-radius:3px;padding:3px 6px;cursor:pointer;color:var(--text3);font-size:10px">🗑</button>
+      </td>`:`<td></td>`}
+    </tr>`;
+  }).join('');
+}
+function deleteDecisao(id){ if(!confirm('Remover?')) return; DB.governanca.decisoes=(DB.governanca.decisoes||[]).filter(d=>d.id!==id); autoSave(); renderDecisoes(); }
 
 let _ciState = { coordKey:'', rawData:[], headers:[], mapping:{}, source:'' };
 
@@ -4932,6 +5502,8 @@ const TITLES={
   alertas:'Alertas e Riscos',
   governanca:'Painel de Governança',
   briefing:'Briefing Semanal',
+  demandas:'Mapa de Demandas',
+  decisoes:'Quadro de Decisões',
   memoria:'Memória & Arquivos',
   agenda:'Agenda & Reuniões',
   'coasup-regional':'COASUP · Painel Regional',
@@ -5210,6 +5782,8 @@ function goTo(key){
   if(key==='importar') initImportSection();
   if(key==='governanca') renderGovernanca();
   if(key==='briefing') renderBriefing();
+  if(key==='demandas') renderDemandas();
+  if(key==='decisoes') renderDecisoes();
   if(key==='memoria') renderMemoria();
   if(key==='agenda') renderAgenda();
 
