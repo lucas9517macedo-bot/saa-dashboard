@@ -1150,6 +1150,30 @@ body::after{ display:none }
   z-index:499;
 }
 .sidebar-overlay.open{display:block}
+
+/* ══ FRENTES SAA — Estilos ══ */
+.f-ta{width:100%;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+  padding:12px 14px;font-family:var(--font);font-size:12px;color:var(--text);outline:none;
+  resize:vertical;line-height:1.65;min-height:80px;transition:border-color var(--trans)}
+.f-ta:focus{border-color:var(--accent)}
+.f-itabs{display:flex;border-bottom:1px solid var(--border2);margin-bottom:14px;overflow-x:auto;gap:0}
+.f-itab{padding:7px 14px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:600;
+  color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:all var(--trans);white-space:nowrap;font-family:var(--font)}
+.f-itab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.f-itab:hover{color:var(--accent)}
+.f-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.f-tbl th{background:var(--accent);color:var(--bg);padding:8px 10px;text-align:left;
+  font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.06em}
+.f-tbl td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text2)}
+.f-tbl tr:nth-child(even) td{background:var(--surface2)}
+.f-upzone{border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:18px;
+  text-align:center;cursor:pointer;background:var(--surface2);transition:all var(--trans)}
+.f-upzone:hover,.f-upzone.dg{border-color:var(--accent);background:var(--good-a)}
+.f-chip{font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:3px;
+  background:var(--surface2);color:var(--text2);border:1px solid var(--border);
+  display:inline-block;margin:2px}
+
 </style>
 </head>
 <body>
@@ -1237,6 +1261,34 @@ body::after{ display:none }
       <div id="coord-nav"></div>
     </div>
 
+
+    <div class="nav-section">
+      <div class="nav-label">🎯 Frentes SAA</div>
+      <button class="nav-item" onclick="goTo('frentes')" data-sec="frentes">
+        <span class="nav-dot"></span>🖐 Visão Geral
+      </button>
+      <button class="nav-item" onclick="goTo('frentes-painel')" data-sec="frentes-painel">
+        <span class="nav-dot"></span>📊 Painel Semanal
+      </button>
+      <button class="nav-item" onclick="goTo('frentes-briefing')" data-sec="frentes-briefing">
+        <span class="nav-dot"></span>⚡ Briefing Dr. Alan
+      </button>
+      <button class="nav-item" onclick="goTo('frente-f1')" data-sec="frente-f1">
+        <span class="nav-dot"></span>1 · Pessoas
+      </button>
+      <button class="nav-item" onclick="goTo('frente-f2')" data-sec="frente-f2">
+        <span class="nav-dot"></span>2 · Infraestrutura
+      </button>
+      <button class="nav-item" onclick="goTo('frente-f3')" data-sec="frente-f3">
+        <span class="nav-dot"></span>3 · Contratos
+      </button>
+      <button class="nav-item" onclick="goTo('frente-f4')" data-sec="frente-f4">
+        <span class="nav-dot"></span>4 · Governança
+      </button>
+      <button class="nav-item" onclick="goTo('frente-f5')" data-sec="frente-f5">
+        <span class="nav-dot"></span>5 · Projetos
+      </button>
+    </div>
     <div class="nav-section">
       <div class="nav-label">⚙ Sistema</div>
       <button class="nav-item" onclick="goTo('importar')" data-sec="importar">
@@ -2132,6 +2184,924 @@ body::after{ display:none }
         </div>
       </div>
 
+    
+      <!-- FRENTES SAA — VISÃO GERAL -->
+      <div id="sec-frentes" class="section">
+        <div class="sec-head">
+          <div class="sec-title">🎯 Frentes de <em>Trabalho</em></div>
+          <div class="sec-sub">GAB/SAA · 5 frentes estratégicas · Monitoramento executivo integrado</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#004B8D,#1B873F);border-radius:var(--radius);padding:16px 22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-family:var(--display);font-size:16px;font-weight:800;color:#fff">Frentes de Trabalho — GAB/SAA</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.75);font-family:var(--mono);margin-top:3px">Sala de Situação SAA · Ministério da Saúde · Monitoramento executivo</div>
+          </div>
+        </div>
+        <div id="frentes-cards-visao" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px"></div>
+        <div class="row-label">Composição e responsáveis</div>
+        <div style="overflow-x:auto"><table class="f-tbl" style="min-width:640px">
+          <thead><tr><th>Frente</th><th>Ativador</th><th>Sistematizador</th><th>Coordenações</th><th>Reunião estratégica</th></tr></thead>
+          <tbody>
+            <tr><td><b>1 · Pessoas</b></td><td>Sérgio Henrique Moreira</td><td>Claudia Spinola</td><td>COGEP · NATT · Gabinete · COASUP</td><td>Sexta-feira 1,5h</td></tr>
+            <tr><td><b>2 · Infraestrutura</b></td><td>Joice (Sub: Jordana)</td><td>Rogério (Sub: Felipe Sousa)</td><td>CGINFRA · COASUP · CGOF · CGLIC · CGFISC</td><td>Quinta-feira manhã 1,5h</td></tr>
+            <tr><td><b>3 · Contratos</b></td><td>Marcello Novaes</td><td>Marta</td><td>CGLIC · CGOF · CGFISC · COGEP</td><td>Quinta-feira manhã 1,5h</td></tr>
+            <tr><td><b>4 · Governança</b></td><td>Soraia Pires</td><td>Vitor (Sub: Giseli)</td><td>Gabinete · CGDI · CODIPE · COASUP</td><td>Quarta-feira 1,5h</td></tr>
+            <tr><td><b>5 · Projetos</b></td><td>Dr. Alan</td><td>Nayla</td><td>Gabinete · NUPP · NPM · COASUP · CGOF</td><td>Quarta-feira manhã 1,5h</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <!-- FRENTES SAA — PAINEL SEMANAL -->
+      <div id="sec-frentes-painel" class="section">
+        <div class="sec-head">
+          <div class="sec-title">📊 Painel <em>Semanal</em> das Frentes</div>
+          <div class="sec-sub">Visão macro das entregas, riscos e prioridades das frentes</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div class="chart-wrap"><div class="chart-title">✅ Entregas críticas da semana</div>
+            <textarea class="f-ta" id="f-p-entregas" placeholder="Liste as principais entregas..."></textarea></div>
+          <div class="chart-wrap"><div class="chart-title">⚠️ Riscos e pontos de atenção</div>
+            <textarea class="f-ta" id="f-p-riscos" placeholder="Identifique os riscos..."></textarea></div>
+          <div class="chart-wrap"><div class="chart-title">⏳ Pendências em aberto</div>
+            <textarea class="f-ta" id="f-p-pendencias" placeholder="O que está pendente..."></textarea></div>
+          <div class="chart-wrap"><div class="chart-title">🔜 Próximos passos</div>
+            <textarea class="f-ta" id="f-p-proximos" placeholder="Próximas ações prioritárias..."></textarea></div>
+        </div>
+        <div class="chart-wrap" style="margin-bottom:14px">
+          <div class="chart-title">📝 Atualização por frente</div>
+          <div id="f-painel-updates" style="display:flex;flex-direction:column;gap:8px;margin-top:10px"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input id="f-p-autor" class="narrativa-autor-input" placeholder="Responsável">
+          <button class="btn btn-primary" style="font-size:11px" onclick="fSalvarPainel()">💾 Salvar painel</button>
+          <button class="btn" style="font-size:11px" onclick="fExportarBriefing()">📄 Exportar</button>
+          <span id="f-p-ts" style="font-family:var(--mono);font-size:10px;color:var(--text3)"></span>
+        </div>
+      </div>
+
+      <!-- FRENTES SAA — BRIEFING DR. ALAN -->
+      <div id="sec-frentes-briefing" class="section">
+        <div style="background:linear-gradient(135deg,rgba(0,75,141,.05),rgba(27,135,63,.05));border:1px solid var(--border2);border-radius:var(--radius);padding:22px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+            <div>
+              <div style="font-family:var(--display);font-size:17px;font-weight:800;color:var(--text)">⚡ Briefing Executivo — Dr. Alan</div>
+              <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:3px">Sala de Situação SAA · GAB/SAA · Resumo executivo semanal das Frentes</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary" onclick="fSalvarBriefing()">💾 Salvar</button>
+              <button class="btn" onclick="fExportarBriefing()">📄 Exportar</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div class="chart-wrap"><div class="chart-title">📊 Situação geral</div>
+              <textarea class="f-ta" id="f-b-situacao" style="font-size:12px" placeholder="Panorama sintético das frentes..."></textarea></div>
+            <div class="chart-wrap"><div class="chart-title">🔴 Pontos críticos</div>
+              <textarea class="f-ta" id="f-b-criticos" style="font-size:12px" placeholder="Principais pontos críticos..."></textarea></div>
+            <div class="chart-wrap"><div class="chart-title">⚠️ Riscos identificados</div>
+              <textarea class="f-ta" id="f-b-riscos" style="font-size:12px" placeholder="Riscos identificados..."></textarea></div>
+            <div class="chart-wrap"><div class="chart-title">📨 Encaminhamentos</div>
+              <textarea class="f-ta" id="f-b-encam" style="font-size:12px" placeholder="Encaminhamentos necessários..."></textarea></div>
+            <div class="chart-wrap"><div class="chart-title">🎯 Prioridades da semana</div>
+              <textarea class="f-ta" id="f-b-prio" style="font-size:12px" placeholder="O que priorizar esta semana..."></textarea></div>
+            <div class="chart-wrap"><div class="chart-title">🚨 Alertas estratégicos</div>
+              <textarea class="f-ta" id="f-b-alertas" style="font-size:12px" placeholder="Alertas para ciência do Dr. Alan..."></textarea></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="f-b-autor" class="narrativa-autor-input" placeholder="Responsável pelo briefing">
+            <span id="f-b-ts" style="font-family:var(--mono);font-size:10px;color:var(--text3)"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FRENTE 1: PESSOAS -->
+      <div id="sec-frente-f1" class="section">
+        <div style="border-left:4px solid #004B8D;padding-left:16px;margin-bottom:20px">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">FRENTE 1 · GAB/SAA · Sala de Situação SAA</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+            <div style="font-family:var(--display);font-size:20px;font-weight:800;color:#004B8D">Pessoas</div>
+            <select id="f-status-f1" class="kpi-unit-input" style="font-size:11px;font-weight:600"
+              onchange="fSaveField('f1','status',this.value);renderFVisao()">
+              <option value="andamento">🟡 Em andamento</option>
+              <option value="ok">🟢 No prazo</option>
+              <option value="critico">🔴 Crítico</option>
+              <option value="concluido">✅ Concluída</option>
+            </select>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div id="f-semaph-f1" style="width:10px;height:10px;border-radius:50%;background:#C05C00;box-shadow:0 0 6px #C05C00"></div>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Status</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <input type="number" id="f-pct-f1" min="0" max="100" value="0"
+                style="width:52px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-family:var(--mono);font-size:10px;font-weight:700;color:#004B8D;outline:none"
+                onblur="fSaveField('f1','pct',this.value)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">%</span>
+            </div>
+            <span id="f-ts-f1" style="font-family:var(--mono);font-size:9px;color:var(--text3)"></span>
+          </div>
+        </div>
+
+        <div class="f-itabs">
+          <button id="f-itab-f1-0" class="f-itab on" onclick="fTab('f1',0)">Visão Geral</button>
+          <button id="f-itab-f1-1" class="f-itab" onclick="fTab('f1',1)">Composição</button>
+          <button id="f-itab-f1-2" class="f-itab" onclick="fTab('f1',2)">Indicadores</button>
+          <button id="f-itab-f1-3" class="f-itab" onclick="fTab('f1',3)">Demandas</button>
+          <button id="f-itab-f1-4" class="f-itab" onclick="fTab('f1',4)">Documentos</button>
+          <button id="f-itab-f1-5" class="f-itab" onclick="fTab('f1',5)">Superintendentes</button>
+        </div>
+
+        <!-- ABA 0: VISÃO GERAL -->
+        <div id="f-ip-f1-0">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">🎯 Finalidade</div>
+              <div id="f-fin-f1" style="font-size:12px;color:var(--text2);line-height:1.7;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">📋 Responsabilidades</div>
+              <div id="f-resp-f1" style="margin-top:6px"></div></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🚀 Entregas Estratégicas</div>
+            <div id="f-ent-f1" style="margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">⚠️ Problemas Identificados</div>
+            <div id="f-dex-f1" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🔧 Ferramentas de Gestão</div>
+            <div id="f-ferr-f1" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">📑 Número SEI</div>
+              <input id="f-sei-f1" class="kpi-unit-input" style="width:100%;margin-top:8px;font-family:var(--mono)"
+                placeholder="Ex: 25000.012345/2026-01" onblur="fSaveField('f1','sei',this.value)"></div>
+            <div class="chart-wrap"><div class="chart-title">👤 Atualizado por</div>
+              <input id="f-autor-f1" class="kpi-unit-input" style="width:100%;margin-top:8px"
+                placeholder="Nome do responsável" onblur="fSaveField('f1','autor',this.value)"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📝 Registro Narrativo</div>
+            <textarea class="f-ta" id="f-narrativa-f1" style="margin-top:8px"
+              placeholder="Narrativa executiva — contexto, decisões, encaminhamentos..."
+              onblur="fSaveField('f1','narrativa',this.value)"></textarea>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🗓 Registro Semanal</div>
+            <textarea class="f-ta" id="f-obs-f1" style="margin-top:8px"
+              placeholder="Observações, encaminhamentos, decisões da semana..."
+              onblur="fSaveField('f1','obs',this.value)"></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f1')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="fAddAcao('f1')">+ Adicionar ação</button>
+              <button class="btn" style="font-size:11px" onclick="fExportarResumo('f1')">📄 Exportar resumo</button>
+            </div>
+            <div id="f-acoes-f1" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 1: COMPOSIÇÃO -->
+        <div id="f-ip-f1-1" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">⚡ Ativador</div>
+              <div id="f-atv-f1" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔧 Sistematizador + Coordenações</div>
+              <div id="f-sis-f1" style="margin-top:8px"></div></div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🕐 Rituais de Monitoramento</div>
+            <div id="f-ritmos-f1" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 2: INDICADORES -->
+        <div id="f-ip-f1-2" style="display:none">
+          <div id="f-kpis-f1" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+        </div>
+
+        <!-- ABA 3: DEMANDAS -->
+        <div id="f-ip-f1-3" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📊 Mapa de Demandas</div>
+            <div style="overflow-x:auto"><table class="f-tbl" style="min-width:500px">
+              <thead><tr><th>Demanda</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>Ação</th></tr></thead>
+              <tbody id="f-dtbody-f1"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px;font-size:11px">Nenhuma demanda registrada</td></tr></tbody>
+            </table></div>
+            <button class="btn" style="margin-top:10px;font-size:11px;background:var(--ms-green);color:#fff;border-color:var(--ms-green)"
+              onclick="fAddDem('f1')">+ Nova demanda</button>
+          </div>
+        </div>
+
+        <!-- ABA 4: DOCUMENTOS -->
+        <div id="f-ip-f1-4" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📎 Enviar arquivo (máx. 1MB)</div>
+            <div class="f-upzone" id="f-upz-f1" style="margin-top:10px"
+              onclick="document.getElementById('f-fi-f1').click()"
+              ondragover="event.preventDefault();this.classList.add('dg')"
+              ondragleave="this.classList.remove('dg')"
+              ondrop="fDropFile(event,'f1')">
+              <div style="font-size:22px;margin-bottom:6px">📂</div>
+              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px">Clique ou arraste o arquivo</div>
+              <div style="font-size:10px;color:var(--text3)">PDF, Word, Excel, PowerPoint, imagens</div>
+              <input type="file" id="f-fi-f1" style="display:none"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg"
+                onchange="fUpFile(this,'f1')">
+            </div>
+            <input id="f-upresp-f1" class="kpi-unit-input" style="margin-top:8px;width:220px"
+              placeholder="Responsável pelo upload">
+          </div>
+          <div id="f-docs-f1"><div style="text-align:center;padding:14px;color:var(--text3);font-size:11px">Nenhum arquivo enviado</div></div>
+        </div>
+
+        <!-- ABA 5: SUPERINTENDENTES -->
+        <div id="f-ip-f1-5" style="display:none">
+          <div style="background:linear-gradient(135deg,rgba(0,91,154,.06),rgba(0,91,154,.02));border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-bottom:14px">
+            <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)">📊 Produto Bruto dos Superintendentes — Oficina GAB/SAA</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title" style="color:#C05C00">❓ Questões / Inquietações</div>
+              <div id="f-sup-q-f1" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--ms-green)">💡 Propostas / Sugestões</div>
+              <div id="f-sup-p-f1" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--accent)">📨 Encaminhamentos</div>
+              <div id="f-sup-e-f1" style="margin-top:8px"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="chart-wrap"><div class="chart-title">🏗 Força de Trabalho (SMSAs)</div>
+              <div id="f-sup-ft-f1" style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔗 Planejamento Integrado (SMSA/DGIP/SAA/FNS)</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px">
+                • Planejamento integrado com SMSA, DGIP, SAA, FNS<br>
+                • Alinhar apoiadores com áreas técnicas do MS<br>
+                • Fluxo interno de comunicação institucional<br>
+                • Recursos com designação para SMSAs<br>
+                • Compartilhamento de experiências entre SMSAs
+              </div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FRENTE 2: INFRAESTRUTURA, LOGÍSTICA E AÇÕES -->
+      <div id="sec-frente-f2" class="section">
+        <div style="border-left:4px solid #1B873F;padding-left:16px;margin-bottom:20px">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">FRENTE 2 · GAB/SAA · Sala de Situação SAA</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+            <div style="font-family:var(--display);font-size:20px;font-weight:800;color:#1B873F">Infraestrutura, Logística e Ações</div>
+            <select id="f-status-f2" class="kpi-unit-input" style="font-size:11px;font-weight:600"
+              onchange="fSaveField('f2','status',this.value);renderFVisao()">
+              <option value="andamento">🟡 Em andamento</option>
+              <option value="ok">🟢 No prazo</option>
+              <option value="critico">🔴 Crítico</option>
+              <option value="concluido">✅ Concluída</option>
+            </select>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div id="f-semaph-f2" style="width:10px;height:10px;border-radius:50%;background:#C05C00;box-shadow:0 0 6px #C05C00"></div>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Status</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <input type="number" id="f-pct-f2" min="0" max="100" value="0"
+                style="width:52px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-family:var(--mono);font-size:10px;font-weight:700;color:#1B873F;outline:none"
+                onblur="fSaveField('f2','pct',this.value)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">%</span>
+            </div>
+            <span id="f-ts-f2" style="font-family:var(--mono);font-size:9px;color:var(--text3)"></span>
+          </div>
+        </div>
+
+        <div class="f-itabs">
+          <button id="f-itab-f2-0" class="f-itab on" onclick="fTab('f2',0)">Visão Geral</button>
+          <button id="f-itab-f2-1" class="f-itab" onclick="fTab('f2',1)">Composição</button>
+          <button id="f-itab-f2-2" class="f-itab" onclick="fTab('f2',2)">Indicadores</button>
+          <button id="f-itab-f2-3" class="f-itab" onclick="fTab('f2',3)">Demandas</button>
+          <button id="f-itab-f2-4" class="f-itab" onclick="fTab('f2',4)">Documentos</button>
+          <button id="f-itab-f2-5" class="f-itab" onclick="fTab('f2',5)">Superintendentes</button>
+        </div>
+
+        <!-- ABA 0: VISÃO GERAL -->
+        <div id="f-ip-f2-0">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">🎯 Finalidade</div>
+              <div id="f-fin-f2" style="font-size:12px;color:var(--text2);line-height:1.7;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">📋 Responsabilidades</div>
+              <div id="f-resp-f2" style="margin-top:6px"></div></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🚀 Entregas Estratégicas</div>
+            <div id="f-ent-f2" style="margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">⚠️ Problemas Identificados</div>
+            <div id="f-dex-f2" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🔧 Ferramentas de Gestão</div>
+            <div id="f-ferr-f2" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">📑 Número SEI</div>
+              <input id="f-sei-f2" class="kpi-unit-input" style="width:100%;margin-top:8px;font-family:var(--mono)"
+                placeholder="Ex: 25000.012345/2026-01" onblur="fSaveField('f2','sei',this.value)"></div>
+            <div class="chart-wrap"><div class="chart-title">👤 Atualizado por</div>
+              <input id="f-autor-f2" class="kpi-unit-input" style="width:100%;margin-top:8px"
+                placeholder="Nome do responsável" onblur="fSaveField('f2','autor',this.value)"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📝 Registro Narrativo</div>
+            <textarea class="f-ta" id="f-narrativa-f2" style="margin-top:8px"
+              placeholder="Narrativa executiva — contexto, decisões, encaminhamentos..."
+              onblur="fSaveField('f2','narrativa',this.value)"></textarea>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🗓 Registro Semanal</div>
+            <textarea class="f-ta" id="f-obs-f2" style="margin-top:8px"
+              placeholder="Observações, encaminhamentos, decisões da semana..."
+              onblur="fSaveField('f2','obs',this.value)"></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f2')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="fAddAcao('f2')">+ Adicionar ação</button>
+              <button class="btn" style="font-size:11px" onclick="fExportarResumo('f2')">📄 Exportar resumo</button>
+            </div>
+            <div id="f-acoes-f2" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 1: COMPOSIÇÃO -->
+        <div id="f-ip-f2-1" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">⚡ Ativador</div>
+              <div id="f-atv-f2" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔧 Sistematizador + Coordenações</div>
+              <div id="f-sis-f2" style="margin-top:8px"></div></div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🕐 Rituais de Monitoramento</div>
+            <div id="f-ritmos-f2" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 2: INDICADORES -->
+        <div id="f-ip-f2-2" style="display:none">
+          <div id="f-kpis-f2" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+        </div>
+
+        <!-- ABA 3: DEMANDAS -->
+        <div id="f-ip-f2-3" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📊 Mapa de Demandas</div>
+            <div style="overflow-x:auto"><table class="f-tbl" style="min-width:500px">
+              <thead><tr><th>Demanda</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>Ação</th></tr></thead>
+              <tbody id="f-dtbody-f2"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px;font-size:11px">Nenhuma demanda registrada</td></tr></tbody>
+            </table></div>
+            <button class="btn" style="margin-top:10px;font-size:11px;background:var(--ms-green);color:#fff;border-color:var(--ms-green)"
+              onclick="fAddDem('f2')">+ Nova demanda</button>
+          </div>
+        </div>
+
+        <!-- ABA 4: DOCUMENTOS -->
+        <div id="f-ip-f2-4" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📎 Enviar arquivo (máx. 1MB)</div>
+            <div class="f-upzone" id="f-upz-f2" style="margin-top:10px"
+              onclick="document.getElementById('f-fi-f2').click()"
+              ondragover="event.preventDefault();this.classList.add('dg')"
+              ondragleave="this.classList.remove('dg')"
+              ondrop="fDropFile(event,'f2')">
+              <div style="font-size:22px;margin-bottom:6px">📂</div>
+              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px">Clique ou arraste o arquivo</div>
+              <div style="font-size:10px;color:var(--text3)">PDF, Word, Excel, PowerPoint, imagens</div>
+              <input type="file" id="f-fi-f2" style="display:none"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg"
+                onchange="fUpFile(this,'f2')">
+            </div>
+            <input id="f-upresp-f2" class="kpi-unit-input" style="margin-top:8px;width:220px"
+              placeholder="Responsável pelo upload">
+          </div>
+          <div id="f-docs-f2"><div style="text-align:center;padding:14px;color:var(--text3);font-size:11px">Nenhum arquivo enviado</div></div>
+        </div>
+
+        <!-- ABA 5: SUPERINTENDENTES -->
+        <div id="f-ip-f2-5" style="display:none">
+          <div style="background:linear-gradient(135deg,rgba(0,91,154,.06),rgba(0,91,154,.02));border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-bottom:14px">
+            <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)">📊 Produto Bruto dos Superintendentes — Oficina GAB/SAA</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title" style="color:#C05C00">❓ Questões / Inquietações</div>
+              <div id="f-sup-q-f2" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--ms-green)">💡 Propostas / Sugestões</div>
+              <div id="f-sup-p-f2" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--accent)">📨 Encaminhamentos</div>
+              <div id="f-sup-e-f2" style="margin-top:8px"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="chart-wrap"><div class="chart-title">🏗 Força de Trabalho (SMSAs)</div>
+              <div id="f-sup-ft-f2" style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔗 Planejamento Integrado (SMSA/DGIP/SAA/FNS)</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px">
+                • Planejamento integrado com SMSA, DGIP, SAA, FNS<br>
+                • Alinhar apoiadores com áreas técnicas do MS<br>
+                • Fluxo interno de comunicação institucional<br>
+                • Recursos com designação para SMSAs<br>
+                • Compartilhamento de experiências entre SMSAs
+              </div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FRENTE 3: CONTRATOS, COMPRAS E ORÇAMENTO -->
+      <div id="sec-frente-f3" class="section">
+        <div style="border-left:4px solid #C05C00;padding-left:16px;margin-bottom:20px">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">FRENTE 3 · GAB/SAA · Sala de Situação SAA</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+            <div style="font-family:var(--display);font-size:20px;font-weight:800;color:#C05C00">Contratos, Compras e Orçamento</div>
+            <select id="f-status-f3" class="kpi-unit-input" style="font-size:11px;font-weight:600"
+              onchange="fSaveField('f3','status',this.value);renderFVisao()">
+              <option value="andamento">🟡 Em andamento</option>
+              <option value="ok">🟢 No prazo</option>
+              <option value="critico">🔴 Crítico</option>
+              <option value="concluido">✅ Concluída</option>
+            </select>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div id="f-semaph-f3" style="width:10px;height:10px;border-radius:50%;background:#C05C00;box-shadow:0 0 6px #C05C00"></div>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Status</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <input type="number" id="f-pct-f3" min="0" max="100" value="0"
+                style="width:52px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-family:var(--mono);font-size:10px;font-weight:700;color:#C05C00;outline:none"
+                onblur="fSaveField('f3','pct',this.value)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">%</span>
+            </div>
+            <span id="f-ts-f3" style="font-family:var(--mono);font-size:9px;color:var(--text3)"></span>
+          </div>
+        </div>
+
+        <div class="f-itabs">
+          <button id="f-itab-f3-0" class="f-itab on" onclick="fTab('f3',0)">Visão Geral</button>
+          <button id="f-itab-f3-1" class="f-itab" onclick="fTab('f3',1)">Composição</button>
+          <button id="f-itab-f3-2" class="f-itab" onclick="fTab('f3',2)">Indicadores</button>
+          <button id="f-itab-f3-3" class="f-itab" onclick="fTab('f3',3)">Demandas</button>
+          <button id="f-itab-f3-4" class="f-itab" onclick="fTab('f3',4)">Documentos</button>
+          <button id="f-itab-f3-5" class="f-itab" onclick="fTab('f3',5)">Superintendentes</button>
+        </div>
+
+        <!-- ABA 0: VISÃO GERAL -->
+        <div id="f-ip-f3-0">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">🎯 Finalidade</div>
+              <div id="f-fin-f3" style="font-size:12px;color:var(--text2);line-height:1.7;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">📋 Responsabilidades</div>
+              <div id="f-resp-f3" style="margin-top:6px"></div></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🚀 Entregas Estratégicas</div>
+            <div id="f-ent-f3" style="margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">⚠️ Problemas Identificados</div>
+            <div id="f-dex-f3" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🔧 Ferramentas de Gestão</div>
+            <div id="f-ferr-f3" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">📑 Número SEI</div>
+              <input id="f-sei-f3" class="kpi-unit-input" style="width:100%;margin-top:8px;font-family:var(--mono)"
+                placeholder="Ex: 25000.012345/2026-01" onblur="fSaveField('f3','sei',this.value)"></div>
+            <div class="chart-wrap"><div class="chart-title">👤 Atualizado por</div>
+              <input id="f-autor-f3" class="kpi-unit-input" style="width:100%;margin-top:8px"
+                placeholder="Nome do responsável" onblur="fSaveField('f3','autor',this.value)"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📝 Registro Narrativo</div>
+            <textarea class="f-ta" id="f-narrativa-f3" style="margin-top:8px"
+              placeholder="Narrativa executiva — contexto, decisões, encaminhamentos..."
+              onblur="fSaveField('f3','narrativa',this.value)"></textarea>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🗓 Registro Semanal</div>
+            <textarea class="f-ta" id="f-obs-f3" style="margin-top:8px"
+              placeholder="Observações, encaminhamentos, decisões da semana..."
+              onblur="fSaveField('f3','obs',this.value)"></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f3')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="fAddAcao('f3')">+ Adicionar ação</button>
+              <button class="btn" style="font-size:11px" onclick="fExportarResumo('f3')">📄 Exportar resumo</button>
+            </div>
+            <div id="f-acoes-f3" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 1: COMPOSIÇÃO -->
+        <div id="f-ip-f3-1" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">⚡ Ativador</div>
+              <div id="f-atv-f3" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔧 Sistematizador + Coordenações</div>
+              <div id="f-sis-f3" style="margin-top:8px"></div></div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🕐 Rituais de Monitoramento</div>
+            <div id="f-ritmos-f3" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 2: INDICADORES -->
+        <div id="f-ip-f3-2" style="display:none">
+          <div id="f-kpis-f3" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+        </div>
+
+        <!-- ABA 3: DEMANDAS -->
+        <div id="f-ip-f3-3" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📊 Mapa de Demandas</div>
+            <div style="overflow-x:auto"><table class="f-tbl" style="min-width:500px">
+              <thead><tr><th>Demanda</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>Ação</th></tr></thead>
+              <tbody id="f-dtbody-f3"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px;font-size:11px">Nenhuma demanda registrada</td></tr></tbody>
+            </table></div>
+            <button class="btn" style="margin-top:10px;font-size:11px;background:var(--ms-green);color:#fff;border-color:var(--ms-green)"
+              onclick="fAddDem('f3')">+ Nova demanda</button>
+          </div>
+        </div>
+
+        <!-- ABA 4: DOCUMENTOS -->
+        <div id="f-ip-f3-4" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📎 Enviar arquivo (máx. 1MB)</div>
+            <div class="f-upzone" id="f-upz-f3" style="margin-top:10px"
+              onclick="document.getElementById('f-fi-f3').click()"
+              ondragover="event.preventDefault();this.classList.add('dg')"
+              ondragleave="this.classList.remove('dg')"
+              ondrop="fDropFile(event,'f3')">
+              <div style="font-size:22px;margin-bottom:6px">📂</div>
+              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px">Clique ou arraste o arquivo</div>
+              <div style="font-size:10px;color:var(--text3)">PDF, Word, Excel, PowerPoint, imagens</div>
+              <input type="file" id="f-fi-f3" style="display:none"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg"
+                onchange="fUpFile(this,'f3')">
+            </div>
+            <input id="f-upresp-f3" class="kpi-unit-input" style="margin-top:8px;width:220px"
+              placeholder="Responsável pelo upload">
+          </div>
+          <div id="f-docs-f3"><div style="text-align:center;padding:14px;color:var(--text3);font-size:11px">Nenhum arquivo enviado</div></div>
+        </div>
+
+        <!-- ABA 5: SUPERINTENDENTES -->
+        <div id="f-ip-f3-5" style="display:none">
+          <div style="background:linear-gradient(135deg,rgba(0,91,154,.06),rgba(0,91,154,.02));border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-bottom:14px">
+            <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)">📊 Produto Bruto dos Superintendentes — Oficina GAB/SAA</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title" style="color:#C05C00">❓ Questões / Inquietações</div>
+              <div id="f-sup-q-f3" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--ms-green)">💡 Propostas / Sugestões</div>
+              <div id="f-sup-p-f3" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--accent)">📨 Encaminhamentos</div>
+              <div id="f-sup-e-f3" style="margin-top:8px"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="chart-wrap"><div class="chart-title">🏗 Força de Trabalho (SMSAs)</div>
+              <div id="f-sup-ft-f3" style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔗 Planejamento Integrado (SMSA/DGIP/SAA/FNS)</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px">
+                • Planejamento integrado com SMSA, DGIP, SAA, FNS<br>
+                • Alinhar apoiadores com áreas técnicas do MS<br>
+                • Fluxo interno de comunicação institucional<br>
+                • Recursos com designação para SMSAs<br>
+                • Compartilhamento de experiências entre SMSAs
+              </div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FRENTE 4: GOVERNANÇA, CONFORMIDADE E COMUNICAÇÃO -->
+      <div id="sec-frente-f4" class="section">
+        <div style="border-left:4px solid #5E35B1;padding-left:16px;margin-bottom:20px">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">FRENTE 4 · GAB/SAA · Sala de Situação SAA</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+            <div style="font-family:var(--display);font-size:20px;font-weight:800;color:#5E35B1">Governança, Conformidade e Comunicação</div>
+            <select id="f-status-f4" class="kpi-unit-input" style="font-size:11px;font-weight:600"
+              onchange="fSaveField('f4','status',this.value);renderFVisao()">
+              <option value="andamento">🟡 Em andamento</option>
+              <option value="ok">🟢 No prazo</option>
+              <option value="critico">🔴 Crítico</option>
+              <option value="concluido">✅ Concluída</option>
+            </select>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div id="f-semaph-f4" style="width:10px;height:10px;border-radius:50%;background:#C05C00;box-shadow:0 0 6px #C05C00"></div>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Status</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <input type="number" id="f-pct-f4" min="0" max="100" value="0"
+                style="width:52px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-family:var(--mono);font-size:10px;font-weight:700;color:#5E35B1;outline:none"
+                onblur="fSaveField('f4','pct',this.value)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">%</span>
+            </div>
+            <span id="f-ts-f4" style="font-family:var(--mono);font-size:9px;color:var(--text3)"></span>
+          </div>
+        </div>
+
+        <div class="f-itabs">
+          <button id="f-itab-f4-0" class="f-itab on" onclick="fTab('f4',0)">Visão Geral</button>
+          <button id="f-itab-f4-1" class="f-itab" onclick="fTab('f4',1)">Composição</button>
+          <button id="f-itab-f4-2" class="f-itab" onclick="fTab('f4',2)">Indicadores</button>
+          <button id="f-itab-f4-3" class="f-itab" onclick="fTab('f4',3)">Demandas</button>
+          <button id="f-itab-f4-4" class="f-itab" onclick="fTab('f4',4)">Documentos</button>
+          <button id="f-itab-f4-5" class="f-itab" onclick="fTab('f4',5)">Superintendentes</button>
+        </div>
+
+        <!-- ABA 0: VISÃO GERAL -->
+        <div id="f-ip-f4-0">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">🎯 Finalidade</div>
+              <div id="f-fin-f4" style="font-size:12px;color:var(--text2);line-height:1.7;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">📋 Responsabilidades</div>
+              <div id="f-resp-f4" style="margin-top:6px"></div></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🚀 Entregas Estratégicas</div>
+            <div id="f-ent-f4" style="margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">⚠️ Problemas Identificados</div>
+            <div id="f-dex-f4" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🔧 Ferramentas de Gestão</div>
+            <div id="f-ferr-f4" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">📑 Número SEI</div>
+              <input id="f-sei-f4" class="kpi-unit-input" style="width:100%;margin-top:8px;font-family:var(--mono)"
+                placeholder="Ex: 25000.012345/2026-01" onblur="fSaveField('f4','sei',this.value)"></div>
+            <div class="chart-wrap"><div class="chart-title">👤 Atualizado por</div>
+              <input id="f-autor-f4" class="kpi-unit-input" style="width:100%;margin-top:8px"
+                placeholder="Nome do responsável" onblur="fSaveField('f4','autor',this.value)"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📝 Registro Narrativo</div>
+            <textarea class="f-ta" id="f-narrativa-f4" style="margin-top:8px"
+              placeholder="Narrativa executiva — contexto, decisões, encaminhamentos..."
+              onblur="fSaveField('f4','narrativa',this.value)"></textarea>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🗓 Registro Semanal</div>
+            <textarea class="f-ta" id="f-obs-f4" style="margin-top:8px"
+              placeholder="Observações, encaminhamentos, decisões da semana..."
+              onblur="fSaveField('f4','obs',this.value)"></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f4')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="fAddAcao('f4')">+ Adicionar ação</button>
+              <button class="btn" style="font-size:11px" onclick="fExportarResumo('f4')">📄 Exportar resumo</button>
+            </div>
+            <div id="f-acoes-f4" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 1: COMPOSIÇÃO -->
+        <div id="f-ip-f4-1" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">⚡ Ativador</div>
+              <div id="f-atv-f4" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔧 Sistematizador + Coordenações</div>
+              <div id="f-sis-f4" style="margin-top:8px"></div></div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🕐 Rituais de Monitoramento</div>
+            <div id="f-ritmos-f4" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 2: INDICADORES -->
+        <div id="f-ip-f4-2" style="display:none">
+          <div id="f-kpis-f4" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+        </div>
+
+        <!-- ABA 3: DEMANDAS -->
+        <div id="f-ip-f4-3" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📊 Mapa de Demandas</div>
+            <div style="overflow-x:auto"><table class="f-tbl" style="min-width:500px">
+              <thead><tr><th>Demanda</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>Ação</th></tr></thead>
+              <tbody id="f-dtbody-f4"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px;font-size:11px">Nenhuma demanda registrada</td></tr></tbody>
+            </table></div>
+            <button class="btn" style="margin-top:10px;font-size:11px;background:var(--ms-green);color:#fff;border-color:var(--ms-green)"
+              onclick="fAddDem('f4')">+ Nova demanda</button>
+          </div>
+        </div>
+
+        <!-- ABA 4: DOCUMENTOS -->
+        <div id="f-ip-f4-4" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📎 Enviar arquivo (máx. 1MB)</div>
+            <div class="f-upzone" id="f-upz-f4" style="margin-top:10px"
+              onclick="document.getElementById('f-fi-f4').click()"
+              ondragover="event.preventDefault();this.classList.add('dg')"
+              ondragleave="this.classList.remove('dg')"
+              ondrop="fDropFile(event,'f4')">
+              <div style="font-size:22px;margin-bottom:6px">📂</div>
+              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px">Clique ou arraste o arquivo</div>
+              <div style="font-size:10px;color:var(--text3)">PDF, Word, Excel, PowerPoint, imagens</div>
+              <input type="file" id="f-fi-f4" style="display:none"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg"
+                onchange="fUpFile(this,'f4')">
+            </div>
+            <input id="f-upresp-f4" class="kpi-unit-input" style="margin-top:8px;width:220px"
+              placeholder="Responsável pelo upload">
+          </div>
+          <div id="f-docs-f4"><div style="text-align:center;padding:14px;color:var(--text3);font-size:11px">Nenhum arquivo enviado</div></div>
+        </div>
+
+        <!-- ABA 5: SUPERINTENDENTES -->
+        <div id="f-ip-f4-5" style="display:none">
+          <div style="background:linear-gradient(135deg,rgba(0,91,154,.06),rgba(0,91,154,.02));border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-bottom:14px">
+            <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)">📊 Produto Bruto dos Superintendentes — Oficina GAB/SAA</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title" style="color:#C05C00">❓ Questões / Inquietações</div>
+              <div id="f-sup-q-f4" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--ms-green)">💡 Propostas / Sugestões</div>
+              <div id="f-sup-p-f4" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--accent)">📨 Encaminhamentos</div>
+              <div id="f-sup-e-f4" style="margin-top:8px"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="chart-wrap"><div class="chart-title">🏗 Força de Trabalho (SMSAs)</div>
+              <div id="f-sup-ft-f4" style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔗 Planejamento Integrado (SMSA/DGIP/SAA/FNS)</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px">
+                • Planejamento integrado com SMSA, DGIP, SAA, FNS<br>
+                • Alinhar apoiadores com áreas técnicas do MS<br>
+                • Fluxo interno de comunicação institucional<br>
+                • Recursos com designação para SMSAs<br>
+                • Compartilhamento de experiências entre SMSAs
+              </div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FRENTE 5: PROJETOS ESTRATÉGICOS -->
+      <div id="sec-frente-f5" class="section">
+        <div style="border-left:4px solid #B71C1C;padding-left:16px;margin-bottom:20px">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">FRENTE 5 · GAB/SAA · Sala de Situação SAA</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+            <div style="font-family:var(--display);font-size:20px;font-weight:800;color:#B71C1C">Projetos Estratégicos</div>
+            <select id="f-status-f5" class="kpi-unit-input" style="font-size:11px;font-weight:600"
+              onchange="fSaveField('f5','status',this.value);renderFVisao()">
+              <option value="andamento">🟡 Em andamento</option>
+              <option value="ok">🟢 No prazo</option>
+              <option value="critico">🔴 Crítico</option>
+              <option value="concluido">✅ Concluída</option>
+            </select>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div id="f-semaph-f5" style="width:10px;height:10px;border-radius:50%;background:#C05C00;box-shadow:0 0 6px #C05C00"></div>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Status</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <input type="number" id="f-pct-f5" min="0" max="100" value="0"
+                style="width:52px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-family:var(--mono);font-size:10px;font-weight:700;color:#B71C1C;outline:none"
+                onblur="fSaveField('f5','pct',this.value)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">%</span>
+            </div>
+            <span id="f-ts-f5" style="font-family:var(--mono);font-size:9px;color:var(--text3)"></span>
+          </div>
+        </div>
+
+        <div class="f-itabs">
+          <button id="f-itab-f5-0" class="f-itab on" onclick="fTab('f5',0)">Visão Geral</button>
+          <button id="f-itab-f5-1" class="f-itab" onclick="fTab('f5',1)">Composição</button>
+          <button id="f-itab-f5-2" class="f-itab" onclick="fTab('f5',2)">Indicadores</button>
+          <button id="f-itab-f5-3" class="f-itab" onclick="fTab('f5',3)">Demandas</button>
+          <button id="f-itab-f5-4" class="f-itab" onclick="fTab('f5',4)">Documentos</button>
+          <button id="f-itab-f5-5" class="f-itab" onclick="fTab('f5',5)">Superintendentes</button>
+        </div>
+
+        <!-- ABA 0: VISÃO GERAL -->
+        <div id="f-ip-f5-0">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">🎯 Finalidade</div>
+              <div id="f-fin-f5" style="font-size:12px;color:var(--text2);line-height:1.7;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">📋 Responsabilidades</div>
+              <div id="f-resp-f5" style="margin-top:6px"></div></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🚀 Entregas Estratégicas</div>
+            <div id="f-ent-f5" style="margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">⚠️ Problemas Identificados</div>
+            <div id="f-dex-f5" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">🔧 Ferramentas de Gestão</div>
+            <div id="f-ferr-f5" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">📑 Número SEI</div>
+              <input id="f-sei-f5" class="kpi-unit-input" style="width:100%;margin-top:8px;font-family:var(--mono)"
+                placeholder="Ex: 25000.012345/2026-01" onblur="fSaveField('f5','sei',this.value)"></div>
+            <div class="chart-wrap"><div class="chart-title">👤 Atualizado por</div>
+              <input id="f-autor-f5" class="kpi-unit-input" style="width:100%;margin-top:8px"
+                placeholder="Nome do responsável" onblur="fSaveField('f5','autor',this.value)"></div>
+          </div>
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📝 Registro Narrativo</div>
+            <textarea class="f-ta" id="f-narrativa-f5" style="margin-top:8px"
+              placeholder="Narrativa executiva — contexto, decisões, encaminhamentos..."
+              onblur="fSaveField('f5','narrativa',this.value)"></textarea>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🗓 Registro Semanal</div>
+            <textarea class="f-ta" id="f-obs-f5" style="margin-top:8px"
+              placeholder="Observações, encaminhamentos, decisões da semana..."
+              onblur="fSaveField('f5','obs',this.value)"></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f5')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="fAddAcao('f5')">+ Adicionar ação</button>
+              <button class="btn" style="font-size:11px" onclick="fExportarResumo('f5')">📄 Exportar resumo</button>
+            </div>
+            <div id="f-acoes-f5" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 1: COMPOSIÇÃO -->
+        <div id="f-ip-f5-1" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title">⚡ Ativador</div>
+              <div id="f-atv-f5" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔧 Sistematizador + Coordenações</div>
+              <div id="f-sis-f5" style="margin-top:8px"></div></div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-title">🕐 Rituais de Monitoramento</div>
+            <div id="f-ritmos-f5" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- ABA 2: INDICADORES -->
+        <div id="f-ip-f5-2" style="display:none">
+          <div id="f-kpis-f5" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+        </div>
+
+        <!-- ABA 3: DEMANDAS -->
+        <div id="f-ip-f5-3" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📊 Mapa de Demandas</div>
+            <div style="overflow-x:auto"><table class="f-tbl" style="min-width:500px">
+              <thead><tr><th>Demanda</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>Ação</th></tr></thead>
+              <tbody id="f-dtbody-f5"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px;font-size:11px">Nenhuma demanda registrada</td></tr></tbody>
+            </table></div>
+            <button class="btn" style="margin-top:10px;font-size:11px;background:var(--ms-green);color:#fff;border-color:var(--ms-green)"
+              onclick="fAddDem('f5')">+ Nova demanda</button>
+          </div>
+        </div>
+
+        <!-- ABA 4: DOCUMENTOS -->
+        <div id="f-ip-f5-4" style="display:none">
+          <div class="chart-wrap" style="margin-bottom:14px">
+            <div class="chart-title">📎 Enviar arquivo (máx. 1MB)</div>
+            <div class="f-upzone" id="f-upz-f5" style="margin-top:10px"
+              onclick="document.getElementById('f-fi-f5').click()"
+              ondragover="event.preventDefault();this.classList.add('dg')"
+              ondragleave="this.classList.remove('dg')"
+              ondrop="fDropFile(event,'f5')">
+              <div style="font-size:22px;margin-bottom:6px">📂</div>
+              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px">Clique ou arraste o arquivo</div>
+              <div style="font-size:10px;color:var(--text3)">PDF, Word, Excel, PowerPoint, imagens</div>
+              <input type="file" id="f-fi-f5" style="display:none"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg"
+                onchange="fUpFile(this,'f5')">
+            </div>
+            <input id="f-upresp-f5" class="kpi-unit-input" style="margin-top:8px;width:220px"
+              placeholder="Responsável pelo upload">
+          </div>
+          <div id="f-docs-f5"><div style="text-align:center;padding:14px;color:var(--text3);font-size:11px">Nenhum arquivo enviado</div></div>
+        </div>
+
+        <!-- ABA 5: SUPERINTENDENTES -->
+        <div id="f-ip-f5-5" style="display:none">
+          <div style="background:linear-gradient(135deg,rgba(0,91,154,.06),rgba(0,91,154,.02));border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-bottom:14px">
+            <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)">📊 Produto Bruto dos Superintendentes — Oficina GAB/SAA</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="chart-wrap"><div class="chart-title" style="color:#C05C00">❓ Questões / Inquietações</div>
+              <div id="f-sup-q-f5" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--ms-green)">💡 Propostas / Sugestões</div>
+              <div id="f-sup-p-f5" style="margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title" style="color:var(--accent)">📨 Encaminhamentos</div>
+              <div id="f-sup-e-f5" style="margin-top:8px"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="chart-wrap"><div class="chart-title">🏗 Força de Trabalho (SMSAs)</div>
+              <div id="f-sup-ft-f5" style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px"></div></div>
+            <div class="chart-wrap"><div class="chart-title">🔗 Planejamento Integrado (SMSA/DGIP/SAA/FNS)</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:8px">
+                • Planejamento integrado com SMSA, DGIP, SAA, FNS<br>
+                • Alinhar apoiadores com áreas técnicas do MS<br>
+                • Fluxo interno de comunicação institucional<br>
+                • Recursos com designação para SMSAs<br>
+                • Compartilhamento de experiências entre SMSAs
+              </div></div>
+          </div>
+        </div>
+      </div>
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app -->
@@ -2647,6 +3617,7 @@ function startApp(){
     }catch(e){ console.warn('Erro ao carregar localStorage:', e); }
   }
   renderAll();
+  initFrentesModule();
 }
 
 function lockApp(){
@@ -5565,6 +6536,14 @@ function saveAll(){
 // NAVIGATION
 // ══════════════════════════════════════════════
 const TITLES={
+  frentes:'Frentes de Trabalho',
+  'frentes-painel':'Painel Semanal das Frentes',
+  'frentes-briefing':'Briefing Executivo — Dr. Alan',
+  'frente-f1':'Frente 1 · Pessoas',
+  'frente-f2':'Frente 2 · Infraestrutura',
+  'frente-f3':'Frente 3 · Contratos',
+  'frente-f4':'Frente 4 · Governança',
+  'frente-f5':'Frente 5 · Projetos Estratégicos',
   overview:'Dashboard Executivo',
   graficos:'Gráficos & Análise',
   alertas:'Alertas e Riscos',
@@ -5845,6 +6824,10 @@ function goTo(key){
     document.querySelector('.sidebar')?.classList.remove('open');
     document.getElementById('sidebar-overlay')?.classList.remove('open');
   }
+  if(key==='frentes'){ requestAnimationFrame(renderFVisao); requestAnimationFrame(renderFPainel); }
+  if(key==='frentes-painel') requestAnimationFrame(renderFPainel);
+  if(key==='frentes-briefing') requestAnimationFrame(renderFBriefing);
+  if(key&&key.startsWith('frente-')){ var _fid=key.replace('frente-',''); requestAnimationFrame(function(){ fCarregarFrente(_fid); }); }
   if(key==='graficos') renderGraficos();
   if(key==='coasup-regional') renderCOASUPRegionalPage();
   if(key==='importar') initImportSection();
@@ -6657,6 +7640,378 @@ function downloadModeloExcel(){
 
 // chamar initImportSection quando navegar para a aba
 renderAIChips();
+
+
+
+// ══════════════════════════════════════════════════════
+// MÓDULO FRENTES SAA — Engine completa
+// ══════════════════════════════════════════════════════
+
+const FRENTES_DB = [
+  {id:'f1',n:1,nome:'Pessoas',cor:'#004B8D',
+   fin:'Garantir capacidade institucional por meio da gestão da força de trabalho, saúde ocupacional, risco psicossocial, qualidade de vida, bem-estar e desenvolvimento profissional.',
+   resp:['Gestão do desempenho e avaliação','Qualidade de vida e bem-estar no trabalho','Planejamento e dimensionamento da Força de Trabalho','Desenvolvimento e capacitação profissional','Saúde ocupacional e risco psicossocial'],
+   coords:['COGEP','NATT','GABINETE','COASUP'],
+   atv:'Sérgio Henrique Moreira',sis:'Claudia Spinola',atvapoio:['Sergio','Priscila','Claudia'],
+   ritmos:[{t:'Alinhamento rápido',f:'Diário',d:'30min',fmt:'Presencial'},{t:'Monitoramento estratégico',f:'Sexta-feira',d:'1,5h',fmt:'Presencial'}],
+   ferramentas:['Kanban','SIMPE (Objetivo 15 SAA)','SIAPE','SEI'],
+   ind:['Tempo médio de reposição de vagas críticas','Taxa de absenteísmo por unidade','Percentual de gestores capacitados nas áreas prioritárias','Tempo de resposta a conflitos internos','Índice de adesão às ações de qualidade de vida'],
+   entregas:['Recomposição parcial da FT pelo CNPU2','Planejamento FT SMSA prioritárias (CE,MG,PR,RS)','Ampliação ações saúde e bem-estar','Aprimoramento PGD'],
+   demEx:['Déficit FT em SMSA prioritárias','Afastamentos por adoecimento mental','Capacitação Lei 14.133 e NR01','Conflitos internos'],
+   super_q:['Dimensão da força de trabalho insuficiente','Número de servidores reduzido nas SMSAs','Como SMSAs integrarão o plano sem efetivo suficiente?'],
+   super_p:['Novos concursos públicos e contratações','CTU / TED / Bolsistas','Reaproveitamento CNU','Processo seletivo público AGSUS'],
+   super_e:['Concurso público: CNU, AGSUS, TED, CTU','Dimensionamento FT das SMSAs (URGENTE)','Solicitar ao MGI servidores CNU 2025','Integrar todas as unidades SIASS/MS'],
+   super_ft:'• Dimensionamento urgente das SMSAs<br>• Concurso: CNU, AGSUS, TED, CTU<br>• Integração SIASS/MS<br>• Reuniões periódicas COGEP/NATT/SMSA/SUPER'},
+  {id:'f2',n:2,nome:'Infraestrutura, Logística e Ações',cor:'#1B873F',
+   fin:'Assegurar condições físicas e logísticas para o funcionamento contínuo do Ministério, com foco em continuidade operacional e apoio às superintendências.',
+   resp:['Propiciar instalações físicas adequadas','Condições logísticas e operacionais eficientes','Manutenção e administração predial','Apoio técnico às superintendências regionais'],
+   coords:['CGINFRA','COASUP','CGOF','CGLIC','CGFISC'],
+   atv:'Joice (Sub: Jordana)',sis:'Rogério (Sub: Felipe Sousa)',atvapoio:['Rogério','Marcelo','Nelson','Thaís','Felipe'],
+   ritmos:[{t:'Alinhamento rápido',f:'Diário',d:'30min',fmt:'Presencial'},{t:'Monitoramento estratégico',f:'Quinta-feira manhã',d:'1,5h',fmt:'Presencial'}],
+   ferramentas:['Kanban/Excel','SIMPE (Objetivo 15 SAA)','SEI','SISMOB'],
+   ind:['Tempo médio de resposta a incidentes','Índice de disponibilidade predial','Percentual de obras entregues no prazo','Custo de manutenção por metro quadrado','Grau de satisfação das unidades usuárias'],
+   entregas:['CCMS — Centro Cultural MS','Reforma Bloco G','Entrega completa Bloco O','Política de infraestrutura predial'],
+   demEx:['Resolução técnica imediata','Garantia recurso orçamentário','Ajuste contratual','Comunicação às áreas'],
+   super_q:['Modelo não resolve entraves logísticos SMSAs','Mapeamento de processos pendente','Falta acesso SISMOB e INVESTSUS'],
+   super_p:['Descentralizar recursos conforme AIP','Maior flexibilidade para pequenos problemas','Otimizar fluxos periodicamente'],
+   super_e:['Proposta descentralização recursos regionais','Oficinas socialização metodologia DIGISUS','Identificar melhorias de fluxo'],
+   super_ft:'• Dimensionamento das SMSAs<br>• Descentralização de recursos por AIP<br>• Apoio técnico contínuo às regionais'},
+  {id:'f3',n:3,nome:'Contratos, Compras e Orçamento',cor:'#C05C00',
+   fin:'Apoiar o planejamento qualificado de contratações, PCA, orçamento, padronização de artefatos e capacitação contínua das equipes.',
+   resp:['Planejamento qualificado de contratação','PCA atrelado ao orçamento e PDP','Padronização dos artefatos da contratação','Criação de Biblioteca de Conhecimento','Capacitação contínua das equipes'],
+   coords:['CGLIC','CGOF','CGFISC','COGEP'],
+   atv:'Marcello Novaes',sis:'Marta',atvapoio:['Ducilene','Diogo','Marta','Francisco','Thais'],
+   ritmos:[{t:'Alinhamento rápido',f:'Diário',d:'30min',fmt:'Presencial'},{t:'Monitoramento estratégico',f:'Quinta-feira manhã',d:'1,5h',fmt:'Presencial'}],
+   ferramentas:['Kanban','SIMPE (Objetivo 15 SAA)','SCDP','Comprasnet'],
+   ind:['Grau de satisfação das unidades usuárias','Tempo médio do ciclo da contratação','Percentual de contratações realizadas versus execução do PCA'],
+   entregas:['Estruturação unidade de planejamento da contratação','Padronizar procedimentos de contratação','Harmonização de critérios SCDP'],
+   demEx:['Pareceres SCDP inconsistentes','Processos sem padronização','Falta de acesso a sistemas'],
+   super_q:['Pareceres SCDP inconsistentes e interpretações divergentes','Entendimentos distintos para situações semelhantes','Falta de acesso a informações dos programas'],
+   super_p:['Revisão de fluxos e dados SCDP','Criar manual de procedimentos padrão','Avaliação de flexibilização nas aprovações'],
+   super_e:['Harmonização critérios SCDP','Manual unificado com equipe SCDP','Reunião SMSA/SCDP e mapeamento de processos','Enviar servidores SCDP aos Estados'],
+   super_ft:'• Harmonização dos critérios SCDP<br>• Manual de procedimentos padronizados<br>• Capacitação equipes nas normas vigentes'},
+  {id:'f4',n:4,nome:'Governança, Conformidade e Comunicação',cor:'#5E35B1',
+   fin:'Organizar normas, processos, informação institucional, comunicação e gestão de riscos. Sair do controle posterior para conformidade preventiva.',
+   resp:['Gestão do conhecimento e compartilhamento institucional','Avaliar e propor políticas, normativos, manuais e guias','Coordenar projetos de melhoria e padronização','Comunicação dos produtos e serviços da SAA'],
+   coords:['GABINETE','CGDI','CODIPE','COASUP'],
+   atv:'Soraia Pires',sis:'Vitor (Sub: Giseli)',atvapoio:['Paulo Jorge','Luziana','Roberto','Giseli','Gláucia'],
+   ritmos:[{t:'Alinhamento rápido',f:'Diário',d:'30min',fmt:'Presencial'},{t:'Monitoramento estratégico',f:'Quarta-feira',d:'1,5h',fmt:'Presencial'}],
+   ferramentas:['Kanban','SIMPE (Objetivo 15 SAA)','SEI','Power BI'],
+   ind:['Tempo de resposta a órgãos de controle','Percentual de processos padronizados','Redução de retrabalho','Número de riscos identificados preventivamente','Grau de utilização dos instrumentos de gestão'],
+   entregas:['Normativos SCDP atualizados','Repositório digital do MS','Nova metodologia de melhoria de processos'],
+   demEx:['Resistência de comunicação das secretarias','Processos despadronizados','Falhas de comunicação interna'],
+   super_q:['Resistência de comunicação das secretarias e facilitadores','Como FNS e DGIP vão integrar as áreas no Plano SAA?','Proposta de reorganização não abarca DGIP e FNS'],
+   super_p:['Capacitação e acesso a resumos executivos e painéis gerenciais','Realizar planejamento com SMSAs e áreas técnicas (SAA, DGIP, FNS)'],
+   super_e:['Planejamento integrado SMSA, DGIP, SAA, FNS','Alinhar apoiadores com áreas técnicas do MS','Fluxo interno de comunicação institucional'],
+   super_ft:'• Comunicação institucional aprimorada<br>• Fluxo interno estabelecido<br>• Compartilhamento de experiências entre SMSAs'},
+  {id:'f5',n:5,nome:'Projetos Estratégicos',cor:'#B71C1C',
+   fin:'Apoiar e monitorar iniciativas estruturantes até sua plena institucionalização: NATT, Agenda ESG, Linguagem Simples, Viva Mais Brasil e Letramento Institucional.',
+   resp:['Institucionalizar fluxos de processos dos Núcleos NUPP e NPM','Acompanhar implementação de ferramentas de gestão','Planejar, acompanhar e monitorar iniciativas estruturantes','Monitorar execução orçamentária e financeira das iniciativas'],
+   coords:['GABINETE','NUPP','NPM','COASUP','CGOF'],
+   atv:'Dr. Alan',sis:'Nayla',atvapoio:['Mônica','Lucas Macedo','Marcos Paulo','Lucas Dantas','Marcelli Alves'],
+   ritmos:[{t:'Alinhamento rápido',f:'Diário',d:'30min',fmt:'Virtual'},{t:'Monitoramento estratégico',f:'Quarta-feira manhã',d:'1,5h',fmt:'Presencial'}],
+   ferramentas:['Kanban (Asana)','Excel','Power BI','Sistemas das coordenações','SIMPE (Objetivo 15)'],
+   ind:['Percentual de execução orçamentária e financeira das iniciativas estruturantes','Percentual de implantação do NATT','Entrega de relatório mensal de monitoramento das iniciativas estruturantes'],
+   entregas:['Relatórios técnicos das iniciativas estruturantes','Relatório de execução orçamentária','Implantação e promoção do NATT'],
+   demEx:['Revitalização sistema áudio/vídeo Emílio Ribas','Reforma CCMS','Implantação do NATT'],
+   super_q:['Integração do planejamento SAA, DGIP e FNS','Como garantir monitoramento sem equipe suficiente','Falta de visibilidade das iniciativas nos territórios'],
+   super_p:['Planejamento integrado com SMSAs','Capacitação e acesso a painéis gerenciais','Comunicação periódica das iniciativas'],
+   super_e:['Planejamento integrado SMSA, DGIP, SAA, FNS','Oficinas socialização metodologia monitoramento','Compartilhamento de experiências entre SMSAs'],
+   super_ft:'• Monitoramento das iniciativas nos territórios<br>• Relatórios periódicos para SMSAs<br>• Integração com planejamento DGIP e FNS'}
+];
+
+// ── Storage das Frentes ──
+function fdbGet(){try{return JSON.parse(localStorage.getItem('saa-frentes-v2')||'{}')}catch(e){return{}}}
+function fdbSet(d){try{localStorage.setItem('saa-frentes-v2',JSON.stringify(d))}catch(e){}}
+function _fNow(){return new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+
+// ── Salvar campo ──
+function fSaveField(fid,k,v){
+  var db=fdbGet();if(!db.frentes)db.frentes={};if(!db.frentes[fid])db.frentes[fid]={};
+  db.frentes[fid][k]=v;fdbSet(db);
+  if(k==='status'){var sm=document.getElementById('f-semaph-'+fid);
+    if(sm){var c=v==='ok'||v==='concluido'?'#1B873F':v==='critico'?'#B71C1C':'#C05C00';sm.style.background=c;sm.style.boxShadow='0 0 6px '+c;}}
+  if(k==='status'||k==='pct')renderFVisao();
+}
+
+// ── Salvar frente ──
+function fSalvar(fid){
+  var db=fdbGet();if(!db.frentes)db.frentes={};if(!db.frentes[fid])db.frentes[fid]={};
+  var ts=_fNow();
+  ['obs','narrativa','sei','autor'].forEach(function(k){var el=document.getElementById('f-'+k+'-'+fid);if(el)db.frentes[fid][k]=el.value;});
+  var stEl=document.getElementById('f-status-'+fid);if(stEl)db.frentes[fid].status=stEl.value;
+  var pctEl=document.getElementById('f-pct-'+fid);if(pctEl)db.frentes[fid].pct=pctEl.value;
+  db.frentes[fid].ts=ts;
+  var f=FRENTES_DB.find(function(x){return x.id===fid;});
+  if(f){if(!db.frentes[fid].kpis)db.frentes[fid].kpis={};
+    f.ind.forEach(function(_,i){var el=document.getElementById('f-kpi-'+fid+'-'+i);if(el)db.frentes[fid].kpis[i]=el.value;});}
+  fdbSet(db);
+  var tsEl=document.getElementById('f-ts-'+fid);if(tsEl)tsEl.textContent='🕐 '+ts;
+  var stv=stEl?stEl.value:'andamento';
+  var sm=document.getElementById('f-semaph-'+fid);
+  if(sm){var c=stv==='ok'||stv==='concluido'?'#1B873F':stv==='critico'?'#B71C1C':'#C05C00';sm.style.background=c;sm.style.boxShadow='0 0 6px '+c;}
+  renderFVisao();fToast('Frente salva!');
+}
+
+// ── Ações ──
+function fAddAcao(fid){
+  var t=prompt('Descrição da ação:');if(!t)return;
+  var r=prompt('Responsável:')||'';var p=prompt('Prazo:')||'';
+  var db=fdbGet();if(!db.frentes)db.frentes={};if(!db.frentes[fid])db.frentes[fid]={};if(!db.frentes[fid].acoes)db.frentes[fid].acoes=[];
+  db.frentes[fid].acoes.unshift({id:'A'+Date.now(),titulo:t,resp:r,prazo:p,status:'aberta'});
+  fdbSet(db);fRenderAcoes(fid,db.frentes[fid].acoes);fToast('Ação adicionada!');
+}
+function fRenderAcoes(fid,acoes){
+  var el=document.getElementById('f-acoes-'+fid);if(!el)return;
+  if(!acoes||!acoes.length){el.innerHTML='';return;}
+  el.innerHTML=acoes.map(function(a){
+    var bg=a.status==='concluida'?'var(--good-a)':a.status==='critica'?'var(--crit-a)':'var(--warn-a)';
+    var col=a.status==='concluida'?'var(--good)':a.status==='critica'?'var(--crit)':'var(--warn)';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">'
+      +'<span style="font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;background:'+bg+';color:'+col+'">'+a.status+'</span>'
+      +'<div style="flex:1;font-size:11px;color:var(--text)">'+a.titulo+'<div style="font-size:9px;color:var(--text3);font-family:var(--mono)">'+(a.resp||'—')+' · '+(a.prazo||'—')+'</div></div>'
+      +'<button onclick="fDelAcao(\''+fid+'\',\''+a.id+'\')" style="background:none;border:1px solid var(--border2);border-radius:3px;padding:2px 6px;cursor:pointer;color:var(--text3);font-size:9px">🗑</button>'
+      +'</div>';
+  }).join('');
+}
+function fDelAcao(fid,aid){
+  if(!confirm('Remover?'))return;var db=fdbGet();
+  if(db.frentes&&db.frentes[fid]&&db.frentes[fid].acoes)db.frentes[fid].acoes=db.frentes[fid].acoes.filter(function(a){return a.id!==aid;});
+  fdbSet(db);fRenderAcoes(fid,db.frentes&&db.frentes[fid]?db.frentes[fid].acoes||[]:[]);
+}
+
+// ── Demandas ──
+function fAddDem(fid){
+  var t=prompt('Demanda:');if(!t)return;var r=prompt('Responsável:')||'';var p=prompt('Prazo:')||'';
+  var db=fdbGet();if(!db.frentes)db.frentes={};if(!db.frentes[fid])db.frentes[fid]={};if(!db.frentes[fid].demandas)db.frentes[fid].demandas=[];
+  db.frentes[fid].demandas.unshift({id:'D'+Date.now(),titulo:t,resp:r,prazo:p,status:'aberta'});
+  fdbSet(db);fRenderDems(fid,db.frentes[fid].demandas);renderFVisao();fToast('Demanda adicionada!');
+}
+function fRenderDems(fid,dems){
+  var el=document.getElementById('f-dtbody-'+fid);if(!el)return;
+  if(!dems||!dems.length){el.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px;font-size:11px">Nenhuma demanda</td></tr>';return;}
+  var SM={aberta:'🔵 Aberta',andamento:'🟡 Andamento',concluida:'✅ Concluída',critica:'🔴 Crítica'};
+  el.innerHTML=dems.map(function(d){
+    var opts=Object.entries(SM).map(function(e){return '<option value="'+e[0]+'"'+(d.status===e[0]?' selected':'')+'>'+e[1]+'</option>';}).join('');
+    return '<tr>'
+      +'<td style="padding:8px;font-size:11px;color:var(--text)">'+d.titulo+'</td>'
+      +'<td style="padding:8px;font-size:11px;color:var(--text2)">'+(d.resp||'—')+'</td>'
+      +'<td style="padding:8px"><select onchange="fUpdDem(\''+fid+'\',\''+d.id+'\',this.value)" style="font-size:9px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;padding:2px">'+opts+'</select></td>'
+      +'<td style="padding:8px;font-family:var(--mono);font-size:10px;color:var(--text2)">'+(d.prazo||'—')+'</td>'
+      +'<td style="padding:8px"><button onclick="fDelDem(\''+fid+'\',\''+d.id+'\')" style="background:none;border:1px solid var(--border2);border-radius:3px;padding:2px 6px;cursor:pointer;color:var(--text3);font-size:9px">🗑</button></td>'
+      +'</tr>';
+  }).join('');
+}
+function fUpdDem(fid,did,st){var db=fdbGet();var d=((db.frentes&&db.frentes[fid]&&db.frentes[fid].demandas)||[]).find(function(d){return d.id===did;});if(d){d.status=st;fdbSet(db);}}
+function fDelDem(fid,did){if(!confirm('Remover?'))return;var db=fdbGet();if(db.frentes&&db.frentes[fid]&&db.frentes[fid].demandas)db.frentes[fid].demandas=db.frentes[fid].demandas.filter(function(d){return d.id!==did;});fdbSet(db);fRenderDems(fid,db.frentes&&db.frentes[fid]?db.frentes[fid].demandas||[]:[]);}
+
+// ── Documentos ──
+function fDropFile(e,fid){e.preventDefault();var f=e.dataTransfer.files[0];if(f)fProcUp(f,fid);}
+function fUpFile(inp,fid){var f=inp.files[0];if(f)fProcUp(f,fid);}
+function fProcUp(file,fid){
+  var ext=file.name.split('.').pop()||'';
+  var resp=document.getElementById('f-upresp-'+fid)?document.getElementById('f-upresp-'+fid).value||'—':'—';
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var db=fdbGet();if(!db.frentes)db.frentes={};if(!db.frentes[fid])db.frentes[fid]={};if(!db.frentes[fid].docs)db.frentes[fid].docs=[];
+    db.frentes[fid].docs.unshift({id:'DOC'+Date.now(),nome:file.name,ext:ext,sz:file.size,resp:resp,dt:_fNow(),b64:e.target.result});
+    try{fdbSet(db);fRenderDocs(fid,db.frentes[fid].docs);renderFVisao();fToast('Arquivo salvo!');}catch(err){alert('Storage cheio. Use link externo.');}
+  };reader.readAsDataURL(file);
+}
+var _fIco={pdf:'📕',doc:'📘',docx:'📘',xls:'📗',xlsx:'📗',ppt:'📙',pptx:'📙',txt:'📄',png:'🖼',jpg:'🖼',jpeg:'🖼'};
+function _fSz(b){return b<1024?b+'B':b<1048576?(b/1024).toFixed(1)+'KB':(b/1048576).toFixed(1)+'MB';}
+function fRenderDocs(fid,docs){
+  var el=document.getElementById('f-docs-'+fid);if(!el)return;
+  if(!docs||!docs.length){el.innerHTML='<div style="text-align:center;padding:14px;color:var(--text3);font-size:11px">Nenhum arquivo enviado</div>';return;}
+  el.innerHTML=docs.map(function(d){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px">'
+      +'<span style="font-size:18px">'+(_fIco[d.ext?d.ext.toLowerCase():'']||'📎')+'</span>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+d.nome+'</div>'
+      +'<div style="font-size:9px;color:var(--text3);font-family:var(--mono)">'+d.dt+' · '+d.resp+' · '+_fSz(d.sz)+'</div></div>'
+      +'<button onclick="fDlDoc(\''+fid+'\',\''+d.id+'\')" style="background:var(--accent);color:#fff;border:none;border-radius:5px;padding:5px 10px;font-size:10px;font-weight:600;cursor:pointer">⬇</button>'
+      +'<button onclick="fDelDoc(\''+fid+'\',\''+d.id+'\')" style="background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 7px;cursor:pointer;color:var(--text3);font-size:10px">🗑</button>'
+      +'</div>';
+  }).join('');
+}
+function fDlDoc(fid,did){var db=fdbGet();var d=((db.frentes&&db.frentes[fid]&&db.frentes[fid].docs)||[]).find(function(d){return d.id===did;});if(!d||!d.b64){alert('Arquivo não encontrado.');return;}var a=document.createElement('a');a.href=d.b64;a.download=d.nome;a.click();}
+function fDelDoc(fid,did){if(!confirm('Remover?'))return;var db=fdbGet();if(db.frentes&&db.frentes[fid]&&db.frentes[fid].docs)db.frentes[fid].docs=db.frentes[fid].docs.filter(function(d){return d.id!==did;});fdbSet(db);fRenderDocs(fid,db.frentes&&db.frentes[fid]?db.frentes[fid].docs||[]:[]);renderFVisao();}
+
+// ── Tabs internas ──
+function fTab(fid,i){
+  for(var j=0;j<6;j++){
+    var p=document.getElementById('f-ip-'+fid+'-'+j);if(p)p.style.display=j===i?'block':'none';
+    var t=document.getElementById('f-itab-'+fid+'-'+j);if(t){t.className='f-itab'+(j===i?' on':'');}
+  }
+}
+
+// ── Exportar resumo ──
+function fExportarResumo(fid){
+  var f=FRENTES_DB.find(function(x){return x.id===fid;});if(!f)return;
+  var db=fdbGet();var fd=db.frentes&&db.frentes[fid]?db.frentes[fid]:{};
+  var txt='RESUMO EXECUTIVO — FRENTE '+f.n+': '+f.nome.toUpperCase()+'\nSala de Situação SAA · '+_fNow()+'\n'+'='.repeat(60)+'\n\n';
+  txt+='FINALIDADE:\n'+f.fin+'\n\nCOMPOSIÇÃO:\n'+f.coords.join(', ')+'\n\n';
+  txt+='STATUS: '+(fd.status||'Em andamento')+' | EXECUÇÃO: '+(fd.pct||0)+'%\n';
+  if(fd.sei)txt+='SEI: '+fd.sei+'\n';if(fd.ts)txt+='Atualizado: '+fd.ts+'\n';if(fd.autor)txt+='Responsável: '+fd.autor+'\n';
+  txt+='\nINDICADORES:\n';f.ind.forEach(function(ind,i){txt+='  '+(i+1)+'. '+ind+': '+(fd.kpis&&fd.kpis[i]?fd.kpis[i]:'—')+'\n';});
+  txt+='\nENTREGAS ESTRATÉGICAS:\n';f.entregas.forEach(function(e,i){txt+='  '+(i+1)+'. '+e+'\n';});
+  if(fd.narrativa)txt+='\nNARRATIVA:\n'+fd.narrativa+'\n';if(fd.obs)txt+='\nREGISTRO SEMANAL:\n'+fd.obs+'\n';
+  txt+='\n'+'='.repeat(60)+'\n';
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+  a.download='Frente'+f.n+'_'+f.nome.split(',')[0].replace(/\s/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.txt';a.click();
+}
+
+// ── Visão Geral ──
+function renderFVisao(){
+  var el=document.getElementById('frentes-cards-visao');if(!el)return;
+  var db=fdbGet();
+  var SM={andamento:{c:'#C05C00',l:'Em andamento',bg:'rgba(192,92,0,.12)'},ok:{c:'#1B873F',l:'No prazo',bg:'rgba(27,135,63,.12)'},critico:{c:'#B71C1C',l:'Crítico',bg:'rgba(183,28,28,.12)'},concluido:{c:'#1B873F',l:'Concluída',bg:'rgba(27,135,63,.12)'}};
+  el.innerHTML=FRENTES_DB.map(function(f){
+    var fd=db.frentes&&db.frentes[f.id]?db.frentes[f.id]:{};
+    var s=SM[fd.status||'andamento']||SM.andamento;
+    var docs=(fd.docs||[]).length,dems=(fd.demandas||[]).length,pct=fd.pct||0;
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all var(--trans)" onclick="goTo(\'frente-'+f.id+'\')" onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'var(--shadow)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'\'">'
+      +'<div style="background:'+f.cor+';padding:14px 16px">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">'
+      +'<span style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.1em">FRENTE '+f.n+'</span>'
+      +'<span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:10px;background:'+s.bg+';color:'+s.c+'">'+s.l+'</span>'
+      +'</div>'
+      +'<div style="font-family:var(--display);font-size:13px;font-weight:700;color:#fff;line-height:1.3">'+f.nome+'</div>'
+      +'<div style="height:3px;background:rgba(255,255,255,.2);border-radius:2px;margin-top:8px"><div style="height:100%;width:'+pct+'%;background:#fff;border-radius:2px"></div></div>'
+      +'<div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.7);margin-top:3px">'+pct+'% execução</div>'
+      +'</div>'
+      +'<div style="padding:10px 14px"><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3)">'
+      +'<span>📎 '+docs+' doc</span><span>🗂 '+dems+' dem.</span>'
+      +'<span>'+(fd.obs?'✓ Atualizado':'Sem registro')+'</span></div></div></div>';
+  }).join('');
+}
+
+// ── Painel Semanal ──
+function renderFPainel(){
+  var db=fdbGet();
+  ['p-entregas','p-riscos','p-pendencias','p-proximos'].forEach(function(id){var el=document.getElementById('f-'+id);if(el&&db.fpainel&&db.fpainel[id])el.value=db.fpainel[id];});
+  if(db.fpainel&&db.fpainel.ts){var ts=document.getElementById('f-p-ts');if(ts)ts.textContent='🕐 '+db.fpainel.ts;}
+  var el2=document.getElementById('f-painel-updates');if(!el2)return;
+  el2.innerHTML=FRENTES_DB.map(function(f){
+    var fd=db.frentes&&db.frentes[f.id]?db.frentes[f.id]:{};
+    return '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);border-left:4px solid '+f.cor+'">'
+      +'<div style="width:22px;height:22px;border-radius:50%;background:'+f.cor+';display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:10px;font-weight:700;color:#fff;flex-shrink:0">'+f.n+'</div>'
+      +'<div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:3px">'+f.nome+'</div>'
+      +'<textarea style="width:100%;background:transparent;border:none;resize:none;font-size:11px;color:var(--text2);outline:none;font-family:var(--font)" rows="2" placeholder="Atualização desta frente..." onblur="fSaveField(\''+f.id+'\',\'semanal\',this.value)">'+(fd.semanal||'')+'</textarea></div></div>';
+  }).join('');
+}
+function fSalvarPainel(){
+  var db=fdbGet();var ts=_fNow();if(!db.fpainel)db.fpainel={};db.fpainel.ts=ts;
+  ['p-entregas','p-riscos','p-pendencias','p-proximos'].forEach(function(id){var el=document.getElementById('f-'+id);if(el)db.fpainel[id]=el.value;});
+  fdbSet(db);var tsEl=document.getElementById('f-p-ts');if(tsEl)tsEl.textContent='🕐 '+ts;fToast('Painel salvo!');
+}
+
+// ── Briefing ──
+function renderFBriefing(){
+  var db=fdbGet();
+  ['b-situacao','b-criticos','b-riscos','b-encam','b-prio','b-alertas'].forEach(function(id){var el=document.getElementById('f-'+id);if(el&&db.fbriefing&&db.fbriefing[id])el.value=db.fbriefing[id];});
+  if(db.fbriefing&&db.fbriefing.ts){var ts=document.getElementById('f-b-ts');if(ts)ts.textContent='🕐 '+db.fbriefing.ts;}
+}
+function fSalvarBriefing(){
+  var db=fdbGet();var ts=_fNow();if(!db.fbriefing)db.fbriefing={};db.fbriefing.ts=ts;
+  ['b-situacao','b-criticos','b-riscos','b-encam','b-prio','b-alertas'].forEach(function(id){var el=document.getElementById('f-'+id);if(el)db.fbriefing[id]=el.value;});
+  fdbSet(db);var tsEl=document.getElementById('f-b-ts');if(tsEl)tsEl.textContent='🕐 '+ts;fToast('Briefing salvo!');
+}
+function fExportarBriefing(){
+  var db=fdbGet();var br=db.fbriefing||{};
+  var txt='BRIEFING EXECUTIVO — DR. ALAN\nSala de Situação SAA · '+_fNow()+'\n'+'='.repeat(60)+'\n\n';
+  [['Situação geral','b-situacao'],['Pontos críticos','b-criticos'],['Riscos','b-riscos'],['Encaminhamentos','b-encam'],['Prioridades','b-prio'],['Alertas','b-alertas']].forEach(function(x){if(br[x[1]])txt+=x[0].toUpperCase()+':\n'+br[x[1]]+'\n\n';});
+  txt+='\nSTATUS DAS FRENTES:\n\n';
+  FRENTES_DB.forEach(function(f){var fd=db.frentes&&db.frentes[f.id]?db.frentes[f.id]:{};txt+='FRENTE '+f.n+' · '+f.nome+'\nStatus: '+(fd.status||'Em andamento')+' | Execução: '+(fd.pct||0)+'%\n'+(fd.semanal?'Atualização: '+fd.semanal:'')+'\n\n';});
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));a.download='Briefing_DrAlan_'+new Date().toISOString().slice(0,10)+'.txt';a.click();
+}
+
+// ── Carregar frente ao navegar ──
+function fCarregarFrente(fid){
+  var db=fdbGet();var fd=db.frentes&&db.frentes[fid]?db.frentes[fid]:{};
+  var f=FRENTES_DB.find(function(x){return x.id===fid;});if(!f)return;
+
+  // Preencher status e semáforo
+  var stEl=document.getElementById('f-status-'+fid);
+  if(stEl&&fd.status){stEl.value=fd.status;var c=fd.status==='ok'||fd.status==='concluido'?'#1B873F':fd.status==='critico'?'#B71C1C':'#C05C00';var sm=document.getElementById('f-semaph-'+fid);if(sm){sm.style.background=c;sm.style.boxShadow='0 0 6px '+c;}}
+  var pctEl=document.getElementById('f-pct-'+fid);if(pctEl&&fd.pct!==undefined)pctEl.value=fd.pct;
+
+  // Preencher finalidade
+  var finEl=document.getElementById('f-fin-'+fid);if(finEl)finEl.textContent=f.fin;
+
+  // Responsabilidades
+  var respEl=document.getElementById('f-resp-'+fid);
+  if(respEl)respEl.innerHTML=f.resp.map(function(r){return '<div style="font-size:11px;color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:6px"><span style="color:'+f.cor+';flex-shrink:0">▸</span>'+r+'</div>';}).join('');
+
+  // Entregas
+  var entEl=document.getElementById('f-ent-'+fid);
+  if(entEl)entEl.innerHTML=f.entregas.map(function(e,i){return '<div style="font-size:11px;color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:8px"><span style="font-family:var(--mono);font-size:9px;background:'+f.cor+';color:#fff;padding:1px 5px;border-radius:3px;flex-shrink:0">'+(i+1)+'</span>'+e+'</div>';}).join('');
+
+  // Problemas
+  var dxEl=document.getElementById('f-dex-'+fid);
+  if(dxEl)dxEl.innerHTML=f.demEx.map(function(d){return '<span class="f-chip">'+d+'</span>';}).join('');
+
+  // Ferramentas
+  var frEl=document.getElementById('f-ferr-'+fid);
+  if(frEl)frEl.innerHTML=f.ferramentas.map(function(t){return '<span class="f-chip" style="background:rgba(0,75,141,.12);color:var(--accent);border-color:rgba(0,75,141,.2)">'+t+'</span>';}).join('');
+
+  // Ativador
+  var atvEl=document.getElementById('f-atv-'+fid);
+  if(atvEl)atvEl.innerHTML='<div style="display:inline-flex;align-items:center;padding:4px 12px;background:rgba(0,75,141,.08);border:1px solid var(--accent);border-radius:20px;font-size:11px;color:var(--accent);margin-bottom:8px">👤 '+f.atv+'</div><div>'+f.atvapoio.map(function(p){return '<span style="display:inline-flex;padding:3px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:10px;color:var(--text2);margin:2px">'+p+'</span>';}).join('')+'</div>';
+
+  // Sistematizador
+  var sisEl=document.getElementById('f-sis-'+fid);
+  if(sisEl)sisEl.innerHTML='<div style="display:inline-flex;padding:4px 12px;background:rgba(27,135,63,.1);border:1px solid var(--ms-green);border-radius:20px;font-size:11px;color:var(--ms-green);margin-bottom:8px">📋 '+f.sis+'</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">'+f.coords.map(function(c){return '<span class="f-chip">'+c+'</span>';}).join('')+'</div>';
+
+  // Rituais
+  var ritEl=document.getElementById('f-ritmos-'+fid);
+  if(ritEl)ritEl.innerHTML=f.ritmos.map(function(r){return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;flex:1;min-width:160px"><div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:6px">'+r.t+'</div><div style="font-size:10px;color:var(--text2);line-height:1.8">📅 '+r.f+'<br>⏱ '+r.d+'<br>📍 '+r.fmt+'</div></div>';}).join('');
+
+  // KPIs
+  var kpiEl=document.getElementById('f-kpis-'+fid);
+  if(kpiEl)kpiEl.innerHTML=f.ind.map(function(ind,i){var val=fd.kpis&&fd.kpis[i]?fd.kpis[i]:'';
+    return '<div style="background:var(--surface2);border:1px solid var(--border);border-top:3px solid '+f.cor+';border-radius:var(--radius-sm);padding:12px">'
+      +'<div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.4">'+ind+'</div>'
+      +'<input type="number" id="f-kpi-'+fid+'-'+i+'" placeholder="0" value="'+val+'" style="width:80px;background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:5px 8px;font-family:var(--mono);font-size:16px;font-weight:700;color:'+f.cor+';outline:none" onblur="fSaveField(\''+fid+'\',\'kpi'+i+'\',this.value)">'
+      +'<div style="font-family:var(--mono);font-size:8px;color:var(--text3);margin-top:2px">valor atual</div></div>';
+  }).join('');
+
+  // Campos de texto salvos
+  if(fd.obs){var o=document.getElementById('f-obs-'+fid);if(o)o.value=fd.obs;}
+  if(fd.narrativa){var n=document.getElementById('f-narrativa-'+fid);if(n)n.value=fd.narrativa;}
+  if(fd.sei){var s=document.getElementById('f-sei-'+fid);if(s)s.value=fd.sei;}
+  if(fd.autor){var au=document.getElementById('f-autor-'+fid);if(au)au.value=fd.autor;}
+  if(fd.ts){var ts=document.getElementById('f-ts-'+fid);if(ts)ts.textContent='🕐 '+fd.ts;}
+
+  // Docs e demandas
+  if(fd.docs&&fd.docs.length)fRenderDocs(fid,fd.docs);
+  if(fd.demandas&&fd.demandas.length)fRenderDems(fid,fd.demandas);
+  if(fd.acoes&&fd.acoes.length)fRenderAcoes(fid,fd.acoes);
+
+  // Superintendentes
+  var qEl=document.getElementById('f-sup-q-'+fid);
+  if(qEl)qEl.innerHTML=f.super_q.map(function(q){return '<div style="font-size:11px;color:var(--text2);padding:3px 0;border-bottom:1px solid var(--border)">• '+q+'</div>';}).join('');
+  var pEl=document.getElementById('f-sup-p-'+fid);
+  if(pEl)pEl.innerHTML=f.super_p.map(function(p){return '<div style="font-size:11px;color:var(--text2);padding:3px 0;border-bottom:1px solid var(--border)">• '+p+'</div>';}).join('');
+  var eEl=document.getElementById('f-sup-e-'+fid);
+  if(eEl)eEl.innerHTML=f.super_e.map(function(e){return '<div style="font-size:11px;color:var(--text2);padding:3px 0;border-bottom:1px solid var(--border)">• '+e+'</div>';}).join('');
+  var ftEl=document.getElementById('f-sup-ft-'+fid);
+  if(ftEl)ftEl.innerHTML=f.super_ft;
+}
+
+// ── Toast ──
+function fToast(msg){
+  var el=document.getElementById('f-toast');
+  if(!el){el=document.createElement('div');el.id='f-toast';el.style.cssText='position:fixed;bottom:20px;right:20px;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s ease;pointer-events:none';document.body.appendChild(el);}
+  el.textContent=msg;el.style.background='#1B873F';
+  el.style.transform='translateY(0)';el.style.opacity='1';
+  setTimeout(function(){el.style.transform='translateY(60px)';el.style.opacity='0';},2500);
+}
+
+// ── Init ──
+function initFrentesModule(){
+  renderFVisao();renderFPainel();renderFBriefing();
+}
+
 </script>
 </body>
 </html>
