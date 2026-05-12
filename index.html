@@ -1175,6 +1175,7 @@ body::after{ display:none }
   display:inline-block;margin:2px}
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -1193,6 +1194,12 @@ body::after{ display:none }
           placeholder="••••••••" onkeydown="if(event.key==='Enter')doUnlock()" autocomplete="off">
       </div>
       <button class="lock-btn" onclick="doUnlock()">Acessar o painel</button>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="showSupaLoginModal()" style="background:none;border:none;cursor:pointer;
+          font-family:var(--mono);font-size:10px;color:var(--accent);text-decoration:underline">
+          🔐 Login com e-mail institucional (Supabase)
+        </button>
+      </div>
       <div class="lock-error" id="lock-error"></div>
     </div>
     <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;margin-top:8px">
@@ -1290,6 +1297,16 @@ body::after{ display:none }
       </button>
     </div>
     <div class="nav-section">
+      <div class="nav-label">🗃 Sistema & Acesso</div>
+      <button class="nav-item" onclick="goTo('historico')" data-sec="historico">
+        <span class="nav-dot"></span>🕐 Histórico de Atualizações
+      </button>
+      <button class="nav-item admin-only" onclick="goTo('aprovacao')" data-sec="aprovacao" style="display:none">
+        <span class="nav-dot"></span>👥 Aprovação de Usuários
+        <span class="nav-badge nb-y" id="aprovacao-pip"></span>
+      </button>
+    </div>
+    <div class="nav-section">
       <div class="nav-label">⚙ Sistema</div>
       <button class="nav-item" onclick="goTo('importar')" data-sec="importar">
         <span class="nav-dot"></span>⬆ Importar Dados
@@ -1305,6 +1322,7 @@ body::after{ display:none }
         <span id="theme-label">Modo Escuro</span>
       </div>
       <button class="lock-btn-side" onclick="lockApp()">🔒 Bloquear / Trocar modo</button>
+      <button class="lock-btn-side" onclick="supaLogout()" style="color:var(--crit)">🚪 Sair (Supabase)</button>
       <div class="footer-ts">v5 · <span>SAA/MS</span><br><span id="ts-date">—</span><br><span style="font-size:8px;opacity:.6">by Lucas Macedo</span></div>
     </div>
   </aside>
@@ -1323,6 +1341,7 @@ body::after{ display:none }
         </div>
       </div>
       <div class="topbar-actions">
+        <span id="supa-user-badge"></span>
         <div class="live-ind"><div class="live-dot"></div>AO VIVO</div>
 
         <!-- Compartilhar WhatsApp -->
@@ -2350,6 +2369,7 @@ body::after{ display:none }
               onblur="fSaveField('f1','obs',this.value)"></textarea>
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
               <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f1')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="showVincularLinkModal('f1')">🔗 Vincular Link</button>
               <button class="btn" style="font-size:11px" onclick="fAddAcao('f1')">+ Adicionar ação</button>
               <button class="btn" style="font-size:11px" onclick="fExportarResumo('f1')">📄 Exportar resumo</button>
             </div>
@@ -2516,6 +2536,7 @@ body::after{ display:none }
               onblur="fSaveField('f2','obs',this.value)"></textarea>
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
               <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f2')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="showVincularLinkModal('f2')">🔗 Vincular Link</button>
               <button class="btn" style="font-size:11px" onclick="fAddAcao('f2')">+ Adicionar ação</button>
               <button class="btn" style="font-size:11px" onclick="fExportarResumo('f2')">📄 Exportar resumo</button>
             </div>
@@ -2682,6 +2703,7 @@ body::after{ display:none }
               onblur="fSaveField('f3','obs',this.value)"></textarea>
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
               <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f3')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="showVincularLinkModal('f3')">🔗 Vincular Link</button>
               <button class="btn" style="font-size:11px" onclick="fAddAcao('f3')">+ Adicionar ação</button>
               <button class="btn" style="font-size:11px" onclick="fExportarResumo('f3')">📄 Exportar resumo</button>
             </div>
@@ -2848,6 +2870,7 @@ body::after{ display:none }
               onblur="fSaveField('f4','obs',this.value)"></textarea>
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
               <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f4')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="showVincularLinkModal('f4')">🔗 Vincular Link</button>
               <button class="btn" style="font-size:11px" onclick="fAddAcao('f4')">+ Adicionar ação</button>
               <button class="btn" style="font-size:11px" onclick="fExportarResumo('f4')">📄 Exportar resumo</button>
             </div>
@@ -3014,6 +3037,7 @@ body::after{ display:none }
               onblur="fSaveField('f5','obs',this.value)"></textarea>
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
               <button class="btn btn-primary" style="font-size:11px" onclick="fSalvar('f5')">💾 Salvar</button>
+              <button class="btn" style="font-size:11px" onclick="showVincularLinkModal('f5')">🔗 Vincular Link</button>
               <button class="btn" style="font-size:11px" onclick="fAddAcao('f5')">+ Adicionar ação</button>
               <button class="btn" style="font-size:11px" onclick="fExportarResumo('f5')">📄 Exportar resumo</button>
             </div>
@@ -3618,6 +3642,14 @@ function startApp(){
   }
   renderAll();
   initFrentesModule();
+  // Inicializar Supabase (async, não bloqueia)
+  initSupabase().then(ok => {
+    if(ok){
+      loadFrentesFromSupabase();
+      initRealtimeSupabase();
+      updateAprovacaoPip();
+    }
+  });
 }
 
 function lockApp(){
@@ -6536,6 +6568,8 @@ function saveAll(){
 // NAVIGATION
 // ══════════════════════════════════════════════
 const TITLES={
+  historico:'Histórico de Atualizações',
+  aprovacao:'Aprovação de Usuários',
   frentes:'Frentes de Trabalho',
   'frentes-painel':'Painel Semanal das Frentes',
   'frentes-briefing':'Briefing Executivo — Dr. Alan',
@@ -6824,6 +6858,8 @@ function goTo(key){
     document.querySelector('.sidebar')?.classList.remove('open');
     document.getElementById('sidebar-overlay')?.classList.remove('open');
   }
+  if(key==='historico') requestAnimationFrame(renderHistoricoPage);
+  if(key==='aprovacao') requestAnimationFrame(renderAprovacaoUsers);
   if(key==='frentes'){ requestAnimationFrame(renderFVisao); requestAnimationFrame(renderFPainel); }
   if(key==='frentes-painel') requestAnimationFrame(renderFPainel);
   if(key==='frentes-briefing') requestAnimationFrame(renderFBriefing);
@@ -6939,7 +6975,163 @@ function popoutCoord(key){
     <tbody>${kpiRows}</tbody></table>
   </div>
   <div class="footer">Desenvolvido por Lucas Macedo · SAA/MS · ${new Date().toLocaleDateString('pt-BR')}</div>
-  </body></html>`;
+  
+      <!-- ══ MODAL AUTH SUPABASE ══ -->
+      <div class="modal-overlay" id="supa-auth-overlay" style="z-index:10000">
+        <div class="modal" style="max-width:480px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div style="font-family:var(--display);font-size:16px;font-weight:800;color:var(--text)">
+              🔐 Acesso Institucional SAA
+            </div>
+            <button onclick="closeSupaAuth()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>
+          </div>
+          <!-- Abas -->
+          <div style="display:flex;border-bottom:2px solid var(--border2);margin-bottom:16px">
+            <button id="supa-tab-login" class="lock-tab active" onclick="supaTabSwitch('login')" style="flex:1;border-bottom:2px solid var(--accent);margin-bottom:-2px">🔑 Entrar</button>
+            <button id="supa-tab-register" class="lock-tab" onclick="supaTabSwitch('register')" style="flex:1">📝 Solicitar Acesso</button>
+            <button id="supa-tab-forgot" class="lock-tab" onclick="supaTabSwitch('forgot')" style="flex:1">🔒 Redefinir Senha</button>
+          </div>
+
+          <!-- PAINEL LOGIN -->
+          <div id="supa-panel-login">
+            <div class="modal-field">
+              <div class="modal-label">E-mail institucional</div>
+              <input class="modal-input" id="supa-login-email" type="email" placeholder="nome@saude.gov.br" autocomplete="email">
+            </div>
+            <div class="modal-field">
+              <div class="modal-label">Senha</div>
+              <input class="modal-input" id="supa-login-senha" type="password" placeholder="••••••••" autocomplete="current-password"
+                onkeydown="if(event.key==='Enter')doSupaLogin()">
+            </div>
+            <div class="lock-error" id="supa-login-err"></div>
+            <div class="modal-footer" style="margin-top:8px">
+              <button class="btn" onclick="supaTabSwitch('forgot')" style="font-size:11px">Esqueci a senha</button>
+              <button class="btn btn-primary" id="supa-login-btn" onclick="doSupaLogin()">Entrar</button>
+            </div>
+          </div>
+
+          <!-- PAINEL CADASTRO -->
+          <div id="supa-panel-register" style="display:none">
+            <div style="background:var(--warn-a);border:1px solid var(--warn);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--text2);margin-bottom:14px">
+              ⚠️ O cadastro gera uma <b>solicitação de acesso</b> que será avaliada pelo administrador antes de liberar o login.
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="modal-field" style="grid-column:1/-1">
+                <div class="modal-label">Nome completo *</div>
+                <input class="modal-input" id="supa-reg-nome" placeholder="Nome Sobrenome">
+              </div>
+              <div class="modal-field">
+                <div class="modal-label">E-mail *</div>
+                <input class="modal-input" id="supa-reg-email" type="email" placeholder="nome@saude.gov.br">
+              </div>
+              <div class="modal-field">
+                <div class="modal-label">Senha (mín. 6 caracteres) *</div>
+                <input class="modal-input" id="supa-reg-senha" type="password" placeholder="••••••••">
+              </div>
+              <div class="modal-field">
+                <div class="modal-label">Coordenação</div>
+                <input class="modal-input" id="supa-reg-coord" placeholder="Ex: COGEP, CGLIC...">
+              </div>
+              <div class="modal-field">
+                <div class="modal-label">Função pretendida</div>
+                <select class="modal-input" id="supa-reg-perfil">
+                  <option value="visualizador">Visualizador</option>
+                  <option value="coordenador">Coordenador</option>
+                  <option value="ativador">Ativador</option>
+                  <option value="sistematizador">Sistematizador</option>
+                  <option value="gestor">Gestor</option>
+                </select>
+              </div>
+              <div class="modal-field">
+                <div class="modal-label">Frente vinculada</div>
+                <select class="modal-input" id="supa-reg-frente">
+                  <option value="">Nenhuma / Geral</option>
+                  <option value="f1">F1 · Pessoas</option>
+                  <option value="f2">F2 · Infraestrutura</option>
+                  <option value="f3">F3 · Contratos</option>
+                  <option value="f4">F4 · Governança</option>
+                  <option value="f5">F5 · Projetos Estratégicos</option>
+                </select>
+              </div>
+              <div class="modal-field" style="grid-column:1/-1">
+                <div class="modal-label">Justificativa de acesso</div>
+                <textarea class="modal-input" id="supa-reg-just" style="min-height:60px" placeholder="Por que você precisa de acesso a este sistema?"></textarea>
+              </div>
+            </div>
+            <div class="lock-error" id="supa-reg-err" style="min-height:18px"></div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" id="supa-reg-btn" onclick="doSupaRegister()">📝 Solicitar Acesso</button>
+            </div>
+          </div>
+
+          <!-- PAINEL ESQUECI SENHA -->
+          <div id="supa-panel-forgot" style="display:none">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
+              Informe seu e-mail institucional. Você receberá um link para redefinir sua senha.
+            </div>
+            <div class="modal-field">
+              <div class="modal-label">E-mail institucional</div>
+              <input class="modal-input" id="supa-forgot-email" type="email" placeholder="nome@saude.gov.br">
+            </div>
+            <div class="lock-error" id="supa-forgot-err" style="min-height:18px"></div>
+            <div class="modal-footer">
+              <button class="btn" onclick="supaTabSwitch('login')">← Voltar</button>
+              <button class="btn btn-primary" id="supa-forgot-btn" onclick="doSupaForgot()">Enviar link</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SEÇÃO HISTÓRICO ══ -->
+      <div id="sec-historico" class="section">
+        <div class="sec-head">
+          <div class="sec-title">🕐 Histórico de <em>Atualizações</em></div>
+          <div class="sec-sub">Linha do tempo de todas as alterações · Filtros por frente, usuário, tipo e data</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)">Filtrar:</div>
+            <select id="hist-f-frente" class="kpi-unit-input" style="width:140px" onchange="renderHistoricoPage()">
+              <option value="">Todas as frentes</option>
+              <option value="f1">F1 · Pessoas</option>
+              <option value="f2">F2 · Infraestrutura</option>
+              <option value="f3">F3 · Contratos</option>
+              <option value="f4">F4 · Governança</option>
+              <option value="f5">F5 · Projetos</option>
+            </select>
+            <select id="hist-f-tipo" class="kpi-unit-input" style="width:130px" onchange="renderHistoricoPage()">
+              <option value="">Todos os tipos</option>
+              <option value="criacao">➕ Criação</option>
+              <option value="edicao">✏️ Edição</option>
+              <option value="exclusao">🗑 Exclusão</option>
+              <option value="importacao">📥 Importação</option>
+              <option value="atualizacao">🔄 Atualização</option>
+              <option value="login">🔑 Login</option>
+              <option value="aprovacao">✅ Aprovação</option>
+            </select>
+            <input id="hist-f-data" type="date" class="kpi-unit-input" style="width:140px" onchange="renderHistoricoPage()">
+            <button class="btn" onclick="document.getElementById('hist-f-frente').value='';document.getElementById('hist-f-tipo').value='';document.getElementById('hist-f-data').value='';renderHistoricoPage()">↺ Limpar</button>
+            <button class="btn btn-primary" style="margin-left:auto;font-size:11px" onclick="exportarHistorico()">📄 Exportar CSV</button>
+          </div>
+        </div>
+        <div id="historico-lista" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- ══ SEÇÃO APROVAÇÃO DE USUÁRIOS ══ -->
+      <div id="sec-aprovacao" class="section">
+        <div class="sec-head">
+          <div class="sec-title">👥 Aprovação de <em>Usuários</em></div>
+          <div class="sec-sub">Gerenciamento de acesso · Apenas administradores · SAA/MS</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <div id="aprovacao-stats" style="display:flex;gap:8px"></div>
+          <button class="btn btn-primary" style="margin-left:auto;font-size:11px" onclick="renderAprovacaoUsers()">🔄 Atualizar lista</button>
+        </div>
+        <div id="aprovacao-lista" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+
+
+</body></html>`;
 
   const w = window.open('','_blank','width=800,height=620,resizable=yes,scrollbars=yes');
   w.document.write(html);
@@ -8012,6 +8204,779 @@ function initFrentesModule(){
   renderFVisao();renderFPainel();renderFBriefing();
 }
 
+
+
+// ══ SUPABASE LAYER ══
+// ══════════════════════════════════════════════════════════════════
+// CAMADA SUPABASE — SAA Dashboard v6
+// Projeto: https://btbdycijbvpoossgplsx.supabase.co
+// ══════════════════════════════════════════════════════════════════
+
+const SUPA_URL = 'https://btbdycijbvpoossgplsx.supabase.co';
+const SUPA_KEY = 'sb_publishable_ElP4iW14tTB7IFNhb8wGWA_-nFLe76L';
+
+// ── Cliente Supabase (via CDN, sem npm) ───────────────────────────
+let _supa = null;
+function getSupa(){
+  if(_supa) return _supa;
+  if(typeof supabase !== 'undefined'){
+    _supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+  }
+  return _supa;
+}
+
+// ── Estado do usuário atual ───────────────────────────────────────
+let CURRENT_USER = null;    // { id, email, nome, perfil, coordenacao, frente_id, status }
+let SUPA_READY   = false;
+
+// ── Inicialização ─────────────────────────────────────────────────
+async function initSupabase(){
+  const sb = getSupa();
+  if(!sb){ console.warn('Supabase SDK não carregado — modo local'); return false; }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if(session?.user){
+      await loadUserProfile(session.user.id);
+    }
+    // Listener de mudança de auth
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if(event === 'SIGNED_IN' && session?.user){
+        await loadUserProfile(session.user.id);
+        onSupaLogin();
+      }
+      if(event === 'SIGNED_OUT'){
+        CURRENT_USER = null;
+        onSupaLogout();
+      }
+    });
+    SUPA_READY = true;
+    return true;
+  } catch(e){
+    console.warn('Supabase init erro:', e.message);
+    return false;
+  }
+}
+
+async function loadUserProfile(uid){
+  const sb = getSupa(); if(!sb) return;
+  const { data, error } = await sb.from('profiles').select('*').eq('id', uid).single();
+  if(data){
+    CURRENT_USER = data;
+    SESSION.supaUser = data;
+    applySupaMode();
+  }
+}
+
+function onSupaLogin(){
+  // Fechar lock screen se logado via Supabase
+  if(CURRENT_USER?.status === 'aprovado'){
+    SESSION.mode = CURRENT_USER.perfil === 'visualizador' ? 'view' : 'edit';
+    document.getElementById('lock-screen')?.classList.add('hidden');
+    applyMode();
+    renderAll();
+    initFrentesModule();
+    loadFrentesFromSupabase();
+    registrarHistorico('login', null, null, null, 'Login realizado');
+  } else if(CURRENT_USER?.status === 'pendente'){
+    document.getElementById('lock-error').textContent = 'Acesso pendente de aprovação pelo administrador.';
+  } else {
+    document.getElementById('lock-error').textContent = 'Acesso negado. Contate o administrador.';
+  }
+}
+
+function onSupaLogout(){
+  SESSION.mode = null;
+  document.getElementById('lock-screen')?.classList.remove('hidden');
+}
+
+function applySupaMode(){
+  if(!CURRENT_USER) return;
+  const perfil = CURRENT_USER.perfil;
+  // Ocultar botões de edição para visualizadores
+  document.querySelectorAll('.edit-only').forEach(el => {
+    el.style.display = (perfil === 'visualizador') ? 'none' : '';
+  });
+  // Admin vê área de aprovação
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = (perfil === 'administrador') ? '' : 'none';
+  });
+  // Badge de usuário no topbar
+  const badge = document.getElementById('supa-user-badge');
+  if(badge) badge.innerHTML = `
+    <span style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:3px;
+      background:var(--good-a);color:var(--good);border:1px solid var(--good)30">
+      👤 ${CURRENT_USER.nome?.split(' ')[0]} · ${CURRENT_USER.perfil}
+    </span>`;
+}
+
+// ── AUTH: Login por e-mail ─────────────────────────────────────────
+async function supaLogin(email, senha){
+  const sb = getSupa(); if(!sb) return { error: 'SDK não carregado' };
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
+  if(error) return { error: error.message };
+  return { data };
+}
+
+async function supaLogout(){
+  const sb = getSupa(); if(!sb) return;
+  await sb.auth.signOut();
+  lockApp();
+}
+
+async function supaRegister(email, senha, meta){
+  const sb = getSupa(); if(!sb) return { error: 'SDK não carregado' };
+  const { data, error } = await sb.auth.signUp({
+    email, password: senha,
+    options: { data: meta }
+  });
+  if(error) return { error: error.message };
+  return { data };
+}
+
+async function supaResetPassword(email){
+  const sb = getSupa(); if(!sb) return { error: 'SDK não carregado' };
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.href
+  });
+  return error ? { error: error.message } : { ok: true };
+}
+
+// ── FRENTES: carregar do Supabase ─────────────────────────────────
+async function loadFrentesFromSupabase(){
+  const sb = getSupa(); if(!sb) return;
+  const { data: frentes } = await sb.from('frentes').select('*').order('n');
+  const { data: kpis }    = await sb.from('frentes_kpis').select('*');
+  const { data: demandas } = await sb.from('frentes_demandas').select('*').eq('status', 'aberta');
+  const { data: acoes }   = await sb.from('frentes_acoes').select('*');
+  const { data: docs }    = await sb.from('frentes_docs').select('*');
+
+  if(!frentes?.length) return;
+
+  // Mesclar dados do Supabase com FRENTES_DB (que tem dados estáticos)
+  frentes.forEach(f => {
+    const local = FRENTES_DB.find(x => x.id === f.id);
+    if(!local) return;
+    // Atualizar campos editáveis vindos do banco
+    if(f.nome)        local.nome = f.nome;
+    if(f.finalidade)  local.fin  = f.finalidade;
+    if(f.ativador)    local.atv  = f.ativador;
+    if(f.sistematizador) local.sis = f.sistematizador;
+    if(f.cor)         local.cor  = f.cor;
+
+    // Montar objeto de dados no fdbGet equivalente
+    const db = fdbGet();
+    if(!db.frentes) db.frentes = {};
+    db.frentes[f.id] = db.frentes[f.id] || {};
+    const fd = db.frentes[f.id];
+    fd.status    = f.status    || fd.status;
+    fd.pct       = f.pct_execucao !== null ? f.pct_execucao : fd.pct;
+    fd.narrativa = f.narrativa || fd.narrativa;
+    fd.obs       = f.obs_semanal || fd.obs;
+    fd.sei       = f.sei       || fd.sei;
+    fd.autor     = f.atualizado_por || fd.autor;
+    fd.ts        = f.updated_at ? new Date(f.updated_at).toLocaleString('pt-BR') : fd.ts;
+
+    // KPIs
+    const fKpis = kpis?.filter(k => k.frente_id === f.id) || [];
+    fd.kpis = fd.kpis || {};
+    fKpis.forEach(k => { fd.kpis[k.idx] = k.valor; });
+
+    // Demandas
+    fd.demandas = demandas?.filter(d => d.frente_id === f.id).map(d => ({
+      id: d.id, titulo: d.titulo, resp: d.resp,
+      prazo: d.prazo, status: d.status
+    })) || fd.demandas || [];
+
+    // Ações
+    fd.acoes = acoes?.filter(a => a.frente_id === f.id).map(a => ({
+      id: a.id, titulo: a.titulo, resp: a.resp,
+      prazo: a.prazo, status: a.status
+    })) || fd.acoes || [];
+
+    // Docs
+    fd.docs = docs?.filter(d => d.frente_id === f.id).map(d => ({
+      id: d.id, nome: d.nome, tipo: d.tipo,
+      url: d.url, resp: d.enviado_por, dt: new Date(d.created_at).toLocaleString('pt-BR')
+    })) || fd.docs || [];
+
+    fdbSet(db);
+  });
+  renderFVisao();
+}
+
+// ── FRENTES: salvar no Supabase ──────────────────────────────────
+async function saveFrenteToSupabase(fid){
+  const sb = getSupa(); if(!sb) return;
+  const db = fdbGet();
+  const fd = db.frentes?.[fid] || {};
+  const f  = FRENTES_DB.find(x => x.id === fid);
+  if(!f) return;
+
+  const anterior = await getAnteriorFrente(fid);
+
+  const payload = {
+    id: fid, n: f.n, nome: f.nome, cor: f.cor,
+    finalidade:     f.fin,
+    ativador:       f.atv || null,
+    sistematizador: f.sis || null,
+    status:         fd.status  || 'andamento',
+    pct_execucao:   parseInt(fd.pct) || 0,
+    narrativa:      fd.narrativa || null,
+    obs_semanal:    fd.obs      || null,
+    sei:            fd.sei      || null,
+    atualizado_por: fd.autor    || CURRENT_USER?.nome || null,
+    updated_at:     new Date().toISOString()
+  };
+
+  const { error } = await sb.from('frentes').upsert(payload, { onConflict: 'id' });
+  if(error){ console.error('Erro ao salvar frente:', error.message); return; }
+
+  // Salvar KPIs
+  if(fd.kpis){
+    const kpiRows = Object.entries(fd.kpis).map(([idx,valor]) => ({
+      frente_id: fid, idx: parseInt(idx),
+      nome: f.ind?.[idx] || `KPI ${idx}`,
+      valor: parseFloat(valor) || 0,
+      updated_at: new Date().toISOString()
+    }));
+    await sb.from('frentes_kpis')
+      .upsert(kpiRows, { onConflict: 'frente_id,idx' });
+  }
+
+  // Histórico: detectar campos alterados
+  const campos = {status:'Status',pct_execucao:'% Execução',narrativa:'Narrativa',
+    obs_semanal:'Registro Semanal',sei:'SEI',ativador:'Ativador',sistematizador:'Sistematizador'};
+  for(const [campo, label] of Object.entries(campos)){
+    if(anterior[campo] !== payload[campo]){
+      await registrarHistorico('edicao', fid, label, anterior[campo], payload[campo]);
+    }
+  }
+}
+
+async function getAnteriorFrente(fid){
+  const sb = getSupa(); if(!sb) return {};
+  const { data } = await sb.from('frentes').select('*').eq('id', fid).single();
+  return data || {};
+}
+
+// ── DEMANDAS: CRUD ────────────────────────────────────────────────
+async function addDemandaSupabase(fid, titulo, resp, prazo){
+  const sb = getSupa(); if(!sb) return null;
+  const { data, error } = await sb.from('frentes_demandas').insert({
+    frente_id: fid, titulo, resp, prazo, status: 'aberta'
+  }).select().single();
+  if(!error) await registrarHistorico('criacao', fid, 'Demanda', null, titulo);
+  return data;
+}
+
+async function updateDemandaStatusSupabase(id, status){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('frentes_demandas').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
+}
+
+async function deleteDemandaSupabase(id, fid){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('frentes_demandas').delete().eq('id', id);
+  await registrarHistorico('exclusao', fid, 'Demanda', id, null);
+}
+
+// ── AÇÕES: CRUD ───────────────────────────────────────────────────
+async function addAcaoSupabase(fid, titulo, resp, prazo){
+  const sb = getSupa(); if(!sb) return null;
+  const { data, error } = await sb.from('frentes_acoes').insert({
+    frente_id: fid, titulo, resp, prazo, status: 'aberta'
+  }).select().single();
+  if(!error) await registrarHistorico('criacao', fid, 'Ação', null, titulo);
+  return data;
+}
+
+async function updateAcaoStatusSupabase(id, status){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('frentes_acoes').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
+}
+
+async function deleteAcaoSupabase(id, fid){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('frentes_acoes').delete().eq('id', id);
+  await registrarHistorico('exclusao', fid, 'Ação', id, null);
+}
+
+// ── DOCUMENTOS: salvar link ou referência ─────────────────────────
+async function addDocSupabase(fid, nome, tipo, url, resp, obs){
+  const sb = getSupa(); if(!sb) return null;
+  const { data, error } = await sb.from('frentes_docs').insert({
+    frente_id: fid, nome, tipo: tipo||'link', url, enviado_por: resp||CURRENT_USER?.nome, observacao: obs
+  }).select().single();
+  if(!error) await registrarHistorico('importacao', fid, 'Documento', null, nome);
+  return data;
+}
+
+async function deleteDocSupabase(id, fid){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('frentes_docs').delete().eq('id', id);
+  await registrarHistorico('exclusao', fid, 'Documento', id, null);
+}
+
+// ── PAINEL SEMANAL ────────────────────────────────────────────────
+async function savePainelSupabase(dados){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('painel_semanal').insert({ ...dados, created_at: new Date().toISOString() });
+}
+
+async function loadPainelSupabase(){
+  const sb = getSupa(); if(!sb) return null;
+  const { data } = await sb.from('painel_semanal')
+    .select('*').order('created_at', { ascending: false }).limit(1).single();
+  return data;
+}
+
+// ── BRIEFING ─────────────────────────────────────────────────────
+async function saveBriefingSupabase(dados){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('briefing').insert({ ...dados, created_at: new Date().toISOString() });
+}
+
+async function loadBriefingSupabase(){
+  const sb = getSupa(); if(!sb) return null;
+  const { data } = await sb.from('briefing')
+    .select('*').order('created_at', { ascending: false }).limit(1).single();
+  return data;
+}
+
+// ── HISTÓRICO ────────────────────────────────────────────────────
+async function registrarHistorico(tipo, frenteId, campo, anterior, novo, obs){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('historico').insert({
+    usuario_id:     CURRENT_USER?.id    || null,
+    usuario_nome:   CURRENT_USER?.nome  || 'Sistema',
+    frente_id:      frenteId || null,
+    coordenacao:    CURRENT_USER?.coordenacao || null,
+    campo_alterado: campo     || null,
+    valor_anterior: anterior ? String(anterior) : null,
+    valor_novo:     novo     ? String(novo)     : null,
+    tipo_alteracao: tipo,
+    observacao:     obs || null,
+    created_at:     new Date().toISOString()
+  });
+}
+
+async function loadHistorico(filtros){
+  const sb = getSupa(); if(!sb) return [];
+  let q = sb.from('historico').select('*').order('created_at', { ascending: false }).limit(200);
+  if(filtros?.frente_id)  q = q.eq('frente_id', filtros.frente_id);
+  if(filtros?.usuario_id) q = q.eq('usuario_id', filtros.usuario_id);
+  if(filtros?.tipo)       q = q.eq('tipo_alteracao', filtros.tipo);
+  if(filtros?.data_de)    q = q.gte('created_at', filtros.data_de);
+  const { data } = await q;
+  return data || [];
+}
+
+// ── USUÁRIOS: gestão pelo admin ───────────────────────────────────
+async function loadPendingUsers(){
+  const sb = getSupa(); if(!sb) return [];
+  const { data } = await sb.from('profiles')
+    .select('*').eq('status', 'pendente').order('created_at');
+  return data || [];
+}
+
+async function loadAllUsers(){
+  const sb = getSupa(); if(!sb) return [];
+  const { data } = await sb.from('profiles').select('*').order('created_at');
+  return data || [];
+}
+
+async function approveUser(uid, novoPerfil){
+  const sb = getSupa(); if(!sb) return;
+  const { error } = await sb.from('profiles').update({
+    status: 'aprovado',
+    perfil: novoPerfil || 'visualizador',
+    aprovado_por: CURRENT_USER?.id,
+    updated_at: new Date().toISOString()
+  }).eq('id', uid);
+  if(!error) await registrarHistorico('aprovacao', null, 'Status usuário', 'pendente', 'aprovado');
+}
+
+async function rejectUser(uid){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('profiles').update({
+    status: 'rejeitado', updated_at: new Date().toISOString()
+  }).eq('id', uid);
+  await registrarHistorico('aprovacao', null, 'Status usuário', 'pendente', 'rejeitado');
+}
+
+async function revokeUser(uid){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('profiles').update({
+    status: 'revogado', updated_at: new Date().toISOString()
+  }).eq('id', uid);
+}
+
+async function updateUserPerfil(uid, perfil, coordenacao, frenteId){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('profiles').update({
+    perfil, coordenacao, frente_id: frenteId,
+    updated_at: new Date().toISOString()
+  }).eq('id', uid);
+}
+
+// ── ACCESS REQUESTS: pré-cadastro ────────────────────────────────
+async function enviarSolicitacaoAcesso(dados){
+  const sb = getSupa(); if(!sb) return { error: 'SDK não carregado' };
+  const { data, error } = await sb.from('access_requests').insert(dados).select().single();
+  return error ? { error: error.message } : { data };
+}
+
+async function loadAccessRequests(){
+  const sb = getSupa(); if(!sb) return [];
+  const { data } = await sb.from('access_requests')
+    .select('*').eq('status','pendente').order('created_at');
+  return data || [];
+}
+
+async function approveAccessRequest(id, perfil){
+  const sb = getSupa(); if(!sb) return;
+  await sb.from('access_requests').update({
+    status: 'aprovado',
+    avaliado_por: CURRENT_USER?.id,
+    updated_at: new Date().toISOString()
+  }).eq('id', id);
+}
+
+// ── TEMPO REAL: escutar mudanças no Supabase ──────────────────────
+function initRealtimeSupabase(){
+  const sb = getSupa(); if(!sb) return;
+  sb.channel('frentes-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'frentes' },
+      payload => {
+        console.log('Frente atualizada em tempo real:', payload.new?.id);
+        loadFrentesFromSupabase();
+      })
+    .subscribe();
+  sb.channel('hist-changes')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'historico' },
+      () => { if(document.getElementById('sec-historico')?.classList.contains('active')) renderHistoricoPage(); })
+    .subscribe();
+}
+
+
+
+// ══ SUPABASE UI ══
+// ══════════════════════════════════════════════════════════════════
+// UI SUPABASE — Login, Cadastro, Aprovação, Histórico
+// ══════════════════════════════════════════════════════════════════
+
+// ── TELA DE LOCK: integrar Supabase + senha local ────────────────
+async function doUnlock(){
+  const val = document.getElementById('lock-input').value.trim();
+  const err = document.getElementById('lock-error');
+  err.textContent = '';
+
+  // Tentar login Supabase se parecer e-mail
+  if(val.includes('@') && SUPA_READY){
+    // Redirecionar para modal de login completo
+    showSupaLoginModal();
+    return;
+  }
+
+  // Senhas locais (fallback sem internet)
+  if(val === PASS_MAIN){ SESSION.mode='view'; startApp(); return; }
+  if(val === PASS_EDIT){ SESSION.mode='edit'; startApp(); return; }
+
+  err.textContent = 'Senha incorreta. Use e-mail@dominio.com para login institucional.';
+  document.getElementById('lock-input').value = '';
+  setTimeout(()=>err.textContent='', 4000);
+}
+
+// ── MODAL DE LOGIN SUPABASE ──────────────────────────────────────
+function showSupaLoginModal(){
+  const ov = document.getElementById('supa-auth-overlay');
+  if(ov){ ov.classList.add('open'); supaTabSwitch('login'); }
+}
+function closeSupaAuth(){
+  document.getElementById('supa-auth-overlay')?.classList.remove('open');
+}
+
+function supaTabSwitch(tab){
+  ['login','register','forgot','request'].forEach(t => {
+    document.getElementById('supa-panel-'+t)?.style && (document.getElementById('supa-panel-'+t).style.display = t===tab?'block':'none');
+    document.getElementById('supa-tab-'+t)?.classList.toggle('active', t===tab);
+  });
+}
+
+async function doSupaLogin(){
+  const email = document.getElementById('supa-login-email')?.value.trim();
+  const senha  = document.getElementById('supa-login-senha')?.value;
+  const errEl  = document.getElementById('supa-login-err');
+  const btn    = document.getElementById('supa-login-btn');
+  if(!email||!senha){ errEl.textContent='Preencha e-mail e senha.'; return; }
+  btn.disabled=true; btn.textContent='Entrando...';
+  const { data, error } = await supaLogin(email, senha);
+  btn.disabled=false; btn.textContent='Entrar';
+  if(error){ errEl.textContent = error; return; }
+  closeSupaAuth();
+  // onSupaLogin é chamado pelo listener auth
+}
+
+async function doSupaRegister(){
+  const nome      = document.getElementById('supa-reg-nome')?.value.trim();
+  const email     = document.getElementById('supa-reg-email')?.value.trim();
+  const senha     = document.getElementById('supa-reg-senha')?.value;
+  const coord     = document.getElementById('supa-reg-coord')?.value.trim();
+  const perfil    = document.getElementById('supa-reg-perfil')?.value;
+  const frente    = document.getElementById('supa-reg-frente')?.value;
+  const just      = document.getElementById('supa-reg-just')?.value.trim();
+  const errEl     = document.getElementById('supa-reg-err');
+  if(!nome||!email||!senha){ errEl.textContent='Preencha nome, e-mail e senha.'; return; }
+  if(senha.length < 6){ errEl.textContent='Senha mínima: 6 caracteres.'; return; }
+
+  const btn = document.getElementById('supa-reg-btn');
+  btn.disabled=true; btn.textContent='Cadastrando...';
+
+  const { data, error } = await supaRegister(email, senha, { nome, perfil, coordenacao: coord, frente_id: frente });
+  btn.disabled=false; btn.textContent='Solicitar Acesso';
+
+  if(error){ errEl.textContent = error; return; }
+
+  // Criar também uma access_request para o admin ver
+  await enviarSolicitacaoAcesso({ nome, email, coordenacao: coord, funcao: perfil, frente_id: frente, justificativa: just });
+
+  errEl.style.color='var(--good)';
+  errEl.textContent = '✓ Cadastro enviado! Aguarde aprovação do administrador.';
+}
+
+async function doSupaForgot(){
+  const email = document.getElementById('supa-forgot-email')?.value.trim();
+  const errEl = document.getElementById('supa-forgot-err');
+  if(!email){ errEl.textContent='Informe o e-mail.'; return; }
+  const btn = document.getElementById('supa-forgot-btn');
+  btn.disabled=true;
+  const { ok, error } = await supaResetPassword(email);
+  btn.disabled=false;
+  errEl.style.color = ok?'var(--good)':'var(--crit)';
+  errEl.textContent = ok ? '✓ Link de redefinição enviado para seu e-mail.' : error;
+}
+
+// ── SEÇÃO HISTÓRICO ──────────────────────────────────────────────
+async function renderHistoricoPage(){
+  const el = document.getElementById('historico-lista'); if(!el) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px">Carregando...</div>';
+
+  const filtros = {
+    frente_id:  document.getElementById('hist-f-frente')?.value || undefined,
+    tipo:       document.getElementById('hist-f-tipo')?.value   || undefined,
+    data_de:    document.getElementById('hist-f-data')?.value   ? document.getElementById('hist-f-data').value+'T00:00:00Z' : undefined,
+  };
+  Object.keys(filtros).forEach(k => filtros[k]===undefined && delete filtros[k]);
+
+  const hist = await loadHistorico(filtros);
+  if(!hist.length){ el.innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px">Nenhum registro encontrado.</div>'; return; }
+
+  const TIPOS_COR = { criacao:'#1B873F',edicao:'#0277BD',exclusao:'#B71C1C',
+    importacao:'#5E35B1',atualizacao:'#C05C00',login:'#6B7280',aprovacao:'#1B873F' };
+  const TIPOS_ICO = { criacao:'➕',edicao:'✏️',exclusao:'🗑',importacao:'📥',
+    atualizacao:'🔄',login:'🔑',aprovacao:'✅' };
+
+  el.innerHTML = hist.map(h => {
+    const cor = TIPOS_COR[h.tipo_alteracao]||'#6B7280';
+    const ico = TIPOS_ICO[h.tipo_alteracao]||'•';
+    const dt  = h.created_at ? new Date(h.created_at).toLocaleString('pt-BR') : '—';
+    const fn  = FRENTES_DB.find(f=>f.id===h.frente_id);
+    return `<div style="display:flex;gap:12px;padding:10px 14px;background:var(--surface);
+      border:1px solid var(--border);border-radius:var(--radius-sm);border-left:3px solid ${cor}">
+      <div style="font-size:16px;flex-shrink:0">${ico}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+          <span style="font-size:11px;font-weight:600;color:var(--text)">${h.usuario_nome||'Sistema'}</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;
+            background:${cor}18;color:${cor}">${h.tipo_alteracao}</span>
+          ${fn?`<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">F${fn.n} · ${fn.nome.split(',')[0]}</span>`:''}
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto">${dt}</span>
+        </div>
+        ${h.campo_alterado?`<div style="font-size:11px;color:var(--text2)"><b>${h.campo_alterado}:</b>
+          ${h.valor_anterior?`<span style="text-decoration:line-through;opacity:.5">${h.valor_anterior}</span> → `:''}
+          <span style="color:${cor}">${h.valor_novo||'—'}</span></div>`:''}
+        ${h.observacao?`<div style="font-size:10px;color:var(--text3);margin-top:2px">${h.observacao}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SEÇÃO APROVAÇÃO DE USUÁRIOS (admin) ──────────────────────────
+async function renderAprovacaoUsers(){
+  const el = document.getElementById('aprovacao-lista'); if(!el) return;
+  const pending = await loadPendingUsers();
+  const all     = await loadAllUsers();
+
+  // Contadores
+  const stats = document.getElementById('aprovacao-stats');
+  if(stats){
+    stats.innerHTML = `
+      <span style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:3px;background:var(--warn-a);color:var(--warn)">
+        ⏳ ${pending.length} pendente${pending.length!==1?'s':''}
+      </span>
+      <span style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:3px;background:var(--good-a);color:var(--good)">
+        ✅ ${all.filter(u=>u.status==='aprovado').length} aprovado${all.filter(u=>u.status==='aprovado').length!==1?'s':''}
+      </span>
+      <span style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:3px;background:var(--surface3);color:var(--text3)">
+        👥 ${all.length} total
+      </span>`;
+  }
+
+  el.innerHTML = all.map(u => {
+    const ST = { pendente:'#C05C00',aprovado:'#1B873F',rejeitado:'#B71C1C',revogado:'#6B7280' };
+    const cor = ST[u.status]||'#6B7280';
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+      padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="width:36px;height:36px;border-radius:50%;background:${cor}20;border:2px solid ${cor};
+        display:flex;align-items:center;justify-content:center;font-weight:700;color:${cor};font-size:13px;flex-shrink:0">
+        ${(u.nome||'?')[0].toUpperCase()}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--text)">${u.nome||'—'}</div>
+        <div style="font-size:10px;color:var(--text2)">${u.email}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          <span style="font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;
+            background:${cor}18;color:${cor}">${u.status}</span>
+          <span style="font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;
+            background:var(--surface2);color:var(--text3)">${u.perfil}</span>
+          ${u.coordenacao?`<span style="font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;background:var(--surface2);color:var(--text3)">${u.coordenacao}</span>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0">
+        ${u.status==='pendente'?`
+          <select id="perfil-sel-${u.id}" style="font-size:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:4px 6px">
+            <option value="visualizador">Visualizador</option>
+            <option value="coordenador">Coordenador</option>
+            <option value="ativador">Ativador</option>
+            <option value="sistematizador">Sistematizador</option>
+            <option value="gestor">Gestor</option>
+            <option value="administrador">Administrador</option>
+          </select>
+          <button onclick="aprovarUser('${u.id}')" style="background:var(--good);color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer">✅ Aprovar</button>
+          <button onclick="rejeitarUser('${u.id}')" style="background:var(--crit-a);color:var(--crit);border:1px solid var(--crit);border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer">❌ Rejeitar</button>`:''}
+        ${u.status==='aprovado'?`
+          <button onclick="revogarUser('${u.id}')" style="background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 10px;font-size:10px;cursor:pointer;color:var(--text3)">Revogar</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function aprovarUser(uid){
+  const perfil = document.getElementById('perfil-sel-'+uid)?.value||'visualizador';
+  await approveUser(uid, perfil);
+  fToast('Usuário aprovado!');
+  renderAprovacaoUsers();
+}
+async function rejeitarUser(uid){
+  if(!confirm('Rejeitar este usuário?')) return;
+  await rejectUser(uid);
+  fToast('Usuário rejeitado.');
+  renderAprovacaoUsers();
+}
+async function revogarUser(uid){
+  if(!confirm('Revogar acesso deste usuário?')) return;
+  await revokeUser(uid);
+  fToast('Acesso revogado.');
+  renderAprovacaoUsers();
+}
+
+// ── MODAL VINCULAR LINK/DOC numa frente ─────────────────────────
+function showVincularLinkModal(fid){
+  const f = FRENTES_DB.find(x=>x.id===fid); if(!f) return;
+  document.getElementById('modal-title').textContent = `🔗 Vincular Link — Frente ${f.n}: ${f.nome.split(',')[0]}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-hint">Vincule links externos (Power BI, Google Sheets, SEI, OneDrive, SharePoint) diretamente à frente. O link fica salvo no banco de dados.</div>
+    <div class="modal-field"><div class="modal-label">Tipo</div>
+      <select class="modal-input" id="vl-tipo">
+        <option value="link">🔗 Link genérico</option>
+        <option value="powerbi">📊 Power BI</option>
+        <option value="sheets">📋 Google Sheets</option>
+        <option value="sei">📑 Processo SEI</option>
+        <option value="onedrive">📁 OneDrive/SharePoint</option>
+        <option value="youtube">🎬 Vídeo / YouTube</option>
+      </select></div>
+    <div class="modal-field"><div class="modal-label">URL / Link *</div>
+      <input class="modal-input" id="vl-url" placeholder="https://..."></div>
+    <div class="modal-field"><div class="modal-label">Nome / Descrição *</div>
+      <input class="modal-input" id="vl-nome" placeholder="Ex: Painel Power BI — Contratos Q1"></div>
+    <div class="modal-field"><div class="modal-label">Observação</div>
+      <input class="modal-input" id="vl-obs" placeholder="Contexto, data de referência..."></div>`;
+  _pa = async () => {
+    const url  = document.getElementById('vl-url')?.value.trim();
+    const nome = document.getElementById('vl-nome')?.value.trim();
+    if(!url||!nome){ alert('URL e nome são obrigatórios.'); return; }
+    const tipo = document.getElementById('vl-tipo')?.value;
+    const obs  = document.getElementById('vl-obs')?.value.trim();
+    // Salvar no Supabase
+    if(SUPA_READY){
+      await addDocSupabase(fid, nome, tipo, url, CURRENT_USER?.nome, obs);
+    }
+    // Salvar local também
+    const db = fdbGet();
+    if(!db.frentes)db.frentes={};if(!db.frentes[fid])db.frentes[fid]={};if(!db.frentes[fid].docs)db.frentes[fid].docs=[];
+    db.frentes[fid].docs.unshift({ id:'L'+Date.now(), nome, tipo, url, resp: CURRENT_USER?.nome||'—', dt: new Date().toLocaleString('pt-BR') });
+    fdbSet(db);
+    fCarregarFrente(fid);
+    closeModal();
+    fToast('Link vinculado!');
+  };
+  openModal();
+}
+
+// ── ATUALIZAR fSalvar e fAddDem para sincronizar com Supabase ────
+// Estas funções sobrescrevem as originais e incluem sync com Supabase
+
+const _origFSalvar = typeof fSalvar !== 'undefined' ? fSalvar : null;
+function fSalvar(fid){
+  // Chamar a versão original (salva localStorage)
+  if(_origFSalvar) _origFSalvar(fid);
+  // Sincronizar com Supabase
+  if(SUPA_READY) saveFrenteToSupabase(fid).then(()=>fToast('Salvo no banco!')).catch(console.error);
+}
+
+const _origFAddDem = typeof fAddDem !== 'undefined' ? fAddDem : null;
+function fAddDem(fid){
+  const t=prompt('Demanda:'); if(!t)return;
+  const r=prompt('Responsável:')||'';
+  const p=prompt('Prazo:')||'';
+  const db=fdbGet();
+  if(!db.frentes)db.frentes={};if(!db.frentes[fid])db.frentes[fid]={};if(!db.frentes[fid].demandas)db.frentes[fid].demandas=[];
+  const newId = SUPA_READY ? 'temp_'+Date.now() : 'D'+Date.now();
+  db.frentes[fid].demandas.unshift({id:newId,titulo:t,resp:r,prazo:p,status:'aberta'});
+  fdbSet(db);
+  fRenderDems(fid,db.frentes[fid].demandas);
+  renderFVisao();
+  // Sync Supabase
+  if(SUPA_READY){
+    addDemandaSupabase(fid,t,r,p).then(data=>{
+      if(data?.id){
+        // Atualizar ID local com ID real do banco
+        const db2=fdbGet();
+        const dem=db2.frentes?.[fid]?.demandas?.find(d=>d.id===newId);
+        if(dem){ dem.id=data.id; fdbSet(db2); }
+      }
+    });
+  }
+  fToast('Demanda adicionada!');
+}
+
+
+
+// ══ FUNÇÕES AUXILIARES SUPABASE ══
+async function updateAprovacaoPip(){
+  if(!SUPA_READY||CURRENT_USER?.perfil!=='administrador')return;
+  const pending=await loadPendingUsers();
+  const pip=document.getElementById('aprovacao-pip');
+  if(pip){pip.textContent=pending.length||'';pip.style.display=pending.length?'':'none';}
+}
+
+async function exportarHistorico(){
+  const hist=await loadHistorico({});
+  if(!hist.length){alert('Nenhum registro.');return;}
+  let csv='\uFEFF'+'Data/Hora;Usuário;Frente;Campo;Anterior;Novo;Tipo;Observação\n';
+  hist.forEach(h=>{csv+=`${h.created_at?new Date(h.created_at).toLocaleString('pt-BR'):'—'};${h.usuario_nome||'—'};${h.frente_id||'—'};${h.campo_alterado||'—'};${h.valor_anterior||'—'};${h.valor_novo||'—'};${h.tipo_alteracao||'—'};${h.observacao||'—'}\n`;});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='Historico_SAA_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
 </script>
 </body>
 </html>
